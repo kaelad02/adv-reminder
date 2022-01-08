@@ -2,7 +2,7 @@
   "name": "adv-reminder",
   "title": "Advantage Reminder for dnd5e",
   "description": "Using the active effect keys defined by Midi QOL, set the default of certain die rolls to advantage/disadvantage/critical.",
-  "author": "kaelad",
+  "author": "kaelad02",
   "version": "0.1",
   "minimumCoreVersion": "0.8.9",
   "compatibleCoreVersion": "0.8.9",
@@ -14,9 +14,9 @@
   "systems": ["dnd5e"],
   "esmodules": ["src/module.js"],
   "styles": ["css/adv-reminder.css"],
-  "url": "https://seieroe.synology.me/adv-reminder",
-  "manifest": "https://seieroe.synology.me/adv-reminder/module.json",
-  "download": "https://seieroe.synology.me/adv-reminder/adv-reminder-v0.1.zip",
-  "changelog": "https://seieroe.synology.me/adv-reminder/CHANGELOG.md",
-  "readme": "https://seieroe.synology.me/adv-reminder/README.md"
+  "url": "https://github.com/kaelad02/adv-reminder",
+  "manifest": "https://github.com/kaelad02/adv-reminder/releases/latest/download/module.json",
+  "download": "https://github.com/kaelad02/adv-reminder/releases/download/v0.1/module.zip",
+  "changelog": "https://github.com/kaelad02/adv-reminder/blob/main/CHANGELOG.md",
+  "readme": "https://github.com/kaelad02/adv-reminder/blob/main/README.md"
 }
