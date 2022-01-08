@@ -1,0 +1,11 @@
+.dialog .dialog-buttons button.default.advantage {
+  font-weight: bold;
+}
+
+.dialog .dialog-buttons button.default.disadvantage {
+  font-weight: bold;
+}
+
+.dialog .dialog-buttons button.default.critical {
+  font-weight: bold;
+}
