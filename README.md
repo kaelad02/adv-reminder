@@ -10,6 +10,7 @@ Supports active effects on the following rolls:
 * Ability checks
 * Saving throws, including auto-fail (e.g. Stunned)
 * Skill checks
+* Tool checks
 * Death saves
 * Damage rolls
 

@@ -47,6 +47,14 @@ Hooks.once("init", () => {
     "WRAPPER"
   );
 
+  // Tool check wrapper
+  libWrapper.register(
+    "adv-reminder",
+    "CONFIG.Item.documentClass.prototype.rollToolCheck",
+    onRollToolCheck,
+    "WRAPPER"
+  );
+
   // Death save wrapper
   libWrapper.register(
     "adv-reminder",
@@ -132,6 +140,26 @@ function onRollSkill(wrapped, skillId, options) {
   }
 
   return wrapped(skillId, options);
+}
+
+function onRollToolCheck(wrapped, options) {
+  debug("onRollToolCheck method called");
+  debug(this);
+
+  // check for adv/dis flags unless the user pressed a fast-forward key
+  const isFF = isFastForwarding(options.event);
+  if (isFF) {
+    debug("held down a fast-foward key, skip checking for adv/dis");
+  } else {
+    debug("checking for adv/dis effects on this tool check");
+    const reminder = new AbilityCheckReminder(
+      this.actor,
+      this.data.data.ability
+    );
+    reminder.updateOptions(options);
+  }
+
+  return wrapped(options);
 }
 
 function onRollDeathSave(wrapped, options) {
