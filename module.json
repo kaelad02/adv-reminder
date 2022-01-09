@@ -5,7 +5,7 @@
   "author": "kaelad02",
   "version": "0.1",
   "minimumCoreVersion": "0.8.9",
-  "compatibleCoreVersion": "0.8.9",
+  "compatibleCoreVersion": "9",
   "dependencies": [
     {
       "name": "lib-wrapper"
