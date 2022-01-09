@@ -144,7 +144,6 @@ function onRollSkill(wrapped, skillId, options) {
 
 function onRollToolCheck(wrapped, options) {
   debug("onRollToolCheck method called");
-  debug(this);
 
   // check for adv/dis flags unless the user pressed a fast-forward key
   const isFF = isFastForwarding(options.event);
