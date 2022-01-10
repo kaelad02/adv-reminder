@@ -22,7 +22,9 @@ Supports active effects on the following rolls:
 
 [Dynamic Active Effects](https://foundryvtt.com/packages/dae) A module that improves the Active Effects system used by dnd5e.
 
-[DFreds Convenient Effects](https://foundryvtt.com/packages/dfreds-convenient-effects) - A module that provides status effects for dnd5e. They also include the active effect keys that Midi QOL defined that this module uses.
+[Combat Utility Belt](https://foundryvtt.com/packages/combat-utility-belt) - A module that provides status effects for dnd5e. They also include the active effect keys that Midi QOL defined that this module uses.
+
+[DFreds Convenient Effects](https://foundryvtt.com/packages/dfreds-convenient-effects) - same as Combat Utility Belt
 
 ## Incompatible Modules
 
