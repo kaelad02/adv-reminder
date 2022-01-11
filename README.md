@@ -14,6 +14,10 @@ Supports active effects on the following rolls:
 * Death saves
 * Damage rolls
 
+### Fast-Forward Overrides
+
+If the player holds down one of the Ctrl/Alt/Shift/Meta to fast-forward the die roll (e.g. hold Alt to roll with disadvantage, skipping the roll dialog) then this module WILL NOT do anything. Holding down one of those keys stops the roll dialog from popping up so it's interpreted as overriding what this module does.
+
 ## Required Modules
 
 [libWrapper](https://foundryvtt.com/packages/lib-wrapper) - A library that makes it easy to wrap core Foundry VTT code. It's used to check the active effects before one of the supported rolls happens to pass along the advantage, disadvantage, or critical option.
