@@ -1,3 +1,8 @@
+# 0.3
+
+* closes #1 Update readme with module compatibility info
+* fix #2 Add check for isSuppressed
+
 # 0.2
 
 * add Tool checks support
