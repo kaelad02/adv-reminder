@@ -14,15 +14,23 @@ Supports active effects on the following rolls:
 * Death saves
 * Damage rolls
 
-### Fast-Forward Overrides
+## Auto-Fail Rolls
 
-If the player holds down one of the Ctrl/Alt/Shift/Meta to fast-forward the die roll (e.g. hold Alt to roll with disadvantage, skipping the roll dialog) then this module WILL NOT do anything. Holding down one of those keys stops the roll dialog from popping up so it's interpreted as overriding what this module does.
+There are active effect keys for automatically failing ability checks, saving throws, skill checks, and casting spells. Only keys relavent to saving throws are supported. The choice to only fail saving throws was made because those are the only auto-fail rolls that the base rules support. However, if there is a use case for adding support for other checks, they can be added.
 
-## Required Modules
+## Fast-Forward Overrides
+
+If the player holds down one of the Ctrl/Alt/Shift/Meta keys to fast-forward the die roll (e.g. hold Alt to roll with advantage, skipping the roll dialog) then this module WILL NOT do anything. Holding down one of those keys stops the roll dialog from popping up so it's interpreted as overriding what this module does.
+
+## Other Modules
+
+Notes about other modules.
+
+### Required Modules
 
 [libWrapper](https://foundryvtt.com/packages/lib-wrapper) - A library that makes it easy to wrap core Foundry VTT code. It's used to check the active effects before one of the supported rolls happens to pass along the advantage, disadvantage, or critical option.
 
-## Suggested Modules
+### Suggested Modules
 
 [Dynamic Active Effects](https://foundryvtt.com/packages/dae) A module that improves the Active Effects system used by dnd5e.
 
@@ -30,6 +38,11 @@ If the player holds down one of the Ctrl/Alt/Shift/Meta to fast-forward the die 
 
 [DFreds Convenient Effects](https://foundryvtt.com/packages/dfreds-convenient-effects) - same as Combat Utility Belt
 
-## Incompatible Modules
+### Compatibility Notes
 
-[Midi QOL](https://foundryvtt.com/packages/midi-qol) It hopefully goes without saying, but since this module replicates some of the functionality that Midi QOL does, you should pick one or the other.
+[Better Rolls for 5e](https://foundryvtt.com/packages/betterrolls5e) This module works with Better Rolls, making rolls with advantage and disadvantage with some caviats.
+
+* Active effects for critical hits do not work.
+* The "d20 Mode" Better Rolls setting of "Single Roll Upgradeable" does not give the hint in the pop-up asking what kind of roll to perform. It will still apply the active effects though possibly leading to some confusion, especially since advantage and disadvantage will not cancel each other out like they should.
+
+[Midi QOL](https://foundryvtt.com/packages/midi-qol) This module is compatible with Midi QOL. However, if you've enabled Midi QOL's workflow then it is not necessary to use this module as well since Midi QOL will already do this for you.
