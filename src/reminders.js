@@ -14,7 +14,7 @@ class BaseReminder {
   _getActiveEffectKeys(actor) {
     return actor
       ? actor.effects
-          .filter((effect) => !effect.data.disabled)
+          .filter((effect) => !effect.isSuppressed && !effect.data.disabled)
           .flatMap((effect) => effect.data.changes)
           .map((change) => change.key)
           .filter((key) => key.startsWith("flags.midi-qol."))
