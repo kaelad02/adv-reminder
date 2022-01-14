@@ -34,6 +34,10 @@ If the player holds down one of the Ctrl/Alt/Shift/Meta to fast-forward the die 
 
 [DFreds Convenient Effects](https://foundryvtt.com/packages/dfreds-convenient-effects) - same as Combat Utility Belt
 
-## Incompatible Modules
+## Compatibility Notes
 
-[Midi QOL](https://foundryvtt.com/packages/midi-qol) It hopefully goes without saying, but since this module replicates some of the functionality that Midi QOL does, you should pick one or the other.
+[Better Rolls for 5e](https://foundryvtt.com/packages/betterrolls5e) This module works with Better Rolls, making rolls with advantage and disadvantage with some caviats.
+* Active effects for critical hits do not work.
+* The "d20 Mode" Better Rolls setting of "Single Roll Upgradeable" does not give the hint in the pop-up asking what kind of roll to perform.
+
+[Midi QOL](https://foundryvtt.com/packages/midi-qol) This module is compatible with Midi QOL. However, if you've enabled Midi QOL's workflow then it is not necessary to use this module as well since Midi QOL will already do this for you.
