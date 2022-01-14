@@ -42,6 +42,6 @@ Notes about other modules.
 
 [Better Rolls for 5e](https://foundryvtt.com/packages/betterrolls5e) This module works with Better Rolls, making rolls with advantage and disadvantage with some caviats.
 * Active effects for critical hits do not work.
-* The "d20 Mode" Better Rolls setting of "Single Roll Upgradeable" does not give the hint in the pop-up asking what kind of roll to perform.
+* The "d20 Mode" Better Rolls setting of "Single Roll Upgradeable" does not give the hint in the pop-up asking what kind of roll to perform. It will, still apply the active effects though possibly leading to some confusion. Especially since advantage and disadvantage will not cancel each other out, changing to a normal roll.
 
 [Midi QOL](https://foundryvtt.com/packages/midi-qol) This module is compatible with Midi QOL. However, if you've enabled Midi QOL's workflow then it is not necessary to use this module as well since Midi QOL will already do this for you.
