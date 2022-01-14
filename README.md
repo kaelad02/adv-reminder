@@ -14,6 +14,10 @@ Supports active effects on the following rolls:
 * Death saves
 * Damage rolls
 
+### Auto-Fail Rolls
+
+There are active effect keys for automatically failing ability checks, saving throws, skill checks, and casting spells. Only keys relavent to saving throws are supported. The choice to only fail saving throws was made because those are the only auto-fail rolls that the base rules support. However, if there is a use case for adding support for other checks, they can be added.
+
 ### Fast-Forward Overrides
 
 If the player holds down one of the Ctrl/Alt/Shift/Meta to fast-forward the die roll (e.g. hold Alt to roll with disadvantage, skipping the roll dialog) then this module WILL NOT do anything. Holding down one of those keys stops the roll dialog from popping up so it's interpreted as overriding what this module does.
