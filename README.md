@@ -14,19 +14,23 @@ Supports active effects on the following rolls:
 * Death saves
 * Damage rolls
 
-### Auto-Fail Rolls
+## Auto-Fail Rolls
 
 There are active effect keys for automatically failing ability checks, saving throws, skill checks, and casting spells. Only keys relavent to saving throws are supported. The choice to only fail saving throws was made because those are the only auto-fail rolls that the base rules support. However, if there is a use case for adding support for other checks, they can be added.
 
-### Fast-Forward Overrides
+## Fast-Forward Overrides
 
-If the player holds down one of the Ctrl/Alt/Shift/Meta to fast-forward the die roll (e.g. hold Alt to roll with disadvantage, skipping the roll dialog) then this module WILL NOT do anything. Holding down one of those keys stops the roll dialog from popping up so it's interpreted as overriding what this module does.
+If the player holds down one of the Ctrl/Alt/Shift/Meta keys to fast-forward the die roll (e.g. hold Alt to roll with advantage, skipping the roll dialog) then this module WILL NOT do anything. Holding down one of those keys stops the roll dialog from popping up so it's interpreted as overriding what this module does.
 
-## Required Modules
+## Other Modules
+
+Notes about other modules.
+
+### Required Modules
 
 [libWrapper](https://foundryvtt.com/packages/lib-wrapper) - A library that makes it easy to wrap core Foundry VTT code. It's used to check the active effects before one of the supported rolls happens to pass along the advantage, disadvantage, or critical option.
 
-## Suggested Modules
+### Suggested Modules
 
 [Dynamic Active Effects](https://foundryvtt.com/packages/dae) A module that improves the Active Effects system used by dnd5e.
 
@@ -34,7 +38,7 @@ If the player holds down one of the Ctrl/Alt/Shift/Meta to fast-forward the die 
 
 [DFreds Convenient Effects](https://foundryvtt.com/packages/dfreds-convenient-effects) - same as Combat Utility Belt
 
-## Compatibility Notes
+### Compatibility Notes
 
 [Better Rolls for 5e](https://foundryvtt.com/packages/betterrolls5e) This module works with Better Rolls, making rolls with advantage and disadvantage with some caviats.
 * Active effects for critical hits do not work.
