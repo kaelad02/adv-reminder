@@ -1,11 +1,11 @@
 # 0.3
 
-* closes #1 Update readme with module compatibility info
-* fix #2 Add check for isSuppressed
+* bug fix: Active effects from unequipped items weren't being ignored
+* documentation: Update readme with module compatibility info
 
 # 0.2
 
-* add Tool checks support
+* feature: add Tool checks support
 * mark compatible with v9
 
 # 0.1
