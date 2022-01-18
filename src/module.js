@@ -1,5 +1,12 @@
 import { AbilitySaveFail } from "./fails.js";
 import {
+  AbilityCheckMessage,
+  AbilitySaveMessage,
+  AttackMessage,
+  DeathSaveMessage,
+  SkillMessage,
+} from "./messages.js";
+import {
   AttackReminder,
   AbilityCheckReminder,
   AbilitySaveReminder,
@@ -80,6 +87,8 @@ function onRollAttack(wrapped, options) {
   if (isFF) {
     debug("held down a fast-foward key, skip checking for adv/dis");
   } else {
+    debug("checking for message effects on this attack roll");
+    new AttackMessage(this.actor, this).addMessage();
     debug("checking for adv/dis effects on this attack roll");
     const reminder = new AttackReminder(this.actor, getTarget(), this);
     reminder.updateOptions(options);
@@ -102,6 +111,8 @@ function onRollAbilitySave(wrapped, abilityId, options) {
   if (isFF) {
     debug("held down a fast-foward key, skip checking for adv/dis");
   } else {
+    debug("checking for message effects on this saving throw");
+    new AbilitySaveMessage(this, abilityId).addMessage();
     debug("checking for adv/dis effects on this saving throw");
     const reminder = new AbilitySaveReminder(this, abilityId);
     reminder.updateOptions(options);
@@ -118,6 +129,8 @@ function onRollAbilityTest(wrapped, abilityId, options) {
   if (isFF) {
     debug("held down a fast-foward key, skip checking for adv/dis");
   } else {
+    debug("checking for message effects on this ability check");
+    new AbilityCheckMessage(this, abilityId).addMessage();
     debug("checking for adv/dis effects on this ability check");
     const reminder = new AbilityCheckReminder(this, abilityId);
     reminder.updateOptions(options);
@@ -134,6 +147,8 @@ function onRollSkill(wrapped, skillId, options) {
   if (isFF) {
     debug("held down a fast-foward key, skip checking for adv/dis");
   } else {
+    debug("checking for message effects on this skill check");
+    new SkillMessage(this, skillId).addMessage();
     debug("checking for adv/dis effects on this skill check");
     const reminder = new SkillReminder(this, skillId);
     reminder.updateOptions(options);
@@ -150,6 +165,8 @@ function onRollToolCheck(wrapped, options) {
   if (isFF) {
     debug("held down a fast-foward key, skip checking for adv/dis");
   } else {
+    debug("checking for message effects on this tool check");
+    new AbilityCheckMessage(this.actor, this.data.data.ability).addMessage();
     debug("checking for adv/dis effects on this tool check");
     const reminder = new AbilityCheckReminder(
       this.actor,
@@ -169,6 +186,8 @@ function onRollDeathSave(wrapped, options) {
   if (isFF) {
     debug("held down a fast-foward key, skip checking for adv/dis");
   } else {
+    debug("checking for message effects on this death save");
+    new DeathSaveMessage(this).addMessage();
     debug("checking for adv/dis effects on this death save");
     const reminder = new DeathSaveReminder(this);
     reminder.updateOptions(options);
