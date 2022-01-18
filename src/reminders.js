@@ -21,6 +21,26 @@ class BaseReminder {
       : [];
   }
 
+  _getMessage(actor, messageKeys) {
+    debug("searching for message keys", actor, messageKeys);
+    const changeValues = actor.effects
+      .filter((effect) => !effect.isSuppressed && !effect.data.disabled)
+      .flatMap((effect) => effect.data.changes)
+      .reduce((map, change) => {
+        map.set(change.key, change.value);
+        return map;
+      }, new Map());
+    debug(changeValues, messageKeys);
+
+    for (const messageKey of messageKeys) {
+      debug("in loop, key", messageKey);
+      const message = changeValues.get(messageKey);
+      debug("has message", message);
+      if (message) return message;
+    }
+    return null;
+  }
+
   /**
    * An accumulator that looks for matching keys and tracks advantage/disadvantage.
    */
@@ -99,6 +119,16 @@ class AbilityBaseReminder extends BaseReminder {
 
     /** @type {string} */
     this.abilityId = abilityId;
+    /** @type {string} */
+    this.message = this._getMessage(actor, this.messageKeys);
+    debug("found message", this.message);
+  }
+
+  get messageKeys() {
+    return [
+      "flags.adv-reminder.message.ability.all",
+      "flags.adv-reminder.message.all",
+    ];
   }
 
   get advantageKeys() {
@@ -116,6 +146,21 @@ class AbilityBaseReminder extends BaseReminder {
   }
 
   updateOptions(options) {
+    if (this.message) {
+      debug("adding hook to renderDialog");
+      Hooks.once("renderDialog", (dialog, html, data) => {
+        debug("called once hook for renderDialog");
+        debug(this);
+        // add message at the end
+        const formGroups = html.find(".form-group:last");
+        formGroups.after(`<div class="form-group"><label>${this.message}</label></div>`);
+        // reset dialog height
+        const position = dialog.position;
+        position.height = "auto";
+        dialog.setPosition(position);
+      });
+    }
+
     // quick return if there are no active effects
     if (this.actorKeys.length == 0) return;
 
@@ -132,6 +177,14 @@ class AbilityBaseReminder extends BaseReminder {
 }
 
 export class AbilityCheckReminder extends AbilityBaseReminder {
+  /** @override */
+  get messageKeys() {
+    return [
+      `flags.adv-reminder.message.ability.check.${this.abilityId}`,
+      "flags.adv-reminder.message.ability.check.all",
+    ].concat(super.messageKeys);
+  }
+
   /** @override */
   get advantageKeys() {
     return super.advantageKeys.concat([
