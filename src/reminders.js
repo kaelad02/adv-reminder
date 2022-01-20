@@ -35,6 +35,9 @@ class BaseReminder {
           if (disKeys.includes(key)) disadvantage = true;
         });
       },
+      disadvantage: (value) => {
+        if (value) disadvantage = true;
+      },
       update: (options) => {
         debug(
           `updating options with {advantage: ${advantage}, disadvantage: ${disadvantage}}`
@@ -173,6 +176,8 @@ export class SkillReminder extends AbilityCheckReminder {
 
     /** @type {string} */
     this.skillId = skillId;
+    /** @type {Item5e[]} */
+    this.items = actor.items;
   }
 
   /** @override */
@@ -189,6 +194,38 @@ export class SkillReminder extends AbilityCheckReminder {
       "flags.midi-qol.disadvantage.skill.all",
       `flags.midi-qol.disadvantage.skill.${this.skillId}`,
     ]);
+  }
+
+  /** @override */
+  updateOptions(options) {
+    // get the active effect keys applicable for this roll
+    const advKeys = this.advantageKeys;
+    const disKeys = this.disadvantageKeys;
+    debug("advKeys", advKeys, "disKeys", disKeys);
+
+    // find matching keys and update options
+    const accumulator = this._accumulator();
+    accumulator.disadvantage(this._armorStealthDisadvantage());
+    accumulator.add(this.actorKeys, advKeys, disKeys);
+    accumulator.update(options);
+  }
+
+  /**
+   * Check if the actor is wearing armor that imposes stealth disadvantage.
+   * @returns true if they are wearing armor that imposes stealth disadvantage, false otherwise
+   */
+  _armorStealthDisadvantage() {
+    if (this.skillId === "ste") {
+      const item = this.items.find(
+        (item) =>
+          item.type === "equipment" &&
+          item.data?.data?.equipped &&
+          item.data?.data?.stealth
+      );
+      debug("equiped item that imposes stealth disadvantage", item?.name);
+      return !!item;
+    }
+    return false;
   }
 }
 

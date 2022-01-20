@@ -1,8 +1,12 @@
 # Advantage Reminder for dnd5e
 
-This module uses the active effect keys defined by Midi QOL to set the default of certain die rolls to advantage/disadvantage/critical. This is useful if you want to be reminded of advantage on Strength saving throws while Raging, for example, but you do not want to use Midi QOL. Midi QOL is great at automating combat with its workflow, however not every game group wants that level of automation. This module provides a good compromise by changing the default to remind you to roll with advantage, disadvantage, or a critical hit.
+Want to use active effects to give your barbarian advantage on strength ability checks and saving throws when Raging? Don't want to install Midi QOL to do it? Then this module might be for you.
 
-It also makes some small CSS changes (bold text) in order to make the advantage, disadvantage, and critical hit buttons more obvious when they should be clicked.
+![Saving Throw screenshot with advantage](screenshot1.png?raw=true)
+
+The basic die roller the D&D 5e system uses provides a pop-up dialog to give the player a chance to add situational bonuses or make d20 rolls with advantage/disadvantage or damage rolls as critical hits. It does not change the default button to remind you when to roll with advantage, disadvantage, or a critical hit. This module uses the active effect keys defined by Midi QOL to change the default button. This is useful if you want to be reminded to roll with advantage on a Strength saving throw while Raging, for example, but you do not want to use Midi QOL. Midi QOL is great at automating combat with its workflow, however not every game group wants that level of automation. If all you want is a reminder but remain in control of the die rolls, then this module is for you.
+
+In addition to the active effects, this module supports armor that imposes stealth disadvantage when equipped. It also makes some small CSS changes (bold text) in order to make the advantage, disadvantage, and critical hit buttons more obvious when they should be clicked.
 
 Supports active effects on the following rolls:
 

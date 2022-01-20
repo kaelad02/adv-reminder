@@ -1,3 +1,7 @@
+# 0.4
+
+* feature: support armor that imposes stealth disadvantage
+
 # 0.3
 
 * bug fix: Active effects from unequipped items weren't being ignored
