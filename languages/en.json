@@ -1,0 +1,6 @@
+{
+    "adv-reminder": {
+        "the-roll": "The roll",
+        "automatically-fails": "{rollString} automatically fails because of {effectLabel}."
+    }
+}

@@ -11,7 +11,7 @@ class BaseFail {
   }
 
   get rollString() {
-    "The roll";
+    game.i18n.format("adv-reminder.the-roll");
   }
 
   failCheck() {

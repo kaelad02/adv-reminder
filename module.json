@@ -11,9 +11,27 @@
       "name": "lib-wrapper"
     }
   ],
-  "systems": ["dnd5e"],
-  "esmodules": ["src/module.js"],
-  "styles": ["css/adv-reminder.css"],
+  "systems": [
+    "dnd5e"
+  ],
+  "esmodules": [
+    "src/module.js"
+  ],
+  "styles": [
+    "css/adv-reminder.css"
+  ],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "languages/en.json"
+    },
+    {
+      "lang": "fr",
+      "name": "Français",
+      "path": "languages/fr.json"
+    }
+  ],
   "url": "https://github.com/kaelad02/adv-reminder",
   "manifest": "https://github.com/kaelad02/adv-reminder/releases/latest/download/module.json",
   "download": "https://github.com/kaelad02/adv-reminder/releases/download/v0.1/module.zip",
