@@ -3,36 +3,40 @@ import { debug } from "./util.js";
 class BaseReminder {
   constructor(actor) {
     /** @type {string[]} */
-    this.actorKeys = this._getActiveEffectKeys(actor);
+    this.actorChanges = this._getActiveEffectChanges(actor);
   }
 
   /**
-   * Get Midi QOL's active effect keys from an actor.
+   * Get Midi QOL's active effect keys, values and labels from an actor.
    * @param {Actor5e} actor the actor
-   * @returns {string[]} an array of Midi QOL's active effects keys
+   * @returns {string[]} an array of objects Midi QOL's active effects keys, values and labels
    */
-  _getActiveEffectKeys(actor) {
+  _getActiveEffectChanges(actor) {
     return actor
       ? actor.effects
-          .filter((effect) => !effect.isSuppressed && !effect.data.disabled)
-          .flatMap((effect) => effect.data.changes)
-          .map((change) => change.key)
-          .filter((key) => key.startsWith("flags.midi-qol."))
+        .filter((effect) => !effect.isSuppressed && !effect.data.disabled)
+        .flatMap((effect) => effect.data.changes)
+        .map((change) => ({ key: change.key, value: change.value.trim(), label: change.document.data.label }))
+        .filter((change) => /^(custom\.)?flags\.midi-qol\..+/.test(change.key))
       : [];
   }
 
   /**
-   * An accumulator that looks for matching keys and tracks advantage/disadvantage.
+   * An accumulator that looks for matching keys and tracks (custom) advantage/disadvantage.
    */
   _accumulator() {
     let advantage;
     let disadvantage;
+    let customAdvantages = [];
+    let customDisadvantages = [];
 
     return {
-      add: (actorKeys, advKeys, disKeys) => {
-        actorKeys.forEach((key) => {
-          if (advKeys.includes(key)) advantage = true;
-          if (disKeys.includes(key)) disadvantage = true;
+      add: (actorChanges, advKeys, disKeys) => {
+        actorChanges.forEach((change) => {
+          if (advKeys.includes(change.key)) advantage = true;
+          if (disKeys.includes(change.key)) disadvantage = true;
+          if (advKeys.find((advKey) => `custom.${advKey}` === change.key) && change.value && !customAdvantages.find((adv) => adv.value === change.value)) customAdvantages.push({ value: change.value, label: change.label });
+          if (disKeys.find((disKey) => `custom.${disKey}` === change.key) && change.value && !customDisadvantages.find((dis) => dis.value === change.value)) customDisadvantages.push({ value: change.value, label: change.label });
         });
       },
       disadvantage: (value) => {
@@ -40,11 +44,15 @@ class BaseReminder {
       },
       update: (options) => {
         debug(
-          `updating options with {advantage: ${advantage}, disadvantage: ${disadvantage}}`
+          `updating options with {advantage: ${advantage}, disadvantage: ${disadvantage}, customAdvantages: ${customAdvantages}, customDisadvantages: ${customDisadvantages}}`
         );
         // only set if adv or dis, the die roller doesn't handle when both are true correctly
         if (advantage && !disadvantage) options.advantage = true;
         else if (!advantage && disadvantage) options.disadvantage = true;
+
+        // add custom adv and dis arrays even if empty
+        options.customAdvantages = customAdvantages;
+        options.customDisadvantages = customDisadvantages;
       },
     };
   }
@@ -55,7 +63,7 @@ export class AttackReminder extends BaseReminder {
     super(actor);
 
     /** @type {string[]} */
-    this.targetKeys = this._getActiveEffectKeys(targetActor);
+    this.targetChanges = this._getActiveEffectChanges(targetActor);
     /** @type {string} */
     this.actionType = item.data.data.actionType;
     /** @type {string} */
@@ -64,7 +72,7 @@ export class AttackReminder extends BaseReminder {
 
   updateOptions(options) {
     // quick return if there are no active effects
-    if (this.actorKeys.length == 0 && this.targetKeys.length == 0) return;
+    if (this.actorChanges.length == 0 && this.targetChanges.length == 0) return;
 
     // build the active effect keys applicable for this roll
     const advKeys = [
@@ -90,8 +98,8 @@ export class AttackReminder extends BaseReminder {
 
     // find matching keys and update options
     const accumulator = this._accumulator();
-    accumulator.add(this.actorKeys, advKeys, disKeys);
-    accumulator.add(this.targetKeys, grantsAdvKeys, grantsDisKeys);
+    accumulator.add(this.actorChanges, advKeys, disKeys);
+    accumulator.add(this.targetChanges, grantsAdvKeys, grantsDisKeys);
     accumulator.update(options);
   }
 }
@@ -120,7 +128,7 @@ class AbilityBaseReminder extends BaseReminder {
 
   updateOptions(options) {
     // quick return if there are no active effects
-    if (this.actorKeys.length == 0) return;
+    if (this.actorChanges.length == 0) return;
 
     // get the active effect keys applicable for this roll
     const advKeys = this.advantageKeys;
@@ -129,7 +137,7 @@ class AbilityBaseReminder extends BaseReminder {
 
     // find matching keys and update options
     const accumulator = this._accumulator();
-    accumulator.add(this.actorKeys, advKeys, disKeys);
+    accumulator.add(this.actorChanges, advKeys, disKeys);
     accumulator.update(options);
   }
 }
@@ -206,7 +214,7 @@ export class SkillReminder extends AbilityCheckReminder {
     // find matching keys and update options
     const accumulator = this._accumulator();
     accumulator.disadvantage(this._armorStealthDisadvantage());
-    accumulator.add(this.actorKeys, advKeys, disKeys);
+    accumulator.add(this.actorChanges, advKeys, disKeys);
     accumulator.update(options);
   }
 
@@ -256,14 +264,14 @@ export class CriticalReminder extends BaseReminder {
     super(actor);
 
     /** @type {string[]} */
-    this.targetKeys = this._getActiveEffectKeys(targetActor);
+    this.targetChanges = this._getActiveEffectChanges(targetActor);
     /** @type {string} */
     this.actionType = item.data.data.actionType;
   }
 
   updateOptions(options) {
     // quick return if there are no active effects
-    if (this.actorKeys.length == 0 && this.targetKeys.length == 0) return;
+    if (this.actorChanges.length == 0 && this.targetChanges.length == 0) return;
 
     // build the active effect keys applicable for this roll
     const critKeys = [
@@ -285,8 +293,8 @@ export class CriticalReminder extends BaseReminder {
 
     // find matching keys and update options
     const accumulator = this._accumulator();
-    accumulator.add(this.actorKeys, critKeys, normalKeys);
-    accumulator.add(this.targetKeys, grantsCritKeys, grantsNormalKeys);
+    accumulator.add(this.actorChanges, critKeys, normalKeys);
+    accumulator.add(this.targetChanges, grantsCritKeys, grantsNormalKeys);
     accumulator.update(options);
   }
 
@@ -294,19 +302,28 @@ export class CriticalReminder extends BaseReminder {
   _accumulator() {
     let crit;
     let normal;
+    let customCrits = [];
+    let customNormals = [];
 
     return {
-      add: (actorKeys, critKeys, normalKeys) => {
-        actorKeys.forEach((key) => {
-          if (critKeys.includes(key)) crit = true;
-          if (normalKeys.includes(key)) normal = true;
+      add: (actorChanges, critKeys, normalKeys) => {
+        actorChanges.forEach((change) => {
+          if (critKeys.includes(change.key)) crit = true;
+          if (normalKeys.includes(change.key)) normal = true;
+          if (critKeys.find((critKey) => `custom.${critKey}` === change.key) && change.value && !customCrits.find((crit) => crit.value === change.value)) customCrits.push({ value: change.value, label: change.label });
+          if (normalKeys.find((normalKey) => `custom.${normalKey}` === change.key) && change.value && !customNormals.find((norm) => norm.value === change.value)) customNormals.push({ value: change.value, label: change.label });
         });
       },
       update: (options) => {
         // a normal hit overrides a crit
         const critical = normal ? false : !!crit;
-        debug(`updating critical: ${critical}`);
         options.critical = critical;
+
+        debug(`updating critical: ${critical}, customCrits: ${customCrits}, customNormals: ${customNormals}`);
+
+        // add custom crits and normals arrays even if empty
+        options.customCrits = customCrits;
+        options.customNormals = customNormals;
       },
     };
   }
