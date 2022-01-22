@@ -1,0 +1,14 @@
+{
+  "name": "adv-reminder",
+  "version": "0.4.0",
+  "author": "kaelad",
+  "description": "Get advantage reminders for lots of d20 rolls",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
+  },
+  "devDependencies": {
+    "jest": "^27.4.7"
+  }
+}
