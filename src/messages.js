@@ -32,7 +32,9 @@ class BaseMessage {
         position.height = "auto";
         dialog.setPosition(position);
       });
+      return message;
     }
+    return null;
   }
 }
 
