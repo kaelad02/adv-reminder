@@ -4,6 +4,7 @@ import {
   AbilitySaveReminder,
   SkillReminder,
   DeathSaveReminder,
+  CriticalReminder,
 } from "../src/reminders";
 
 function createActorWithEffects(...keys) {
@@ -86,6 +87,17 @@ function createEffect(key) {
         },
       ],
       disabled: false,
+    },
+  };
+}
+
+function createItem(actionType, abilityMod) {
+  return {
+    abilityMod,
+    data: {
+      data: {
+        actionType,
+      },
     },
   };
 }
@@ -1013,5 +1025,187 @@ describe("DeathSaveReminder both advantage and disadvantage flags", () => {
 
     expect(options.advantage).toBeUndefined();
     expect(options.disadvantage).toBeUndefined();
+  });
+});
+
+describe("CriticalReminder no legit active effects", () => {
+  test("damage roll with no active effects should be normal", () => {
+    const actor = createActorWithEffects();
+    const item = createItem("mwak", "str");
+    const options = {};
+
+    const reminder = new CriticalReminder(actor, null, item);
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBeUndefined();
+    expect(options.disadvantage).toBeUndefined();
+  });
+
+  test("damage roll with a suppressed active effect should be normal", () => {
+    const actor = createActorWithEffects("flags.midi-qol.critical.all");
+    const item = createItem("mwak", "str");
+    actor.effects[0].isSuppressed = true;
+    const options = {};
+
+    const reminder = new CriticalReminder(actor, null, item);
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBeUndefined();
+    expect(options.disadvantage).toBeUndefined();
+  });
+
+  test("damage roll with a disabled active effect should be normal", () => {
+    const actor = createActorWithEffects("flags.midi-qol.critical.all");
+    const item = createItem("mwak", "str");
+    actor.effects[0].data.disabled = true;
+    const options = {};
+
+    const reminder = new CriticalReminder(actor, null, item);
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBeUndefined();
+    expect(options.disadvantage).toBeUndefined();
+  });
+});
+
+describe("CriticalReminder critical flags", () => {
+  test("damage roll with critical.all flag should be critical", () => {
+    const actor = createActorWithEffects("flags.midi-qol.critical.all");
+    const item = createItem("mwak", "str");
+    const options = {};
+
+    const reminder = new CriticalReminder(actor, null, item);
+    reminder.updateOptions(options);
+
+    expect(options.critical).toBe(true);
+  });
+
+  test("damage roll with critical.mwak flag should be critical for Melee Weapon Attack", () => {
+    const actor = createActorWithEffects("flags.midi-qol.critical.mwak");
+    const item = createItem("mwak", "str");
+    const options = {};
+
+    const reminder = new CriticalReminder(actor, null, item);
+    reminder.updateOptions(options);
+
+    expect(options.critical).toBe(true);
+  });
+
+  test("damage roll with critical.rsak flag should be normal for Melee Weapon Attack", () => {
+    const actor = createActorWithEffects("flags.midi-qol.critical.rsak");
+    const item = createItem("mwak", "str");
+    const options = {};
+
+    const reminder = new CriticalReminder(actor, null, item);
+    reminder.updateOptions(options);
+
+    expect(options.critical).toBe(false);
+  });
+
+  test("damage roll with grants.critical.all flag should be critical", () => {
+    const actor = createActorWithEffects();
+    const target = createActorWithEffects("flags.midi-qol.grants.critical.all");
+    const item = createItem("mwak", "str");
+    const options = {};
+
+    const reminder = new CriticalReminder(actor, target, item);
+    reminder.updateOptions(options);
+
+    expect(options.critical).toBe(true);
+  });
+
+  test("damage roll with grants.critical.rwak flag should be critical for Ranged Weapon Attack", () => {
+    const actor = createActorWithEffects();
+    const target = createActorWithEffects(
+      "flags.midi-qol.grants.critical.rwak"
+    );
+    const item = createItem("rwak", "dex");
+    const options = {};
+
+    const reminder = new CriticalReminder(actor, target, item);
+    reminder.updateOptions(options);
+
+    expect(options.critical).toBe(true);
+  });
+
+  test("damage roll with grants.critical.rwak flag should be normal for Melee Spell Attack", () => {
+    const actor = createActorWithEffects();
+    const target = createActorWithEffects(
+      "flags.midi-qol.grants.critical.rwak"
+    );
+    const item = createItem("msak", "int");
+    const options = {};
+
+    const reminder = new CriticalReminder(actor, target, item);
+    reminder.updateOptions(options);
+
+    expect(options.critical).toBe(false);
+  });
+});
+
+describe("CriticalReminder no critical flags", () => {
+  test("damage roll with noCritical.all flag should be normal", () => {
+    const actor = createActorWithEffects("flags.midi-qol.noCritical.all");
+    const item = createItem("mwak", "str");
+    const options = {};
+
+    const reminder = new CriticalReminder(actor, null, item);
+    reminder.updateOptions(options);
+
+    expect(options.critical).toBe(false);
+  });
+
+  test("damage roll with noCritical.mwak flag should be normal for Melee Weapon Attack", () => {
+    const actor = createActorWithEffects("flags.midi-qol.noCritical.mwak");
+    const item = createItem("mwak", "str");
+    const options = {};
+
+    const reminder = new CriticalReminder(actor, null, item);
+    reminder.updateOptions(options);
+
+    expect(options.critical).toBe(false);
+  });
+
+  test("damage roll with fail.critical.all flag should be normal", () => {
+    const actor = createActorWithEffects();
+    const target = createActorWithEffects("flags.midi-qol.fail.critical.all");
+    const item = createItem("mwak", "str");
+    const options = {};
+
+    const reminder = new CriticalReminder(actor, target, item);
+    reminder.updateOptions(options);
+
+    expect(options.critical).toBe(false);
+  });
+
+  test("damage roll with fail.critical.rwak flag should be normal for Ranged Weapon Attack", () => {
+    const actor = createActorWithEffects();
+    const target = createActorWithEffects("flags.midi-qol.fail.critical.rwak");
+    const item = createItem("rwak", "dex");
+    const options = {};
+
+    const reminder = new CriticalReminder(actor, target, item);
+    reminder.updateOptions(options);
+
+    expect(options.critical).toBe(false);
+  });
+});
+
+describe("CriticalReminder both critical and no critical flags", () => {
+  test("damage roll with critical on actor and no critical on target should be normal", () => {
+    // critical on weapon attacks
+    const actor = createActorWithEffects(
+      "flags.midi-qol.critical.mwak",
+      "flags.midi-qol.critical.rwak"
+    );
+    // cancel all crits, like Adamantine Armor
+    const target = createActorWithEffects("flags.midi-qol.fail.critical.all");
+    const item = createItem("mwak", "str");
+    const options = {};
+
+    const reminder = new CriticalReminder(actor, target, item);
+    reminder.updateOptions(options);
+
+    expect(options.critical).toBe(false);
   });
 });
