@@ -65,6 +65,26 @@ class BaseFail {
     // create the chat message
     return ChatMessage.create(chatData);
   }
+
+  toMessage(messageData) {
+    // content that immatates a die roll
+    const content = await renderTemplate(
+      "modules/adv-reminder/templates/fail-dice-roll.html"
+    );
+    // merge basic data with child's data
+    const chatData = foundry.utils.mergeObject(
+      {
+        user: game.user.id,
+        type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+        content,
+      },
+      messageData
+    );
+    // apply the roll mode to adjust message visibility
+    ChatMessage.applyRollMode(chatData, game.settings.get("core", "rollMode"));
+    // create the chat message
+    return ChatMessage.create(chatData);
+  }
 }
 
 export class AbilitySaveFail extends BaseFail {
@@ -89,5 +109,24 @@ export class AbilitySaveFail extends BaseFail {
     return game.i18n.format("DND5E.SavePromptTitle", {
       ability: CONFIG.DND5E.abilities[this.abilityId],
     });
+  }
+
+  toMessage(options = {}) {
+    // options was passed into rollAbilitySave to start with
+
+    // build title, probably used as flavor
+    const label = CONFIG.DND5E.abilities[this.abilityId];
+    const title = `${game.i18n.format("DND5E.SavePromptTitle", {
+      ability: label,
+    })}: ${this.actor.name}`;
+    // build chat message data
+    const messageData = foundry.utils.mergeObject(options.messageData || {}, {
+      speaker: options.speaker || ChatMessage.getSpeaker({ actor: this.actor }),
+      "flags.dnd5e.roll": { type: "save", abilityId: this.abilityId },
+    });
+    // pull flavor from a few places before falling back to title
+    messageData.flavor = messageData.flavor || options.flavor || title;
+
+    super.toMessage(messageData);
   }
 }
