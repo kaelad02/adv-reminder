@@ -1,9 +1,75 @@
 import { describe, expect, test } from "@jest/globals";
-import { AbilityCheckReminder, AbilitySaveReminder } from "../src/reminders";
+import {
+  AbilityCheckReminder,
+  AbilitySaveReminder,
+  SkillReminder,
+} from "../src/reminders";
 
 function createActorWithEffects(...keys) {
   const effects = keys.map(createEffect);
-  return { effects };
+  return {
+    data: {
+      data: {
+        skills: {
+          acr: {
+            ability: "dex",
+          },
+          ani: {
+            ability: "wis",
+          },
+          arc: {
+            ability: "int",
+          },
+          ath: {
+            ability: "str",
+          },
+          dec: {
+            ability: "cha",
+          },
+          his: {
+            ability: "int",
+          },
+          ins: {
+            ability: "wis",
+          },
+          itm: {
+            ability: "cha",
+          },
+          inv: {
+            ability: "int",
+          },
+          med: {
+            ability: "wis",
+          },
+          nat: {
+            ability: "int",
+          },
+          prc: {
+            ability: "wis",
+          },
+          prf: {
+            ability: "cha",
+          },
+          per: {
+            ability: "cha",
+          },
+          rel: {
+            ability: "int",
+          },
+          slt: {
+            ability: "dex",
+          },
+          ste: {
+            ability: "dex",
+          },
+          sur: {
+            ability: "wis",
+          },
+        },
+      },
+    },
+    effects,
+  };
 }
 
 function createEffect(key) {
@@ -438,6 +504,355 @@ describe("AbilitySaveReminder both advantage and disadvantage flags", () => {
     const options = {};
 
     const reminder = new AbilitySaveReminder(actor, "str");
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBe(true);
+    expect(options.disadvantage).toBeUndefined();
+  });
+});
+
+describe("SkillReminder no legit active effects", () => {
+  test("skill check with no active effects should be normal", () => {
+    const actor = createActorWithEffects();
+    const options = {};
+
+    const reminder = new SkillReminder(actor, "prc");
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBeUndefined();
+    expect(options.disadvantage).toBeUndefined();
+  });
+
+  test("skill check with a suppressed active effect should be normal", () => {
+    const actor = createActorWithEffects("flags.midi-qol.advantage.all");
+    actor.effects[0].isSuppressed = true;
+    const options = {};
+
+    const reminder = new SkillReminder(actor, "prc");
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBeUndefined();
+    expect(options.disadvantage).toBeUndefined();
+  });
+
+  test("skill check with a disabled active effect should be normal", () => {
+    const actor = createActorWithEffects("flags.midi-qol.advantage.all");
+    actor.effects[0].data.disabled = true;
+    const options = {};
+
+    const reminder = new SkillReminder(actor, "prc");
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBeUndefined();
+    expect(options.disadvantage).toBeUndefined();
+  });
+
+  test("Stealth check with armor that imposes disadvantage but wrong type", () => {
+    const actor = createActorWithEffects();
+    actor.items = [
+      {
+        type: "spell",
+        data: {
+          data: {
+            equipped: true,
+            stealth: true,
+          },
+        },
+      },
+    ];
+    const options = {};
+
+    const reminder = new SkillReminder(actor, "ste");
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBeUndefined();
+    expect(options.disadvantage).toBeUndefined();
+  });
+
+  test("Stealth check with armor that imposes disadvantage but not equipped", () => {
+    const actor = createActorWithEffects();
+    actor.items = [
+      {
+        type: "equipment",
+        data: {
+          data: {
+            equipped: false,
+            stealth: true,
+          },
+        },
+      },
+    ];
+    const options = {};
+
+    const reminder = new SkillReminder(actor, "ste");
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBeUndefined();
+    expect(options.disadvantage).toBeUndefined();
+  });
+});
+
+describe("SkillReminder advantage flags", () => {
+  test("skill check with advantage.all flag should be advantage", () => {
+    const actor = createActorWithEffects("flags.midi-qol.advantage.all");
+    const options = {};
+
+    const reminder = new SkillReminder(actor, "prc");
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBe(true);
+    expect(options.disadvantage).toBeUndefined();
+  });
+
+  test("skill check with advantage.ability.all should be advantage", () => {
+    const actor = createActorWithEffects(
+      "flags.midi-qol.advantage.ability.all"
+    );
+    const options = {};
+
+    const reminder = new SkillReminder(actor, "prc");
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBe(true);
+    expect(options.disadvantage).toBeUndefined();
+  });
+
+  test("skill check with advantage.ability.check.all should be advantage", () => {
+    const actor = createActorWithEffects(
+      "flags.midi-qol.advantage.ability.check.all"
+    );
+    const options = {};
+
+    const reminder = new SkillReminder(actor, "prc");
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBe(true);
+    expect(options.disadvantage).toBeUndefined();
+  });
+
+  test("skill check with advantage.ability.check.wis should be advantage for prc check", () => {
+    const actor = createActorWithEffects(
+      "flags.midi-qol.advantage.ability.check.wis"
+    );
+    const options = {};
+
+    const reminder = new SkillReminder(actor, "prc");
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBe(true);
+    expect(options.disadvantage).toBeUndefined();
+  });
+
+  test("skill check with advantage.ability.check.wis should be normal for arc check", () => {
+    const actor = createActorWithEffects(
+      "flags.midi-qol.advantage.ability.check.wis"
+    );
+    const options = {};
+
+    const reminder = new SkillReminder(actor, "arc");
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBeUndefined();
+    expect(options.disadvantage).toBeUndefined();
+  });
+
+  test("skill check with advantage.skill.all should be advantage", () => {
+    const actor = createActorWithEffects("flags.midi-qol.advantage.skill.all");
+    const options = {};
+
+    const reminder = new SkillReminder(actor, "prc");
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBe(true);
+    expect(options.disadvantage).toBeUndefined();
+  });
+
+  test("skill check with advantage.skill.prc should be advantage for prc check", () => {
+    const actor = createActorWithEffects("flags.midi-qol.advantage.skill.prc");
+    const options = {};
+
+    const reminder = new SkillReminder(actor, "prc");
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBe(true);
+    expect(options.disadvantage).toBeUndefined();
+  });
+
+  test("skill check with advantage.skill.prc should be normal for arc check", () => {
+    const actor = createActorWithEffects("flags.midi-qol.advantage.skill.prc");
+    const options = {};
+
+    const reminder = new SkillReminder(actor, "arc");
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBeUndefined();
+    expect(options.disadvantage).toBeUndefined();
+  });
+});
+
+describe("SkillReminder disadvantage flags", () => {
+  test("skill check with disadvantage.all flag should be disadvantage", () => {
+    const actor = createActorWithEffects("flags.midi-qol.disadvantage.all");
+    const options = {};
+
+    const reminder = new SkillReminder(actor, "prc");
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBeUndefined();
+    expect(options.disadvantage).toBe(true);
+  });
+
+  test("skill check with disadvantage.ability.all should be disadvantage", () => {
+    const actor = createActorWithEffects(
+      "flags.midi-qol.disadvantage.ability.all"
+    );
+    const options = {};
+
+    const reminder = new SkillReminder(actor, "prc");
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBeUndefined();
+    expect(options.disadvantage).toBe(true);
+  });
+
+  test("skill check with disadvantage.ability.check.all should be disadvantage", () => {
+    const actor = createActorWithEffects(
+      "flags.midi-qol.disadvantage.ability.check.all"
+    );
+    const options = {};
+
+    const reminder = new SkillReminder(actor, "prc");
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBeUndefined();
+    expect(options.disadvantage).toBe(true);
+  });
+
+  test("skill check with disadvantage.ability.check.wis should be disadvantage for prc check", () => {
+    const actor = createActorWithEffects(
+      "flags.midi-qol.disadvantage.ability.check.wis"
+    );
+    const options = {};
+
+    const reminder = new SkillReminder(actor, "prc");
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBeUndefined();
+    expect(options.disadvantage).toBe(true);
+  });
+
+  test("skill check with disadvantage.ability.check.wis should be normal for arc check", () => {
+    const actor = createActorWithEffects(
+      "flags.midi-qol.disadvantage.ability.check.wis"
+    );
+    const options = {};
+
+    const reminder = new SkillReminder(actor, "arc");
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBeUndefined();
+    expect(options.disadvantage).toBeUndefined();
+  });
+
+  test("skill check with disadvantage.skill.all should be disadvantage", () => {
+    const actor = createActorWithEffects(
+      "flags.midi-qol.disadvantage.skill.all"
+    );
+    const options = {};
+
+    const reminder = new SkillReminder(actor, "prc");
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBeUndefined();
+    expect(options.disadvantage).toBe(true);
+  });
+
+  test("skill check with disadvantage.skill.prc should be disadvantage for prc check", () => {
+    const actor = createActorWithEffects(
+      "flags.midi-qol.disadvantage.skill.prc"
+    );
+    const options = {};
+
+    const reminder = new SkillReminder(actor, "prc");
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBeUndefined();
+    expect(options.disadvantage).toBe(true);
+  });
+
+  test("skill check with disadvantage.skill.prc should be normal for arc check", () => {
+    const actor = createActorWithEffects(
+      "flags.midi-qol.disadvantage.skill.prc"
+    );
+    const options = {};
+
+    const reminder = new SkillReminder(actor, "arc");
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBeUndefined();
+    expect(options.disadvantage).toBeUndefined();
+  });
+
+  test("Stealth check with armor that imposes disadvantage", () => {
+    const actor = createActorWithEffects();
+    actor.items = [
+      {
+        type: "equipment",
+        data: {
+          data: {
+            equipped: true,
+            stealth: true,
+          },
+        },
+      },
+    ];
+    const options = {};
+
+    const reminder = new SkillReminder(actor, "ste");
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBeUndefined();
+    expect(options.disadvantage).toBe(true);
+  });
+});
+
+describe("SkillReminder both advantage and disadvantage flags", () => {
+  test("skill check with both advantage and disadvantage should be normal", () => {
+    const actor = createActorWithEffects(
+      "flags.midi-qol.advantage.skill.all",
+      "flags.midi-qol.disadvantage.skill.prc"
+    );
+    const options = {};
+
+    const reminder = new SkillReminder(actor, "prc");
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBeUndefined();
+    expect(options.disadvantage).toBeUndefined();
+  });
+
+  test("skill check with wrong advantage and same disadvantage should be disadvantage", () => {
+    const actor = createActorWithEffects(
+      "flags.midi-qol.advantage.skill.ath",
+      "flags.midi-qol.disadvantage.skill.prc"
+    );
+    const options = {};
+
+    const reminder = new SkillReminder(actor, "prc");
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBeUndefined();
+    expect(options.disadvantage).toBe(true);
+  });
+
+  test("skill check with same advantage and wrong disadvantage should be advantage", () => {
+    const actor = createActorWithEffects(
+      "flags.midi-qol.advantage.skill.prc",
+      "flags.midi-qol.disadvantage.skill.arc"
+    );
+    const options = {};
+
+    const reminder = new SkillReminder(actor, "prc");
     reminder.updateOptions(options);
 
     expect(options.advantage).toBe(true);
