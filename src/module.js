@@ -222,13 +222,20 @@ function getTarget() {
  * @param {Object} options the object created while parsing the effects flags
  */
 function createRenderDialogHook(options) {
+  const id = options.dialogOptions?.id || options.options?.dialogOptions?.id;
+  if (!id) return;
+
   const callback = (dialog, html) => {
-    if (dialog.options.id !== (options.dialogOptions?.id || options.options?.dialogOptions?.id)) return;
+    if (dialog.options.id !== id) return;
     rollDialogUpdater(dialog, html, options);
     Hooks.off("renderDialog", callback);
   }
 
-  Hooks.on("renderDialog", callback);
+  const hookId = Hooks.on("renderDialog", callback);
+
+  setTimeout(() => {
+    Hooks.off("renderDialog", hookId);
+  }, 10_000);
 }
 
 /**
