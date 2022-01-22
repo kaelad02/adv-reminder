@@ -1,6 +1,7 @@
 {
     "adv-reminder": {
         "the-roll": "Le jet",
-        "automatically-fails": "{rollString} rate automatiquement à cause de l'effet : {effectLabel}."
+        "automatically-fails": "{rollString} rate automatiquement à cause de l'effet : {effectLabel}.",
+        "no-critical": "Critique impossible"
     }
 }

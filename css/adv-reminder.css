@@ -9,3 +9,16 @@
 .dialog .dialog-buttons button.default.critical {
   font-weight: bold;
 }
+
+.dialog .dialog-content div.custom-flags {
+    font-size: 12px;
+    margin: 10px 0;
+    padding: 5px;
+    border: 1px solid rgb(0, 0, 0, 0.2);
+    background-color:rgb(0, 0, 0, 0.05);
+}
+
+.dialog .dialog-content div.custom-flags ul:not(:first-child) {
+    border-top: 1px solid rgb(0, 0, 0, 0.2);
+    padding-top: 6px;
+}

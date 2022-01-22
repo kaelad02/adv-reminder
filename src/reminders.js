@@ -53,6 +53,9 @@ class BaseReminder {
         // add custom adv and dis arrays even if empty
         options.customAdvantages = customAdvantages;
         options.customDisadvantages = customDisadvantages;
+
+        // add an html id (should be unique) to the roll dialog window
+        options.dialogOptions = mergeObject(options.dialogOptions || {}, { id: randomID() });
       },
     };
   }
@@ -324,6 +327,9 @@ export class CriticalReminder extends BaseReminder {
         // add custom crits and normals arrays even if empty
         options.customCrits = customCrits;
         options.customNormals = customNormals;
+
+        // add an html id (should be unique) to the roll dialog window
+        options.options = mergeObject(options.options || {}, { dialogOptions: { id: randomID() } });
       },
     };
   }

@@ -83,6 +83,7 @@ function onRollAttack(wrapped, options) {
     debug("checking for adv/dis effects on this attack roll");
     const reminder = new AttackReminder(this.actor, getTarget(), this);
     reminder.updateOptions(options);
+    createRenderDialogHook(options);
   }
 
   return wrapped(options);
@@ -105,6 +106,7 @@ function onRollAbilitySave(wrapped, abilityId, options) {
     debug("checking for adv/dis effects on this saving throw");
     const reminder = new AbilitySaveReminder(this, abilityId);
     reminder.updateOptions(options);
+    createRenderDialogHook(options);
   }
 
   return wrapped(abilityId, options);
@@ -121,6 +123,7 @@ function onRollAbilityTest(wrapped, abilityId, options) {
     debug("checking for adv/dis effects on this ability check");
     const reminder = new AbilityCheckReminder(this, abilityId);
     reminder.updateOptions(options);
+    createRenderDialogHook(options);
   }
 
   return wrapped(abilityId, options);
@@ -137,6 +140,7 @@ function onRollSkill(wrapped, skillId, options) {
     debug("checking for adv/dis effects on this skill check");
     const reminder = new SkillReminder(this, skillId);
     reminder.updateOptions(options);
+    createRenderDialogHook(options);
   }
 
   return wrapped(skillId, options);
@@ -156,6 +160,7 @@ function onRollToolCheck(wrapped, options) {
       this.data.data.ability
     );
     reminder.updateOptions(options);
+    createRenderDialogHook(options);
   }
 
   return wrapped(options);
@@ -172,6 +177,7 @@ function onRollDeathSave(wrapped, options) {
     debug("checking for adv/dis effects on this death save");
     const reminder = new DeathSaveReminder(this);
     reminder.updateOptions(options);
+    createRenderDialogHook(options);
   }
 
   return wrapped(options);
@@ -188,6 +194,7 @@ function onRollDamage(wrapped, options) {
     debug("checking for critical/normal effects on this damage roll");
     const reminder = new CriticalReminder(this.actor, getTarget(), this);
     reminder.updateOptions(options);
+    createRenderDialogHook(options);
   }
 
   return wrapped(options);
@@ -208,4 +215,53 @@ function isFastForwarding(options) {
  */
 function getTarget() {
   return [...game.user.targets][0]?.actor;
+}
+
+/**
+ * Create a renderDialog Hook that unregister itself once done. This hook check that the created dialog id matches the id passed as an argument.
+ * @param {Object} options the object created while parsing the effects flags
+ */
+function createRenderDialogHook(options) {
+  const callback = (dialog, html) => {
+    if (dialog.options.id !== (options.dialogOptions?.id || options.options?.dialogOptions?.id)) return;
+    rollDialogUpdater(dialog, html, options);
+    Hooks.off("renderDialog", callback);
+  }
+
+  Hooks.on("renderDialog", callback);
+}
+
+/**
+ * Update the roll window with the custom adv/dis/crits/normalCrits.
+ * @param {Dialog} dialog the rendered dialog
+ * @param {jQuery} html The HTML content of the dialog
+ * @param {Array} [options.customAdvantages] the custom advantages to display
+ * @param {Array} [options.customDisadvantages] the custom disadvantages to display
+ * @param {Array} [options.customCrits] the custom criticals to display
+ * @param {Array} [options.customNormals] the custom "normal" criticals to display
+ */
+function rollDialogUpdater(dialog, html, { customAdvantages = [], customDisadvantages = [], customCrits = [], customNormals = [] } = {}) {
+  if (!customAdvantages.length && !customDisadvantages.length && !customCrits.length && !customNormals.length) return;
+
+  const htmlContent = html.find('.dialog-content');
+
+  let customAdvantagesContent = "";
+  let customDisadvantagesContent = "";
+  let customCritsContent = "";
+  let customNormalsContent = "";
+
+  customAdvantages.forEach((adv) => customAdvantagesContent += `<li><b>${game.i18n.localize("DND5E.Advantage")} :</b> ${adv.value} (${adv.label})</li>`);
+  customDisadvantages.forEach((dis) => customDisadvantagesContent += `<li><b>${game.i18n.localize("DND5E.Disadvantage")} :</b> ${dis.value} (${dis.label})</li>`);
+  customCrits.forEach((crit) => customCritsContent += `<li><b>${game.i18n.localize("DND5E.CriticalHit")} :</b> ${crit.value} (${crit.label})</li>`);
+  customNormals.forEach((norm) => customNormalsContent += `<li><b>${game.i18n.localize("adv-reminder.no-critical")} :</b> ${norm.value} (${norm.label})</li>`);
+
+  htmlContent.append(
+    `
+      <div class="custom-flags">
+        ${[customAdvantagesContent, customDisadvantagesContent, customCritsContent, customNormalsContent].map((content, index) => { if (content) { return `<ul>${content}</ul>` } }).join('')}
+      </div>
+    `
+  );
+
+  dialog.setPosition({ height: 'auto' });
 }
