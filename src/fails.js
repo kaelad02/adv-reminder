@@ -30,7 +30,7 @@ class BaseFail {
 
     // search for the fail keys and return the effect data
     return this.actor.effects
-      .filter((effect) => !effect.data.disabled)
+      .filter((effect) => !effect.isSuppressed && !effect.data.disabled)
       .flatMap((effect) => effect.data.changes)
       .filter((change) => failKeys.includes(change.key))
       .map((change) => change.document?.data)
