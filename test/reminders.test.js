@@ -3,6 +3,7 @@ import {
   AbilityCheckReminder,
   AbilitySaveReminder,
   SkillReminder,
+  DeathSaveReminder,
 } from "../src/reminders";
 
 function createActorWithEffects(...keys) {
@@ -856,6 +857,161 @@ describe("SkillReminder both advantage and disadvantage flags", () => {
     reminder.updateOptions(options);
 
     expect(options.advantage).toBe(true);
+    expect(options.disadvantage).toBeUndefined();
+  });
+});
+
+describe("DeathSaveReminder no legit active effects", () => {
+  test("death save with no active effects should be normal", () => {
+    const actor = createActorWithEffects();
+    const options = {};
+
+    const reminder = new DeathSaveReminder(actor);
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBeUndefined();
+    expect(options.disadvantage).toBeUndefined();
+  });
+
+  test("death save with a suppressed active effect should be normal", () => {
+    const actor = createActorWithEffects("flags.midi-qol.advantage.all");
+    actor.effects[0].isSuppressed = true;
+    const options = {};
+
+    const reminder = new DeathSaveReminder(actor);
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBeUndefined();
+    expect(options.disadvantage).toBeUndefined();
+  });
+
+  test("death save with a disabled active effect should be normal", () => {
+    const actor = createActorWithEffects("flags.midi-qol.advantage.all");
+    actor.effects[0].data.disabled = true;
+    const options = {};
+
+    const reminder = new DeathSaveReminder(actor);
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBeUndefined();
+    expect(options.disadvantage).toBeUndefined();
+  });
+});
+
+describe("DeathSaveReminder advantage flags", () => {
+  test("death save with advantage.all flag should be advantage", () => {
+    const actor = createActorWithEffects("flags.midi-qol.advantage.all");
+    const options = {};
+
+    const reminder = new DeathSaveReminder(actor);
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBe(true);
+    expect(options.disadvantage).toBeUndefined();
+  });
+
+  test("death save with advantage.ability.all should be advantage", () => {
+    const actor = createActorWithEffects(
+      "flags.midi-qol.advantage.ability.all"
+    );
+    const options = {};
+
+    const reminder = new DeathSaveReminder(actor);
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBe(true);
+    expect(options.disadvantage).toBeUndefined();
+  });
+
+  test("death save with advantage.ability.save.all should be advantage", () => {
+    const actor = createActorWithEffects(
+      "flags.midi-qol.advantage.ability.save.all"
+    );
+    const options = {};
+
+    const reminder = new DeathSaveReminder(actor);
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBe(true);
+    expect(options.disadvantage).toBeUndefined();
+  });
+
+  test("death save with advantage.deathSave should be advantage", () => {
+    const actor = createActorWithEffects("flags.midi-qol.advantage.deathSave");
+    const options = {};
+
+    const reminder = new DeathSaveReminder(actor);
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBe(true);
+    expect(options.disadvantage).toBeUndefined();
+  });
+});
+
+describe("DeathSaveReminder disadvantage flags", () => {
+  test("death save with disadvantage.all flag should be disadvantage", () => {
+    const actor = createActorWithEffects("flags.midi-qol.disadvantage.all");
+    const options = {};
+
+    const reminder = new DeathSaveReminder(actor);
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBeUndefined();
+    expect(options.disadvantage).toBe(true);
+  });
+
+  test("death save with disadvantage.ability.all should be disadvantage", () => {
+    const actor = createActorWithEffects(
+      "flags.midi-qol.disadvantage.ability.all"
+    );
+    const options = {};
+
+    const reminder = new DeathSaveReminder(actor);
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBeUndefined();
+    expect(options.disadvantage).toBe(true);
+  });
+
+  test("death save with disadvantage.ability.save.all should be disadvantage", () => {
+    const actor = createActorWithEffects(
+      "flags.midi-qol.disadvantage.ability.save.all"
+    );
+    const options = {};
+
+    const reminder = new DeathSaveReminder(actor);
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBeUndefined();
+    expect(options.disadvantage).toBe(true);
+  });
+
+  test("death save with disadvantage.deathSave should be disadvantage", () => {
+    const actor = createActorWithEffects(
+      "flags.midi-qol.disadvantage.deathSave"
+    );
+    const options = {};
+
+    const reminder = new DeathSaveReminder(actor);
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBeUndefined();
+    expect(options.disadvantage).toBe(true);
+  });
+});
+
+describe("DeathSaveReminder both advantage and disadvantage flags", () => {
+  test("death save with both advantage and disadvantage should be normal", () => {
+    const actor = createActorWithEffects(
+      "flags.midi-qol.advantage.ability.save.all",
+      "flags.midi-qol.disadvantage.deathSave"
+    );
+    const options = {};
+
+    const reminder = new DeathSaveReminder(actor);
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBeUndefined();
     expect(options.disadvantage).toBeUndefined();
   });
 });
