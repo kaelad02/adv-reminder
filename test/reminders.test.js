@@ -85,6 +85,11 @@ function createEffect(key) {
           value: "1",
           mode: 0,
           priority: "0",
+          document: {
+            data: {
+              label: `label.${key}`
+            }
+          }
         },
       ],
       disabled: false,
