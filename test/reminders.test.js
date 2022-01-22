@@ -1,5 +1,6 @@
 import { describe, expect, test } from "@jest/globals";
 import {
+  AttackReminder,
   AbilityCheckReminder,
   AbilitySaveReminder,
   SkillReminder,
@@ -101,6 +102,355 @@ function createItem(actionType, abilityMod) {
     },
   };
 }
+
+describe("AttackReminder no legit active effects", () => {
+  test("attack with no active effects should be normal", () => {
+    const actor = createActorWithEffects();
+    const target = createActorWithEffects();
+    const item = createItem("mwak", "str");
+    const options = {};
+
+    const reminder = new AttackReminder(actor, target, item);
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBeUndefined();
+    expect(options.disadvantage).toBeUndefined();
+  });
+
+  test("attack with a suppressed active effect should be normal", () => {
+    const actor = createActorWithEffects("flags.midi-qol.advantage.all");
+    actor.effects[0].isSuppressed = true;
+    const item = createItem("mwak", "str");
+    const options = {};
+
+    const reminder = new AttackReminder(actor, null, item);
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBeUndefined();
+    expect(options.disadvantage).toBeUndefined();
+  });
+
+  test("attack with a disabled active effect should be normal", () => {
+    const actor = createActorWithEffects("flags.midi-qol.advantage.all");
+    actor.effects[0].data.disabled = true;
+    const item = createItem("mwak", "str");
+    const options = {};
+
+    const reminder = new AttackReminder(actor, null, item);
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBeUndefined();
+    expect(options.disadvantage).toBeUndefined();
+  });
+});
+
+describe("AttackReminder advantage flags", () => {
+  test("attack with advantage.all flag should be advantage", () => {
+    const actor = createActorWithEffects("flags.midi-qol.advantage.all");
+    const item = createItem("mwak", "str");
+    const options = {};
+
+    const reminder = new AttackReminder(actor, null, item);
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBe(true);
+    expect(options.disadvantage).toBeUndefined();
+  });
+
+  test("attack with advantage.attack.all flag should be advantage", () => {
+    const actor = createActorWithEffects("flags.midi-qol.advantage.attack.all");
+    const item = createItem("mwak", "str");
+    const options = {};
+
+    const reminder = new AttackReminder(actor, null, item);
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBe(true);
+    expect(options.disadvantage).toBeUndefined();
+  });
+
+  test("attack with advantage.attack.mwak flag should be advantage for Melee Weapon Attack", () => {
+    const actor = createActorWithEffects(
+      "flags.midi-qol.advantage.attack.mwak"
+    );
+    const item = createItem("mwak", "str");
+    const options = {};
+
+    const reminder = new AttackReminder(actor, null, item);
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBe(true);
+    expect(options.disadvantage).toBeUndefined();
+  });
+
+  test("attack with advantage.attack.mwak flag should be normal for Ranged Weapon Attack", () => {
+    const actor = createActorWithEffects(
+      "flags.midi-qol.advantage.attack.mwak"
+    );
+    const item = createItem("rwak", "dex");
+    const options = {};
+
+    const reminder = new AttackReminder(actor, null, item);
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBeUndefined();
+    expect(options.disadvantage).toBeUndefined();
+  });
+
+  test("attack with advantage.attack.cha flag should be advantage for Charisma Attack", () => {
+    const actor = createActorWithEffects("flags.midi-qol.advantage.attack.cha");
+    const item = createItem("rsak", "cha");
+    const options = {};
+
+    const reminder = new AttackReminder(actor, null, item);
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBe(true);
+    expect(options.disadvantage).toBeUndefined();
+  });
+
+  test("attack with advantage.attack.cha flag should be normal for Intelligence Attack", () => {
+    const actor = createActorWithEffects("flags.midi-qol.advantage.attack.cha");
+    const item = createItem("rsak", "int");
+    const options = {};
+
+    const reminder = new AttackReminder(actor, null, item);
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBeUndefined();
+    expect(options.disadvantage).toBeUndefined();
+  });
+
+  test("attack with grants.advantage.attack.all flag should be advantage", () => {
+    const actor = createActorWithEffects();
+    const target = createActorWithEffects(
+      "flags.midi-qol.grants.advantage.attack.all"
+    );
+    const item = createItem("rwak", "dex");
+    const options = {};
+
+    const reminder = new AttackReminder(actor, target, item);
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBe(true);
+    expect(options.disadvantage).toBeUndefined();
+  });
+
+  test("attack with grants.advantage.attack.rwak flag should be advantage for Ranged Weapon Attack", () => {
+    const actor = createActorWithEffects();
+    const target = createActorWithEffects(
+      "flags.midi-qol.grants.advantage.attack.rwak"
+    );
+    const item = createItem("rwak", "dex");
+    const options = {};
+
+    const reminder = new AttackReminder(actor, target, item);
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBe(true);
+    expect(options.disadvantage).toBeUndefined();
+  });
+
+  test("attack with grants.advantage.attack.rwak flag should be advantage for Ranged Spell Attack", () => {
+    const actor = createActorWithEffects();
+    const target = createActorWithEffects(
+      "flags.midi-qol.grants.advantage.attack.rwak"
+    );
+    const item = createItem("rsak", "wis");
+    const options = {};
+
+    const reminder = new AttackReminder(actor, target, item);
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBeUndefined();
+    expect(options.disadvantage).toBeUndefined();
+  });
+});
+
+describe("AttackReminder disadvantage flags", () => {
+  test("attack with disadvantage.all flag should be disadvantage", () => {
+    const actor = createActorWithEffects("flags.midi-qol.disadvantage.all");
+    const item = createItem("mwak", "str");
+    const options = {};
+
+    const reminder = new AttackReminder(actor, null, item);
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBeUndefined;
+    expect(options.disadvantage).toBe(true);
+  });
+
+  test("attack with disadvantage.attack.all flag should be disadvantage", () => {
+    const actor = createActorWithEffects(
+      "flags.midi-qol.disadvantage.attack.all"
+    );
+    const item = createItem("mwak", "str");
+    const options = {};
+
+    const reminder = new AttackReminder(actor, null, item);
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBeUndefined();
+    expect(options.disadvantage).toBe(true);
+  });
+
+  test("attack with disadvantage.attack.mwak flag should be disadvantage for Melee Weapon Attack", () => {
+    const actor = createActorWithEffects(
+      "flags.midi-qol.disadvantage.attack.mwak"
+    );
+    const item = createItem("mwak", "str");
+    const options = {};
+
+    const reminder = new AttackReminder(actor, null, item);
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBeUndefined();
+    expect(options.disadvantage).toBe(true);
+  });
+
+  test("attack with disadvantage.attack.mwak flag should be normal for Ranged Weapon Attack", () => {
+    const actor = createActorWithEffects(
+      "flags.midi-qol.disadvantage.attack.mwak"
+    );
+    const item = createItem("rwak", "dex");
+    const options = {};
+
+    const reminder = new AttackReminder(actor, null, item);
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBeUndefined();
+    expect(options.disadvantage).toBeUndefined();
+  });
+
+  test("attack with disadvantage.attack.cha flag should be disadvantage for Charisma Attack", () => {
+    const actor = createActorWithEffects(
+      "flags.midi-qol.disadvantage.attack.cha"
+    );
+    const item = createItem("rsak", "cha");
+    const options = {};
+
+    const reminder = new AttackReminder(actor, null, item);
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBeUndefined();
+    expect(options.disadvantage).toBe(true);
+  });
+
+  test("attack with disadvantage.attack.cha flag should be normal for Intelligence Attack", () => {
+    const actor = createActorWithEffects(
+      "flags.midi-qol.disadvantage.attack.cha"
+    );
+    const item = createItem("rsak", "int");
+    const options = {};
+
+    const reminder = new AttackReminder(actor, null, item);
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBeUndefined();
+    expect(options.disadvantage).toBeUndefined();
+  });
+
+  test("attack with grants.disadvantage.attack.all flag should be disadvantage", () => {
+    const actor = createActorWithEffects();
+    const target = createActorWithEffects(
+      "flags.midi-qol.grants.disadvantage.attack.all"
+    );
+    const item = createItem("rwak", "dex");
+    const options = {};
+
+    const reminder = new AttackReminder(actor, target, item);
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBeUndefined();
+    expect(options.disadvantage).toBe(true);
+  });
+
+  test("attack with grants.disadvantage.attack.rwak flag should be disadvantage for Ranged Weapon Attack", () => {
+    const actor = createActorWithEffects();
+    const target = createActorWithEffects(
+      "flags.midi-qol.grants.disadvantage.attack.rwak"
+    );
+    const item = createItem("rwak", "dex");
+    const options = {};
+
+    const reminder = new AttackReminder(actor, target, item);
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBeUndefined();
+    expect(options.disadvantage).toBe(true);
+  });
+
+  test("attack with grants.disadvantage.attack.rwak flag should be disadvantage for Ranged Spell Attack", () => {
+    const actor = createActorWithEffects();
+    const target = createActorWithEffects(
+      "flags.midi-qol.grants.disadvantage.attack.rwak"
+    );
+    const item = createItem("rsak", "wis");
+    const options = {};
+
+    const reminder = new AttackReminder(actor, target, item);
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBeUndefined();
+    expect(options.disadvantage).toBeUndefined();
+  });
+});
+
+describe("AttackReminder both advantage and disadvantage flags", () => {
+  test("attack with both advantage and disadvantage should be normal", () => {
+    const actor = createActorWithEffects(
+      "flags.midi-qol.advantage.attack.rsak"
+    );
+    // simulates Dodge
+    const target = createActorWithEffects(
+      "flags.midi-qol.grants.disadvantage.attack.all"
+    );
+    const item = createItem("rsak", "wis");
+    const options = {};
+
+    const reminder = new AttackReminder(actor, target, item);
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBeUndefined();
+    expect(options.disadvantage).toBeUndefined();
+  });
+
+  test("attack with wrong advantage and same disadvantage should be disadvantage", () => {
+    const actor = createActorWithEffects(
+      "flags.midi-qol.advantage.attack.mwak"
+    );
+    // simulates Dodge
+    const target = createActorWithEffects(
+      "flags.midi-qol.grants.disadvantage.attack.all"
+    );
+    const item = createItem("rsak", "wis");
+    const options = {};
+
+    const reminder = new AttackReminder(actor, target, item);
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBeUndefined();
+    expect(options.disadvantage).toBe(true);
+  });
+
+  test("attack with same advantage and wrong disadvantage should be advantage", () => {
+    const actor = createActorWithEffects(
+      "flags.midi-qol.advantage.attack.rsak"
+    );
+    // simulates Dodge
+    const target = createActorWithEffects(
+      "flags.midi-qol.grants.disadvantage.attack.mwak"
+    );
+    const item = createItem("rsak", "wis");
+    const options = {};
+
+    const reminder = new AttackReminder(actor, target, item);
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBe(true);
+    expect(options.disadvantage).toBeUndefined();
+  });
+});
 
 describe("AbilityCheckReminder no legit active effects", () => {
   test("ability check with no active effects should be normal", () => {
