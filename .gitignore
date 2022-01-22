@@ -1,1 +1,4 @@
 adv-reminder.lock
+
+# Dependency directory
+node_modules/
