@@ -105,9 +105,9 @@ describe("AttackMessage no legit active effects", () => {
     const actor = createActorWithEffects();
     const item = createItem("mwak", "str");
 
-    const message = new AttackMessage(actor, item).addMessage();
+    const messages = new AttackMessage(actor, item).addMessage();
 
-    expect(message).toBeNull();
+    expect(messages).toStrictEqual([]);
   });
 
   test("attack with a suppressed active effect should not add a message", () => {
@@ -118,9 +118,9 @@ describe("AttackMessage no legit active effects", () => {
     actor.effects[0].isSuppressed = true;
     const item = createItem("mwak", "str");
 
-    const message = new AttackMessage(actor, item).addMessage();
+    const messages = new AttackMessage(actor, item).addMessage();
 
-    expect(message).toBeNull();
+    expect(messages).toStrictEqual([]);
   });
 
   test("attack with a disabled active effect should not add a message", () => {
@@ -131,9 +131,9 @@ describe("AttackMessage no legit active effects", () => {
     actor.effects[0].data.disabled = true;
     const item = createItem("mwak", "str");
 
-    const message = new AttackMessage(actor, item).addMessage();
+    const messages = new AttackMessage(actor, item).addMessage();
 
-    expect(message).toBeNull();
+    expect(messages).toStrictEqual([]);
   });
 });
 
@@ -145,9 +145,9 @@ describe("AttackMessage message flags", () => {
     ]);
     const item = createItem("mwak", "str");
 
-    const message = new AttackMessage(actor, item).addMessage();
+    const messages = new AttackMessage(actor, item).addMessage();
 
-    expect(message).toBe("message.all message");
+    expect(messages).toStrictEqual(["message.all message"]);
   });
 
   test("attack with message.attack.all flag should add the message", () => {
@@ -157,9 +157,9 @@ describe("AttackMessage message flags", () => {
     ]);
     const item = createItem("mwak", "str");
 
-    const message = new AttackMessage(actor, item).addMessage();
+    const messages = new AttackMessage(actor, item).addMessage();
 
-    expect(message).toBe("message.attack.all message");
+    expect(messages).toStrictEqual(["message.attack.all message"]);
   });
 
   test("attack with message.attack.mwak flag should add the message for Melee Weapon Attack", () => {
@@ -169,9 +169,9 @@ describe("AttackMessage message flags", () => {
     ]);
     const item = createItem("mwak", "str");
 
-    const message = new AttackMessage(actor, item).addMessage();
+    const messages = new AttackMessage(actor, item).addMessage();
 
-    expect(message).toBe("message.attack.mwak message");
+    expect(messages).toStrictEqual(["message.attack.mwak message"]);
   });
 
   test("attack with message.attack.mwak flag should not add the message for Ranged Weapon Attack", () => {
@@ -181,9 +181,9 @@ describe("AttackMessage message flags", () => {
     ]);
     const item = createItem("rwak", "dex");
 
-    const message = new AttackMessage(actor, item).addMessage();
+    const messages = new AttackMessage(actor, item).addMessage();
 
-    expect(message).toBeNull();
+    expect(messages).toStrictEqual([]);
   });
 
   test("attack with message.attack.cha flag should add the message for Charisma Attack", () => {
@@ -193,9 +193,9 @@ describe("AttackMessage message flags", () => {
     ]);
     const item = createItem("rsak", "cha");
 
-    const message = new AttackMessage(actor, item).addMessage();
+    const messages = new AttackMessage(actor, item).addMessage();
 
-    expect(message).toBe("message.attack.cha message");
+    expect(messages).toStrictEqual(["message.attack.cha message"]);
   });
 
   test("attack with message.attack.cha flag should not add the message for Intelligence Attack", () => {
@@ -205,8 +205,8 @@ describe("AttackMessage message flags", () => {
     ]);
     const item = createItem("rsak", "int");
 
-    const message = new AttackMessage(actor, item).addMessage();
+    const messages = new AttackMessage(actor, item).addMessage();
 
-    expect(message).toBeNull();
+    expect(messages).toStrictEqual([]);
   });
 });

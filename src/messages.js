@@ -13,28 +13,31 @@ class BaseMessage {
     return ["flags.adv-reminder.message.all"];
   }
 
-  addMessage() {
+  async addMessage() {
     const keys = this.messageKeys;
-    const change = this.changes.find((change) => keys.includes(change.key));
+    const messages = this.changes
+      .filter((change) => keys.includes(change.key))
+      .map((change) => change.value);
 
-    if (change) {
-      const message = change.value;
+    if (messages.length > 0) {
+      const message = await renderTemplate(
+        "modules/adv-reminder/templates/roll-dialog-messages.hbs",
+        { messages }
+      );
       debug("adding hook to renderDialog w/ ", message);
       Hooks.once("renderDialog", (dialog, html, data) => {
         debug("called once hook for renderDialog");
         // add message at the end
         const formGroups = html.find(".form-group:last");
-        formGroups.after(
-          `<div class="form-group"><label>${message}</label></div>`
-        );
+        formGroups.after(message);
         // reset dialog height
         const position = dialog.position;
         position.height = "auto";
         dialog.setPosition(position);
       });
-      return message;
     }
-    return null;
+
+    return messages;
   }
 }
 

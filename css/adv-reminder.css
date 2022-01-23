@@ -9,3 +9,16 @@
 .dialog .dialog-buttons button.default.critical {
   font-weight: bold;
 }
+
+.dialog .dialog-content .adv-reminder-messages {
+  background: rgba(0, 0, 0, 0.05);
+  padding: 1px 3px;
+  margin: 3px 0;
+  color: #191813;
+  border: 1px solid #7a7971;
+  border-radius: 3px;
+}
+
+.adv-reminder-messages > div:not(:last-child) {
+  margin-bottom: 10px;
+}
