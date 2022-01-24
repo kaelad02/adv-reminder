@@ -1,11 +1,16 @@
-import { describe, expect, test } from "@jest/globals";
+import { beforeEach, describe, expect, jest, test } from "@jest/globals";
 import { AttackMessage } from "../src/messages";
 
-// fake verion of Hooks.once
-globalThis.Hooks = {};
-globalThis.Hooks.once = () => {};
 // fake version of renderTemplate
 globalThis.renderTemplate = () => {};
+
+// mock Hooks.once to check if it was called
+globalThis.Hooks = {};
+let onceMock;
+beforeEach(() => {
+  onceMock = jest.fn(() => {});
+  globalThis.Hooks.once = onceMock;
+});
 
 function createActorWithEffects(...keyValuePairs) {
   const effects = keyValuePairs.map(createEffect);
@@ -110,6 +115,7 @@ describe("AttackMessage no legit active effects", () => {
     const messages = await new AttackMessage(actor, item).addMessage();
 
     expect(messages).toStrictEqual([]);
+    expect(onceMock).not.toBeCalled();
   });
 
   test("attack with a suppressed active effect should not add a message", async () => {
@@ -123,6 +129,7 @@ describe("AttackMessage no legit active effects", () => {
     const messages = await new AttackMessage(actor, item).addMessage();
 
     expect(messages).toStrictEqual([]);
+    expect(onceMock).not.toBeCalled();
   });
 
   test("attack with a disabled active effect should not add a message", async () => {
@@ -136,6 +143,7 @@ describe("AttackMessage no legit active effects", () => {
     const messages = await new AttackMessage(actor, item).addMessage();
 
     expect(messages).toStrictEqual([]);
+    expect(onceMock).not.toBeCalled();
   });
 });
 
@@ -150,6 +158,7 @@ describe("AttackMessage message flags", () => {
     const messages = await new AttackMessage(actor, item).addMessage();
 
     expect(messages).toStrictEqual(["message.all message"]);
+    expect(onceMock).toBeCalledWith("renderDialog", expect.anything());
   });
 
   test("attack with message.attack.all flag should add the message", async () => {
@@ -162,6 +171,7 @@ describe("AttackMessage message flags", () => {
     const messages = await new AttackMessage(actor, item).addMessage();
 
     expect(messages).toStrictEqual(["message.attack.all message"]);
+    expect(onceMock).toBeCalledWith("renderDialog", expect.anything());
   });
 
   test("attack with message.attack.mwak flag should add the message for Melee Weapon Attack", async () => {
@@ -174,6 +184,7 @@ describe("AttackMessage message flags", () => {
     const messages = await new AttackMessage(actor, item).addMessage();
 
     expect(messages).toStrictEqual(["message.attack.mwak message"]);
+    expect(onceMock).toBeCalledWith("renderDialog", expect.anything());
   });
 
   test("attack with message.attack.mwak flag should not add the message for Ranged Weapon Attack", async () => {
@@ -186,6 +197,7 @@ describe("AttackMessage message flags", () => {
     const messages = await new AttackMessage(actor, item).addMessage();
 
     expect(messages).toStrictEqual([]);
+    expect(onceMock).not.toBeCalled();
   });
 
   test("attack with message.attack.cha flag should add the message for Charisma Attack", async () => {
@@ -198,6 +210,7 @@ describe("AttackMessage message flags", () => {
     const messages = await new AttackMessage(actor, item).addMessage();
 
     expect(messages).toStrictEqual(["message.attack.cha message"]);
+    expect(onceMock).toBeCalledWith("renderDialog", expect.anything());
   });
 
   test("attack with message.attack.cha flag should not add the message for Intelligence Attack", async () => {
@@ -210,5 +223,19 @@ describe("AttackMessage message flags", () => {
     const messages = await new AttackMessage(actor, item).addMessage();
 
     expect(messages).toStrictEqual([]);
+    expect(onceMock).not.toBeCalled();
+  });
+
+  test("attack with two messages should add both messages", async () => {
+    const actor = createActorWithEffects(
+      ["flags.adv-reminder.message.attack.all", "first"],
+      ["flags.adv-reminder.message.attack.mwak", "second"]
+    );
+    const item = createItem("mwak", "str");
+
+    const messages = await new AttackMessage(actor, item).addMessage();
+
+    expect(messages).toStrictEqual(["first", "second"]);
+    expect(onceMock).toBeCalledWith("renderDialog", expect.anything());
   });
 });
