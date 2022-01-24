@@ -3,6 +3,7 @@ import {
   AbilityCheckMessage,
   AbilitySaveMessage,
   AttackMessage,
+  DamageMessage,
   DeathSaveMessage,
   SkillMessage,
 } from "../src/messages";
@@ -708,6 +709,113 @@ describe("DeathSaveMessage message flags", () => {
     );
 
     const messages = await new DeathSaveMessage(actor).addMessage();
+
+    expect(messages).toStrictEqual(["first", "second"]);
+    expect(onceMock).toBeCalledWith("renderDialog", expect.anything());
+  });
+});
+
+describe("DamageMessage no legit active effects", () => {
+  test("damage with no active effects should not add a message", async () => {
+    const actor = createActorWithEffects();
+    const item = createItem("mwak", "str");
+
+    const messages = await new DamageMessage(actor, item).addMessage();
+
+    expect(messages).toStrictEqual([]);
+    expect(onceMock).not.toBeCalled();
+  });
+
+  test("damage with a suppressed active effect should not add a message", async () => {
+    const actor = createActorWithEffects([
+      "flags.adv-reminder.message.all",
+      "some message",
+    ]);
+    actor.effects[0].isSuppressed = true;
+    const item = createItem("mwak", "str");
+
+    const messages = await new DamageMessage(actor, item).addMessage();
+
+    expect(messages).toStrictEqual([]);
+    expect(onceMock).not.toBeCalled();
+  });
+
+  test("damage with a disabled active effect should not add a message", async () => {
+    const actor = createActorWithEffects([
+      "flags.adv-reminder.message.all",
+      "some message",
+    ]);
+    actor.effects[0].data.disabled = true;
+    const item = createItem("mwak", "str");
+
+    const messages = await new DamageMessage(actor, item).addMessage();
+
+    expect(messages).toStrictEqual([]);
+    expect(onceMock).not.toBeCalled();
+  });
+});
+
+describe("DamageMessage message flags", () => {
+  test("damage with message.all flag should add the message", async () => {
+    const actor = createActorWithEffects([
+      "flags.adv-reminder.message.all",
+      "message.all message",
+    ]);
+    const item = createItem("mwak", "str");
+
+    const messages = await new DamageMessage(actor, item).addMessage();
+
+    expect(messages).toStrictEqual(["message.all message"]);
+    expect(onceMock).toBeCalledWith("renderDialog", expect.anything());
+  });
+
+  test("damage with message.damage.all flag should add the message", async () => {
+    const actor = createActorWithEffects([
+      "flags.adv-reminder.message.damage.all",
+      "message.damage.all message",
+    ]);
+    const item = createItem("mwak", "str");
+
+    const messages = await new DamageMessage(actor, item).addMessage();
+
+    expect(messages).toStrictEqual(["message.damage.all message"]);
+    expect(onceMock).toBeCalledWith("renderDialog", expect.anything());
+  });
+
+  test("damage with message.damage.mwak flag should add the message for Melee Weapon damage", async () => {
+    const actor = createActorWithEffects([
+      "flags.adv-reminder.message.damage.mwak",
+      "message.damage.mwak message",
+    ]);
+    const item = createItem("mwak", "str");
+
+    const messages = await new DamageMessage(actor, item).addMessage();
+
+    expect(messages).toStrictEqual(["message.damage.mwak message"]);
+    expect(onceMock).toBeCalledWith("renderDialog", expect.anything());
+  });
+
+  test("damage with message.damage.mwak flag should not add the message for Ranged Weapon damage", async () => {
+    const actor = createActorWithEffects([
+      "flags.adv-reminder.message.damage.mwak",
+      "message.damage.mwak message",
+    ]);
+    const item = createItem("rwak", "dex");
+
+    const messages = await new DamageMessage(actor, item).addMessage();
+
+    expect(messages).toStrictEqual([]);
+    expect(onceMock).not.toBeCalled();
+  });
+
+  test("damage with two messages should add both messages", async () => {
+    const actor = createActorWithEffects(
+      ["flags.adv-reminder.message.damage.all", "first"],
+      ["flags.adv-reminder.message.damage.mwak", "second"]
+    );
+    const item = createItem("mwak", "str");
+
+    const messages = await new DamageMessage(actor, item).addMessage();
 
     expect(messages).toStrictEqual(["first", "second"]);
     expect(onceMock).toBeCalledWith("renderDialog", expect.anything());

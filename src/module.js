@@ -3,6 +3,7 @@ import {
   AbilityCheckMessage,
   AbilitySaveMessage,
   AttackMessage,
+  DamageMessage,
   DeathSaveMessage,
   SkillMessage,
 } from "./messages.js";
@@ -196,7 +197,7 @@ async function onRollDeathSave(wrapped, options) {
   return wrapped(options);
 }
 
-function onRollDamage(wrapped, options) {
+async function onRollDamage(wrapped, options) {
   debug("onRollDamage method called");
 
   // check for critical flags unless the user pressed a fast-forward key
@@ -204,6 +205,8 @@ function onRollDamage(wrapped, options) {
   if (isFF) {
     debug("held down a fast-foward key, skip checking for adv/dis");
   } else {
+    debug("checking for message effects on this damage roll");
+    await new DamageMessage(this.actor, this).addMessage();
     debug("checking for critical/normal effects on this damage roll");
     const reminder = new CriticalReminder(this.actor, getTarget(), this);
     reminder.updateOptions(options);

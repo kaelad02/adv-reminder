@@ -125,4 +125,19 @@ export class DeathSaveMessage extends AbilityBaseMessage {
   }
 }
 
-// TODO DamageMessage
+export class DamageMessage extends BaseMessage {
+  constructor(actor, item) {
+    super(actor);
+
+    /** @type {string} */
+    this.actionType = item.data.data.actionType;
+  }
+
+  /** @override */
+  get messageKeys() {
+    return super.messageKeys.concat(
+      "flags.adv-reminder.message.damage.all",
+      `flags.adv-reminder.message.damage.${this.actionType}`
+    );
+  }
+}
