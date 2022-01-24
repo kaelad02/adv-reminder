@@ -5,7 +5,8 @@ class BaseMessage {
     /** @type {EffectChangeData[]} */
     this.changes = actor.effects
       .filter((effect) => !effect.isSuppressed && !effect.data.disabled)
-      .flatMap((effect) => effect.data.changes);
+      .flatMap((effect) => effect.data.changes)
+      .sort((a, b) => b.priority - a.priority);
   }
 
   get messageKeys() {
