@@ -3,6 +3,7 @@ import {
   AbilityCheckMessage,
   AbilitySaveMessage,
   AttackMessage,
+  SkillMessage,
 } from "../src/messages";
 
 // fake version of renderTemplate
@@ -273,7 +274,6 @@ describe("AbilityCheckMessage no legit active effects", () => {
       "some message",
     ]);
     actor.effects[0].data.disabled = true;
-    const item = createItem("mwak", "str");
 
     const messages = await new AbilityCheckMessage(actor, "int").addMessage();
 
@@ -385,7 +385,6 @@ describe("AbilitySaveMessage no legit active effects", () => {
       "some message",
     ]);
     actor.effects[0].data.disabled = true;
-    const item = createItem("mwak", "str");
 
     const messages = await new AbilitySaveMessage(actor, "int").addMessage();
 
@@ -462,6 +461,153 @@ describe("AbilitySaveMessage message flags", () => {
     );
 
     const messages = await new AbilitySaveMessage(actor, "dex").addMessage();
+
+    expect(messages).toStrictEqual(["first", "second"]);
+    expect(onceMock).toBeCalledWith("renderDialog", expect.anything());
+  });
+});
+
+describe("SkillMessage no legit active effects", () => {
+  test("skill check with no active effects should not add a message", async () => {
+    const actor = createActorWithEffects();
+
+    const messages = await new SkillMessage(actor, "ath").addMessage();
+
+    expect(messages).toStrictEqual([]);
+    expect(onceMock).not.toBeCalled();
+  });
+
+  test("skill check with a suppressed active effect should not add a message", async () => {
+    const actor = createActorWithEffects([
+      "flags.adv-reminder.message.all",
+      "some message",
+    ]);
+    actor.effects[0].isSuppressed = true;
+
+    const messages = await new SkillMessage(actor, "ath").addMessage();
+
+    expect(messages).toStrictEqual([]);
+    expect(onceMock).not.toBeCalled();
+  });
+
+  test("skill check with a disabled active effect should not add a message", async () => {
+    const actor = createActorWithEffects([
+      "flags.adv-reminder.message.all",
+      "some message",
+    ]);
+    actor.effects[0].data.disabled = true;
+
+    const messages = await new SkillMessage(actor, "ath").addMessage();
+
+    expect(messages).toStrictEqual([]);
+    expect(onceMock).not.toBeCalled();
+  });
+});
+
+describe("SkillMessage message flags", () => {
+  test("skill check with message.all flag should add the message", async () => {
+    const actor = createActorWithEffects([
+      "flags.adv-reminder.message.all",
+      "message.all message",
+    ]);
+
+    const messages = await new SkillMessage(actor, "prc").addMessage();
+
+    expect(messages).toStrictEqual(["message.all message"]);
+    expect(onceMock).toBeCalledWith("renderDialog", expect.anything());
+  });
+
+  test("skill check with message.ability.all flag should add the message", async () => {
+    const actor = createActorWithEffects([
+      "flags.adv-reminder.message.ability.all",
+      "message.ability.all message",
+    ]);
+
+    const messages = await new SkillMessage(actor, "prc").addMessage();
+
+    expect(messages).toStrictEqual(["message.ability.all message"]);
+    expect(onceMock).toBeCalledWith("renderDialog", expect.anything());
+  });
+
+  test("skill check with message.ability.check.all flag should add the message", async () => {
+    const actor = createActorWithEffects([
+      "flags.adv-reminder.message.ability.check.all",
+      "message.ability.check.all message",
+    ]);
+
+    const messages = await new SkillMessage(actor, "prc").addMessage();
+
+    expect(messages).toStrictEqual(["message.ability.check.all message"]);
+    expect(onceMock).toBeCalledWith("renderDialog", expect.anything());
+  });
+
+  test("skill check with message.ability.check.wis flag should add the message for Perception Check", async () => {
+    const actor = createActorWithEffects([
+      "flags.adv-reminder.message.ability.check.wis",
+      "message.ability.check.int message",
+    ]);
+
+    const messages = await new SkillMessage(actor, "prc").addMessage();
+
+    expect(messages).toStrictEqual(["message.ability.check.int message"]);
+    expect(onceMock).toBeCalledWith("renderDialog", expect.anything());
+  });
+
+  test("skill check with message.ability.check.wis flag should not add the message for Acrobatics Check", async () => {
+    const actor = createActorWithEffects([
+      "flags.adv-reminder.message.ability.check.wis",
+      "message.ability.check.int",
+    ]);
+
+    const messages = await new SkillMessage(actor, "acr").addMessage();
+
+    expect(messages).toStrictEqual([]);
+    expect(onceMock).not.toBeCalled();
+  });
+
+  test("skill check with message.skill.all flag should add the message", async () => {
+    const actor = createActorWithEffects([
+      "flags.adv-reminder.message.skill.all",
+      "message.skill.all message",
+    ]);
+
+    const messages = await new SkillMessage(actor, "prc").addMessage();
+
+    expect(messages).toStrictEqual(["message.skill.all message"]);
+    expect(onceMock).toBeCalledWith("renderDialog", expect.anything());
+  });
+
+  test("skill check with message.skill.prc flag should add the message for Perception Check", async () => {
+    const actor = createActorWithEffects([
+      "flags.adv-reminder.message.skill.prc",
+      "message.skill.prc message",
+    ]);
+
+    const messages = await new SkillMessage(actor, "prc").addMessage();
+
+    expect(messages).toStrictEqual(["message.skill.prc message"]);
+    expect(onceMock).toBeCalledWith("renderDialog", expect.anything());
+  });
+
+  test("skill check with message.skill.prc flag should not add the message for Nature Check", async () => {
+    const actor = createActorWithEffects([
+      "flags.adv-reminder.message.skill.prc",
+      "message.skill.prc message",
+    ]);
+
+    const messages = await new SkillMessage(actor, "nat").addMessage();
+
+    expect(messages).toStrictEqual([]);
+    expect(onceMock).not.toBeCalled();
+  });
+
+  test("skill check with two messages should add both messages", async () => {
+    const actor = createActorWithEffects(
+      ["flags.adv-reminder.message.ability.check.dex", "first"],
+      ["flags.adv-reminder.message.skill.ste", "second"]
+    );
+
+    const messages = await new SkillMessage(actor, "ste").addMessage();
 
     expect(messages).toStrictEqual(["first", "second"]);
     expect(onceMock).toBeCalledWith("renderDialog", expect.anything());
