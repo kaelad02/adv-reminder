@@ -1,5 +1,9 @@
 import { beforeEach, describe, expect, jest, test } from "@jest/globals";
-import { AbilityCheckMessage, AttackMessage } from "../src/messages";
+import {
+  AbilityCheckMessage,
+  AbilitySaveMessage,
+  AttackMessage,
+} from "../src/messages";
 
 // fake version of renderTemplate
 globalThis.renderTemplate = () => {};
@@ -346,6 +350,118 @@ describe("AbilityCheckMessage message flags", () => {
     );
 
     const messages = await new AbilityCheckMessage(actor, "dex").addMessage();
+
+    expect(messages).toStrictEqual(["first", "second"]);
+    expect(onceMock).toBeCalledWith("renderDialog", expect.anything());
+  });
+});
+
+describe("AbilitySaveMessage no legit active effects", () => {
+  test("saving throw with no active effects should not add a message", async () => {
+    const actor = createActorWithEffects();
+
+    const messages = await new AbilitySaveMessage(actor, "int").addMessage();
+
+    expect(messages).toStrictEqual([]);
+    expect(onceMock).not.toBeCalled();
+  });
+
+  test("saving throw with a suppressed active effect should not add a message", async () => {
+    const actor = createActorWithEffects([
+      "flags.adv-reminder.message.all",
+      "some message",
+    ]);
+    actor.effects[0].isSuppressed = true;
+
+    const messages = await new AbilitySaveMessage(actor, "int").addMessage();
+
+    expect(messages).toStrictEqual([]);
+    expect(onceMock).not.toBeCalled();
+  });
+
+  test("saving throw with a disabled active effect should not add a message", async () => {
+    const actor = createActorWithEffects([
+      "flags.adv-reminder.message.all",
+      "some message",
+    ]);
+    actor.effects[0].data.disabled = true;
+    const item = createItem("mwak", "str");
+
+    const messages = await new AbilitySaveMessage(actor, "int").addMessage();
+
+    expect(messages).toStrictEqual([]);
+    expect(onceMock).not.toBeCalled();
+  });
+});
+
+describe("AbilitySaveMessage message flags", () => {
+  test("saving throw with message.all flag should add the message", async () => {
+    const actor = createActorWithEffects([
+      "flags.adv-reminder.message.all",
+      "message.all message",
+    ]);
+
+    const messages = await new AbilitySaveMessage(actor, "int").addMessage();
+
+    expect(messages).toStrictEqual(["message.all message"]);
+    expect(onceMock).toBeCalledWith("renderDialog", expect.anything());
+  });
+
+  test("saving throw with message.ability.all flag should add the message", async () => {
+    const actor = createActorWithEffects([
+      "flags.adv-reminder.message.ability.all",
+      "message.ability.all message",
+    ]);
+
+    const messages = await new AbilitySaveMessage(actor, "int").addMessage();
+
+    expect(messages).toStrictEqual(["message.ability.all message"]);
+    expect(onceMock).toBeCalledWith("renderDialog", expect.anything());
+  });
+
+  test("saving throw with message.ability.save.all flag should add the message", async () => {
+    const actor = createActorWithEffects([
+      "flags.adv-reminder.message.ability.save.all",
+      "message.ability.save.all message",
+    ]);
+
+    const messages = await new AbilitySaveMessage(actor, "int").addMessage();
+
+    expect(messages).toStrictEqual(["message.ability.save.all message"]);
+    expect(onceMock).toBeCalledWith("renderDialog", expect.anything());
+  });
+
+  test("saving throw with message.ability.save.int flag should add the message for Intelligence Check", async () => {
+    const actor = createActorWithEffects([
+      "flags.adv-reminder.message.ability.save.int",
+      "message.ability.save.int message",
+    ]);
+
+    const messages = await new AbilitySaveMessage(actor, "int").addMessage();
+
+    expect(messages).toStrictEqual(["message.ability.save.int message"]);
+    expect(onceMock).toBeCalledWith("renderDialog", expect.anything());
+  });
+
+  test("saving throw with message.ability.save.int flag should not add the message for Dexterity Check", async () => {
+    const actor = createActorWithEffects([
+      "flags.adv-reminder.message.ability.save.int",
+      "message.ability.save.int",
+    ]);
+
+    const messages = await new AbilitySaveMessage(actor, "dex").addMessage();
+
+    expect(messages).toStrictEqual([]);
+    expect(onceMock).not.toBeCalled();
+  });
+
+  test("saving throw with two messages should add both messages", async () => {
+    const actor = createActorWithEffects(
+      ["flags.adv-reminder.message.ability.save.all", "first"],
+      ["flags.adv-reminder.message.ability.save.dex", "second"]
+    );
+
+    const messages = await new AbilitySaveMessage(actor, "dex").addMessage();
 
     expect(messages).toStrictEqual(["first", "second"]);
     expect(onceMock).toBeCalledWith("renderDialog", expect.anything());
