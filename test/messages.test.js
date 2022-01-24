@@ -3,6 +3,7 @@ import {
   AbilityCheckMessage,
   AbilitySaveMessage,
   AttackMessage,
+  DeathSaveMessage,
   SkillMessage,
 } from "../src/messages";
 
@@ -608,6 +609,105 @@ describe("SkillMessage message flags", () => {
     );
 
     const messages = await new SkillMessage(actor, "ste").addMessage();
+
+    expect(messages).toStrictEqual(["first", "second"]);
+    expect(onceMock).toBeCalledWith("renderDialog", expect.anything());
+  });
+});
+
+describe("DeathSaveMessage no legit active effects", () => {
+  test("death save with no active effects should not add a message", async () => {
+    const actor = createActorWithEffects();
+
+    const messages = await new DeathSaveMessage(actor).addMessage();
+
+    expect(messages).toStrictEqual([]);
+    expect(onceMock).not.toBeCalled();
+  });
+
+  test("death save with a suppressed active effect should not add a message", async () => {
+    const actor = createActorWithEffects([
+      "flags.adv-reminder.message.all",
+      "some message",
+    ]);
+    actor.effects[0].isSuppressed = true;
+
+    const messages = await new DeathSaveMessage(actor).addMessage();
+
+    expect(messages).toStrictEqual([]);
+    expect(onceMock).not.toBeCalled();
+  });
+
+  test("death save with a disabled active effect should not add a message", async () => {
+    const actor = createActorWithEffects([
+      "flags.adv-reminder.message.all",
+      "some message",
+    ]);
+    actor.effects[0].data.disabled = true;
+
+    const messages = await new DeathSaveMessage(actor).addMessage();
+
+    expect(messages).toStrictEqual([]);
+    expect(onceMock).not.toBeCalled();
+  });
+});
+
+describe("DeathSaveMessage message flags", () => {
+  test("death save with message.all flag should add the message", async () => {
+    const actor = createActorWithEffects([
+      "flags.adv-reminder.message.all",
+      "message.all message",
+    ]);
+
+    const messages = await new DeathSaveMessage(actor).addMessage();
+
+    expect(messages).toStrictEqual(["message.all message"]);
+    expect(onceMock).toBeCalledWith("renderDialog", expect.anything());
+  });
+
+  test("death save with message.ability.all flag should add the message", async () => {
+    const actor = createActorWithEffects([
+      "flags.adv-reminder.message.ability.all",
+      "message.ability.all message",
+    ]);
+
+    const messages = await new DeathSaveMessage(actor).addMessage();
+
+    expect(messages).toStrictEqual(["message.ability.all message"]);
+    expect(onceMock).toBeCalledWith("renderDialog", expect.anything());
+  });
+
+  test("death save with message.ability.save.all flag should add the message", async () => {
+    const actor = createActorWithEffects([
+      "flags.adv-reminder.message.ability.save.all",
+      "message.ability.save.all message",
+    ]);
+
+    const messages = await new DeathSaveMessage(actor).addMessage();
+
+    expect(messages).toStrictEqual(["message.ability.save.all message"]);
+    expect(onceMock).toBeCalledWith("renderDialog", expect.anything());
+  });
+
+  test("death save with message.deathSave flag should add the message", async () => {
+    const actor = createActorWithEffects([
+      "flags.adv-reminder.message.deathSave",
+      "message.deathSave message",
+    ]);
+
+    const messages = await new DeathSaveMessage(actor).addMessage();
+
+    expect(messages).toStrictEqual(["message.deathSave message"]);
+    expect(onceMock).toBeCalledWith("renderDialog", expect.anything());
+  });
+
+  test("death save with two messages should add both messages", async () => {
+    const actor = createActorWithEffects(
+      ["flags.adv-reminder.message.ability.save.all", "first"],
+      ["flags.adv-reminder.message.deathSave", "second"]
+    );
+
+    const messages = await new DeathSaveMessage(actor).addMessage();
 
     expect(messages).toStrictEqual(["first", "second"]);
     expect(onceMock).toBeCalledWith("renderDialog", expect.anything());
