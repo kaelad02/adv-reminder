@@ -6,7 +6,7 @@ class BaseMessage {
     this.changes = actor.effects
       .filter((effect) => !effect.isSuppressed && !effect.data.disabled)
       .flatMap((effect) => effect.data.changes)
-      .sort((a, b) => b.priority - a.priority);
+      .sort((a, b) => a.priority - b.priority);
   }
 
   get messageKeys() {
