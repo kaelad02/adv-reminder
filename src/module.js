@@ -84,7 +84,7 @@ async function onRollAttack(wrapped, options) {
   debug("onRollAttack method called");
 
   // check for adv/dis flags unless the user pressed a fast-forward key
-  const isFF = isFastForwarding(options.event);
+  const isFF = isFastForwarding(options);
   if (isFF) {
     debug("held down a fast-foward key, skip checking for adv/dis");
   } else {
@@ -108,7 +108,7 @@ async function onRollAbilitySave(wrapped, abilityId, options) {
   }
 
   // check for adv/dis flags unless the user pressed a fast-forward key
-  const isFF = isFastForwarding(options.event);
+  const isFF = isFastForwarding(options);
   if (isFF) {
     debug("held down a fast-foward key, skip checking for adv/dis");
   } else {
@@ -126,7 +126,7 @@ async function onRollAbilityTest(wrapped, abilityId, options) {
   debug("onRollAbilityTest method called");
 
   // check for adv/dis flags unless the user pressed a fast-forward key
-  const isFF = isFastForwarding(options.event);
+  const isFF = isFastForwarding(options);
   if (isFF) {
     debug("held down a fast-foward key, skip checking for adv/dis");
   } else {
@@ -144,7 +144,7 @@ async function onRollSkill(wrapped, skillId, options) {
   debug("onRollSkill method called");
 
   // check for adv/dis flags unless the user pressed a fast-forward key
-  const isFF = isFastForwarding(options.event);
+  const isFF = isFastForwarding(options);
   if (isFF) {
     debug("held down a fast-foward key, skip checking for adv/dis");
   } else {
@@ -162,7 +162,7 @@ async function onRollToolCheck(wrapped, options) {
   debug("onRollToolCheck method called");
 
   // check for adv/dis flags unless the user pressed a fast-forward key
-  const isFF = isFastForwarding(options.event);
+  const isFF = isFastForwarding(options);
   if (isFF) {
     debug("held down a fast-foward key, skip checking for adv/dis");
   } else {
@@ -183,7 +183,7 @@ async function onRollDeathSave(wrapped, options) {
   debug("onRollDeathSave method called");
 
   // check for adv/dis flags unless the user pressed a fast-forward key
-  const isFF = isFastForwarding(options.event);
+  const isFF = isFastForwarding(options);
   if (isFF) {
     debug("held down a fast-foward key, skip checking for adv/dis");
   } else {
@@ -201,7 +201,7 @@ async function onRollDamage(wrapped, options) {
   debug("onRollDamage method called");
 
   // check for critical flags unless the user pressed a fast-forward key
-  const isFF = isFastForwarding(options.event);
+  const isFF = isFastForwarding(options);
   if (isFF) {
     debug("held down a fast-foward key, skip checking for adv/dis");
   } else {
@@ -220,8 +220,8 @@ async function onRollDamage(wrapped, options) {
  * @param {Event} event the event
  * @returns {Boolean} true if they are fast-forwarding, false otherwise
  */
-function isFastForwarding(event) {
-  return event?.shiftKey || event?.altKey || event?.ctrlKey || event?.metaKey;
+function isFastForwarding(options) {
+  return !!(options.fastForward || options.event?.shiftKey || options.event?.altKey || options.event?.ctrlKey || options.event?.metaKey);
 }
 
 /**
