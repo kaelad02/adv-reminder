@@ -804,7 +804,7 @@ describe("DamageMessage no legit active effects", () => {
     const messages = await new DamageMessage(actor, item).addMessage(options);
 
     expect(messages).toStrictEqual([]);
-    expect(options.dialogOptions).toBeUndefined();
+    expect(options.options?.dialogOptions).toBeUndefined();
   });
 
   test("damage with a suppressed active effect should not add a message", async () => {
@@ -819,7 +819,7 @@ describe("DamageMessage no legit active effects", () => {
     const messages = await new DamageMessage(actor, item).addMessage(options);
 
     expect(messages).toStrictEqual([]);
-    expect(options.dialogOptions).toBeUndefined();
+    expect(options.options?.dialogOptions).toBeUndefined();
   });
 
   test("damage with a disabled active effect should not add a message", async () => {
@@ -834,7 +834,7 @@ describe("DamageMessage no legit active effects", () => {
     const messages = await new DamageMessage(actor, item).addMessage(options);
 
     expect(messages).toStrictEqual([]);
-    expect(options.dialogOptions).toBeUndefined();
+    expect(options.options?.dialogOptions).toBeUndefined();
   });
 });
 
@@ -850,7 +850,7 @@ describe("DamageMessage message flags", () => {
     const messages = await new DamageMessage(actor, item).addMessage(options);
 
     expect(messages).toStrictEqual(["message.all message"]);
-    expect(options.dialogOptions?.id).toBe("");
+    expect(options.options?.dialogOptions?.id).toBe("");
   });
 
   test("damage with message.damage.all flag should add the message", async () => {
@@ -864,7 +864,7 @@ describe("DamageMessage message flags", () => {
     const messages = await new DamageMessage(actor, item).addMessage(options);
 
     expect(messages).toStrictEqual(["message.damage.all message"]);
-    expect(options.dialogOptions?.id).toBe("");
+    expect(options.options?.dialogOptions?.id).toBe("");
   });
 
   test("damage with message.damage.mwak flag should add the message for Melee Weapon damage", async () => {
@@ -878,7 +878,7 @@ describe("DamageMessage message flags", () => {
     const messages = await new DamageMessage(actor, item).addMessage(options);
 
     expect(messages).toStrictEqual(["message.damage.mwak message"]);
-    expect(options.dialogOptions?.id).toBe("");
+    expect(options.options?.dialogOptions?.id).toBe("");
   });
 
   test("damage with message.damage.mwak flag should not add the message for Ranged Weapon damage", async () => {
@@ -892,7 +892,7 @@ describe("DamageMessage message flags", () => {
     const messages = await new DamageMessage(actor, item).addMessage(options);
 
     expect(messages).toStrictEqual([]);
-    expect(options.dialogOptions).toBeUndefined();
+    expect(options.options?.dialogOptions).toBeUndefined();
   });
 
   test("damage with two messages should add both messages", async () => {
@@ -906,6 +906,6 @@ describe("DamageMessage message flags", () => {
     const messages = await new DamageMessage(actor, item).addMessage(options);
 
     expect(messages).toStrictEqual(["first", "second"]);
-    expect(options.dialogOptions?.id).toBe("");
+    expect(options.options?.dialogOptions?.id).toBe("");
   });
 });

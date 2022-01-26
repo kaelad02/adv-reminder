@@ -150,4 +150,10 @@ export class DamageMessage extends BaseMessage {
       `flags.adv-reminder.message.damage.${this.actionType}`
     );
   }
+
+  async addMessage(options) {
+    // Damage options has a nested options variable, add that and pass it to super
+    options.options = options.options || {};
+    return super.addMessage(options.options);
+  }
 }
