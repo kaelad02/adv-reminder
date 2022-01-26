@@ -89,7 +89,7 @@ async function onRollAttack(wrapped, options) {
     debug("held down a fast-foward key, skip checking for adv/dis");
   } else {
     debug("checking for message effects on this attack roll");
-    await new AttackMessage(this.actor, this).addMessage();
+    await new AttackMessage(this.actor, this).addMessage(options);
     debug("checking for adv/dis effects on this attack roll");
     const reminder = new AttackReminder(this.actor, getTarget(), this);
     reminder.updateOptions(options);
@@ -113,7 +113,7 @@ async function onRollAbilitySave(wrapped, abilityId, options) {
     debug("held down a fast-foward key, skip checking for adv/dis");
   } else {
     debug("checking for message effects on this saving throw");
-    await new AbilitySaveMessage(this, abilityId).addMessage();
+    await new AbilitySaveMessage(this, abilityId).addMessage(options);
     debug("checking for adv/dis effects on this saving throw");
     const reminder = new AbilitySaveReminder(this, abilityId);
     reminder.updateOptions(options);
@@ -131,7 +131,7 @@ async function onRollAbilityTest(wrapped, abilityId, options) {
     debug("held down a fast-foward key, skip checking for adv/dis");
   } else {
     debug("checking for message effects on this ability check");
-    await new AbilityCheckMessage(this, abilityId).addMessage();
+    await new AbilityCheckMessage(this, abilityId).addMessage(options);
     debug("checking for adv/dis effects on this ability check");
     const reminder = new AbilityCheckReminder(this, abilityId);
     reminder.updateOptions(options);
@@ -149,7 +149,7 @@ async function onRollSkill(wrapped, skillId, options) {
     debug("held down a fast-foward key, skip checking for adv/dis");
   } else {
     debug("checking for message effects on this skill check");
-    await new SkillMessage(this, skillId).addMessage();
+    await new SkillMessage(this, skillId).addMessage(options);
     debug("checking for adv/dis effects on this skill check");
     const reminder = new SkillReminder(this, skillId);
     reminder.updateOptions(options);
@@ -167,7 +167,10 @@ async function onRollToolCheck(wrapped, options) {
     debug("held down a fast-foward key, skip checking for adv/dis");
   } else {
     debug("checking for message effects on this tool check");
-    await new AbilityCheckMessage(this.actor, this.data.data.ability).addMessage();
+    await new AbilityCheckMessage(
+      this.actor,
+      this.data.data.ability
+    ).addMessage(options);
     debug("checking for adv/dis effects on this tool check");
     const reminder = new AbilityCheckReminder(
       this.actor,
@@ -188,7 +191,7 @@ async function onRollDeathSave(wrapped, options) {
     debug("held down a fast-foward key, skip checking for adv/dis");
   } else {
     debug("checking for message effects on this death save");
-    await new DeathSaveMessage(this).addMessage();
+    await new DeathSaveMessage(this).addMessage(options);
     debug("checking for adv/dis effects on this death save");
     const reminder = new DeathSaveReminder(this);
     reminder.updateOptions(options);
@@ -206,7 +209,7 @@ async function onRollDamage(wrapped, options) {
     debug("held down a fast-foward key, skip checking for adv/dis");
   } else {
     debug("checking for message effects on this damage roll");
-    await new DamageMessage(this.actor, this).addMessage();
+    await new DamageMessage(this.actor, this).addMessage(options);
     debug("checking for critical/normal effects on this damage roll");
     const reminder = new CriticalReminder(this.actor, getTarget(), this);
     reminder.updateOptions(options);
@@ -221,7 +224,13 @@ async function onRollDamage(wrapped, options) {
  * @returns {Boolean} true if they are fast-forwarding, false otherwise
  */
 function isFastForwarding(options) {
-  return !!(options.fastForward || options.event?.shiftKey || options.event?.altKey || options.event?.ctrlKey || options.event?.metaKey);
+  return !!(
+    options.fastForward ||
+    options.event?.shiftKey ||
+    options.event?.altKey ||
+    options.event?.ctrlKey ||
+    options.event?.metaKey
+  );
 }
 
 /**
