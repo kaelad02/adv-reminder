@@ -78,4 +78,4 @@ Notes about other modules.
 
 [Minimal Rolling Enhancements for D&D5e](https://foundryvtt.com/packages/mre-dnd5e) This module works with MRE, making rolls with advantage and disadvantage with the following known issue(s).
 
-- Holding Shift (or how it's Roll Dislog Modifier Key setting is configured) to show the Damage roll dialog will not show critical hits or damage messages.
+- Holding Shift (or how "Roll Dialog Modifier Key" is configured) to show the Damage roll dialog will not show critical hits or damage messages.
