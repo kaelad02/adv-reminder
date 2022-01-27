@@ -1,5 +1,13 @@
 import { AbilitySaveFail } from "./fails.js";
 import {
+  AbilityCheckMessage,
+  AbilitySaveMessage,
+  AttackMessage,
+  DamageMessage,
+  DeathSaveMessage,
+  SkillMessage,
+} from "./messages.js";
+import {
   AttackReminder,
   AbilityCheckReminder,
   AbilitySaveReminder,
@@ -72,7 +80,7 @@ Hooks.once("init", () => {
   );
 });
 
-function onRollAttack(wrapped, options) {
+async function onRollAttack(wrapped, options) {
   debug("onRollAttack method called");
 
   // check for adv/dis flags unless the user pressed a fast-forward key
@@ -80,6 +88,8 @@ function onRollAttack(wrapped, options) {
   if (isFF) {
     debug("held down a fast-foward key, skip checking for adv/dis");
   } else {
+    debug("checking for message effects on this attack roll");
+    await new AttackMessage(this.actor, this).addMessage(options);
     debug("checking for adv/dis effects on this attack roll");
     const reminder = new AttackReminder(this.actor, getTarget(), this);
     reminder.updateOptions(options);
@@ -88,7 +98,7 @@ function onRollAttack(wrapped, options) {
   return wrapped(options);
 }
 
-function onRollAbilitySave(wrapped, abilityId, options) {
+async function onRollAbilitySave(wrapped, abilityId, options) {
   debug("onRollAbilitySave method called");
 
   // check if an effect says to fail this roll
@@ -102,6 +112,8 @@ function onRollAbilitySave(wrapped, abilityId, options) {
   if (isFF) {
     debug("held down a fast-foward key, skip checking for adv/dis");
   } else {
+    debug("checking for message effects on this saving throw");
+    await new AbilitySaveMessage(this, abilityId).addMessage(options);
     debug("checking for adv/dis effects on this saving throw");
     const reminder = new AbilitySaveReminder(this, abilityId);
     reminder.updateOptions(options);
@@ -110,7 +122,7 @@ function onRollAbilitySave(wrapped, abilityId, options) {
   return wrapped(abilityId, options);
 }
 
-function onRollAbilityTest(wrapped, abilityId, options) {
+async function onRollAbilityTest(wrapped, abilityId, options) {
   debug("onRollAbilityTest method called");
 
   // check for adv/dis flags unless the user pressed a fast-forward key
@@ -118,6 +130,8 @@ function onRollAbilityTest(wrapped, abilityId, options) {
   if (isFF) {
     debug("held down a fast-foward key, skip checking for adv/dis");
   } else {
+    debug("checking for message effects on this ability check");
+    await new AbilityCheckMessage(this, abilityId).addMessage(options);
     debug("checking for adv/dis effects on this ability check");
     const reminder = new AbilityCheckReminder(this, abilityId);
     reminder.updateOptions(options);
@@ -126,7 +140,7 @@ function onRollAbilityTest(wrapped, abilityId, options) {
   return wrapped(abilityId, options);
 }
 
-function onRollSkill(wrapped, skillId, options) {
+async function onRollSkill(wrapped, skillId, options) {
   debug("onRollSkill method called");
 
   // check for adv/dis flags unless the user pressed a fast-forward key
@@ -134,6 +148,8 @@ function onRollSkill(wrapped, skillId, options) {
   if (isFF) {
     debug("held down a fast-foward key, skip checking for adv/dis");
   } else {
+    debug("checking for message effects on this skill check");
+    await new SkillMessage(this, skillId).addMessage(options);
     debug("checking for adv/dis effects on this skill check");
     const reminder = new SkillReminder(this, skillId);
     reminder.updateOptions(options);
@@ -142,7 +158,7 @@ function onRollSkill(wrapped, skillId, options) {
   return wrapped(skillId, options);
 }
 
-function onRollToolCheck(wrapped, options) {
+async function onRollToolCheck(wrapped, options) {
   debug("onRollToolCheck method called");
 
   // check for adv/dis flags unless the user pressed a fast-forward key
@@ -150,6 +166,11 @@ function onRollToolCheck(wrapped, options) {
   if (isFF) {
     debug("held down a fast-foward key, skip checking for adv/dis");
   } else {
+    debug("checking for message effects on this tool check");
+    await new AbilityCheckMessage(
+      this.actor,
+      this.data.data.ability
+    ).addMessage(options);
     debug("checking for adv/dis effects on this tool check");
     const reminder = new AbilityCheckReminder(
       this.actor,
@@ -161,7 +182,7 @@ function onRollToolCheck(wrapped, options) {
   return wrapped(options);
 }
 
-function onRollDeathSave(wrapped, options) {
+async function onRollDeathSave(wrapped, options) {
   debug("onRollDeathSave method called");
 
   // check for adv/dis flags unless the user pressed a fast-forward key
@@ -169,6 +190,8 @@ function onRollDeathSave(wrapped, options) {
   if (isFF) {
     debug("held down a fast-foward key, skip checking for adv/dis");
   } else {
+    debug("checking for message effects on this death save");
+    await new DeathSaveMessage(this).addMessage(options);
     debug("checking for adv/dis effects on this death save");
     const reminder = new DeathSaveReminder(this);
     reminder.updateOptions(options);
@@ -177,14 +200,16 @@ function onRollDeathSave(wrapped, options) {
   return wrapped(options);
 }
 
-function onRollDamage(wrapped, options) {
+async function onRollDamage(wrapped, options) {
   debug("onRollDamage method called");
 
   // check for critical flags unless the user pressed a fast-forward key
-  const isFF = isFastForwarding(options);
+  const isFF = isFastForwardingDamage(options.event);
   if (isFF) {
     debug("held down a fast-foward key, skip checking for adv/dis");
   } else {
+    debug("checking for message effects on this damage roll");
+    await new DamageMessage(this.actor, this).addMessage(options);
     debug("checking for critical/normal effects on this damage roll");
     const reminder = new CriticalReminder(this.actor, getTarget(), this);
     reminder.updateOptions(options);
@@ -195,11 +220,28 @@ function onRollDamage(wrapped, options) {
 
 /**
  * Check if the user is holding down a fast-forward key.
- * @param {Event} event the event
+ * @param {object} options the options
  * @returns {Boolean} true if they are fast-forwarding, false otherwise
  */
 function isFastForwarding(options) {
-  return !!(options.fastForward || options.event?.shiftKey || options.event?.altKey || options.event?.ctrlKey || options.event?.metaKey);
+  return !!(
+    options.fastForward ||
+    options.event?.shiftKey ||
+    options.event?.altKey ||
+    options.event?.ctrlKey ||
+    options.event?.metaKey
+  );
+}
+
+/**
+ * Check if the user is holding down a fast-forward key for a damage roll.
+ * @param {Event} event the event
+ * @returns {Boolean} true if they are fast-forwarding, false otherwise
+ */
+function isFastForwardingDamage(event) {
+  // special handling for MRE and damage rolls, always process since it will run after this module
+  if (game.modules.get("mre-dnd5e")?.active) return false;
+  return event?.shiftKey || event?.altKey || event?.ctrlKey || event?.metaKey;
 }
 
 /**

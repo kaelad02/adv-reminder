@@ -10,13 +10,13 @@ In addition to the active effects, this module supports armor that imposes steal
 
 Supports active effects on the following rolls:
 
-* Attack rolls
-* Ability checks
-* Saving throws, including auto-fail (e.g. Stunned)
-* Skill checks
-* Tool checks
-* Death saves
-* Damage rolls
+- Attack rolls
+- Ability checks
+- Saving throws, including auto-fail (e.g. Stunned)
+- Skill checks
+- Tool checks
+- Death saves
+- Damage rolls
 
 ## Auto-Fail Rolls
 
@@ -25,6 +25,31 @@ There are active effect keys for automatically failing ability checks, saving th
 ## Fast-Forward Overrides
 
 If the player holds down one of the Ctrl/Alt/Shift/Meta keys to fast-forward the die roll (e.g. hold Alt to roll with advantage, skipping the roll dialog) then this module WILL NOT do anything. Holding down one of those keys stops the roll dialog from popping up so it's interpreted as overriding what this module does.
+
+## Messages
+
+In addition to active effects adding advantage or disadvantage, you can also add messages to remind you of conditional bonuses or advantage. For example, features like Dwarven Resilience give advantage on saving throws against poison don't work with the advantage flags since there isn't a way to limit it to poison. Now you can add a message to the dialog right above the buttons to remind you about Dwarven Resilience.
+
+![Saving Throw screenshot with message](screenshot2.png?raw=true)
+
+You have control over when the message appears and what it contains, including HTML formatting. In the screenshot above it just reminds you to roll with advantage on saving throws against poison. You are free to change it to just include `Dwarven Resilience` if that's all the reminder you need or `Advantage against poison` that doesn't mention saving throws since it only appears on CON saving throws.
+
+The active effects keys are listed below and should be set with the change mode of `Custom`.
+
+- `flags.adv-reminder.message.all` for all rolls
+- `flags.adv-reminder.message.attack.all` for all Attack rolls
+- `flags.adv-reminder.message.attack.mwak/rwak/msak/rsak` for Attack rolls of a specific action type
+- `flags.adv-reminder.message.attack.str/dex/con/int/wis/cha` for Attack rolls using a specific ability
+- `flags.adv-reminder.message.ability.all` for all Ability checks, Saving throws, Skill checks, and Death saves
+- `flags.adv-reminder.message.ability.check.all` for all Ability checks and Skill checks
+- `flags.adv-reminder.message.ability.check.str/dex/con/int/wis/cha` for specific Ability checks and Skill checks
+- `flags.adv-reminder.message.ability.save.all` for all Saving throws and Death saves
+- `flags.adv-reminder.message.ability.save.str/dex/con/int/wis/cha` for specific Saving throws
+- `flags.adv-reminder.message.skill.all` for all Skill checks
+- `flags.adv-reminder.message.skill.acr/ath/.../sur` for specific Skill checks
+- `flags.adv-reminder.message.deathSave` for Death saves
+- `flags.adv-reminder.message.damage.all` for all Damage rolls
+- `flags.adv-reminder.message.damage.mwak/rwak/msak/rsak` for Damage rolls of a specific action type
 
 ## Other Modules
 
@@ -44,9 +69,11 @@ Notes about other modules.
 
 ### Compatibility Notes
 
-[Better Rolls for 5e](https://foundryvtt.com/packages/betterrolls5e) This module works with Better Rolls, making rolls with advantage and disadvantage with some caviats.
+[Better Rolls for 5e](https://foundryvtt.com/packages/betterrolls5e) This module works with Better Rolls, making rolls with advantage and disadvantage with the following known issue(s).
 
-* Active effects for critical hits do not work.
-* The "d20 Mode" Better Rolls setting of "Single Roll Upgradeable" does not give the hint in the pop-up asking what kind of roll to perform. It will still apply the active effects though possibly leading to some confusion, especially since advantage and disadvantage will not cancel each other out like they should.
+- Active effects for critical hits do not work.
+- The "d20 Mode" Better Rolls setting of "Single Roll Upgradeable" does not give the hint in the pop-up asking what kind of roll to perform. It will still apply the active effects though possibly leading to some confusion, especially since advantage and disadvantage will not cancel each other out like they should.
 
 [Midi QOL](https://foundryvtt.com/packages/midi-qol) This module is compatible with Midi QOL. However, if you've enabled Midi QOL's workflow then it is not necessary to use this module as well since Midi QOL will already do this for you.
+
+[Minimal Rolling Enhancements for D&D5e](https://foundryvtt.com/packages/mre-dnd5e) This module works with MRE, making rolls with advantage/disadvantage and showing messages if you hold the "Roll Dialog Modifier Key" (an MRE setting).
