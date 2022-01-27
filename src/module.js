@@ -204,7 +204,7 @@ async function onRollDamage(wrapped, options) {
   debug("onRollDamage method called");
 
   // check for critical flags unless the user pressed a fast-forward key
-  const isFF = isFastForwarding(options);
+  const isFF = isFastForwardingDamage(options.event);
   if (isFF) {
     debug("held down a fast-foward key, skip checking for adv/dis");
   } else {
@@ -220,7 +220,7 @@ async function onRollDamage(wrapped, options) {
 
 /**
  * Check if the user is holding down a fast-forward key.
- * @param {Event} event the event
+ * @param {object} options the options
  * @returns {Boolean} true if they are fast-forwarding, false otherwise
  */
 function isFastForwarding(options) {
@@ -231,6 +231,17 @@ function isFastForwarding(options) {
     options.event?.ctrlKey ||
     options.event?.metaKey
   );
+}
+
+/**
+ * Check if the user is holding down a fast-forward key for a damage roll.
+ * @param {Event} event the event
+ * @returns {Boolean} true if they are fast-forwarding, false otherwise
+ */
+function isFastForwardingDamage(event) {
+  // special handling for MRE and damage rolls, always process since it will run after this module
+  if (game.modules.get("mre-dnd5e")?.active) return false;
+  return event?.shiftKey || event?.altKey || event?.ctrlKey || event?.metaKey;
 }
 
 /**

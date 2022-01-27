@@ -76,6 +76,4 @@ Notes about other modules.
 
 [Midi QOL](https://foundryvtt.com/packages/midi-qol) This module is compatible with Midi QOL. However, if you've enabled Midi QOL's workflow then it is not necessary to use this module as well since Midi QOL will already do this for you.
 
-[Minimal Rolling Enhancements for D&D5e](https://foundryvtt.com/packages/mre-dnd5e) This module works with MRE, making rolls with advantage and disadvantage with the following known issue(s).
-
-- Holding Shift (or how "Roll Dialog Modifier Key" is configured) to show the Damage roll dialog will not show critical hits or damage messages.
+[Minimal Rolling Enhancements for D&D5e](https://foundryvtt.com/packages/mre-dnd5e) This module works with MRE, making rolls with advantage/disadvantage and showing messages if you hold the "Roll Dialog Modifier Key" (an MRE setting).
