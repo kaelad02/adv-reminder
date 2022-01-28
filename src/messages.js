@@ -17,7 +17,9 @@ class BaseMessage {
     const keys = this.messageKeys;
     const messages = this.changes
       .filter((change) => keys.includes(change.key))
-      .map((change) => change.value);
+      .map((change) => {
+        return { label: change.document.data.label, value: change.value };
+      });
 
     if (messages.length > 0) {
       // add id to dialogOptions to put the message on the correct roll dialog
