@@ -80,6 +80,39 @@ Hooks.once("init", () => {
   );
 });
 
+// Add message flags to DAE so it shows them in the AE editor. Should do this in
+// a setup hook, but this module is loaded before DAE so do it in ready instead.
+Hooks.once("ready", () => {
+  if (game.modules.get("dae")?.active) {
+    const fields = [];
+    fields.push("flags.adv-reminder.message.all");
+    fields.push("flags.adv-reminder.message.attack.all");
+    fields.push("flags.adv-reminder.message.ability.all");
+    fields.push("flags.adv-reminder.message.ability.check.all");
+    fields.push("flags.adv-reminder.message.ability.save.all");
+    fields.push("flags.adv-reminder.message.skill.all");
+    fields.push("flags.adv-reminder.message.deathSave");
+    fields.push("flags.adv-reminder.message.damage.all");
+
+    ["mwak", "rwak", "msak", "rsak"].forEach((actionType) => {
+      fields.push(`flags.adv-reminder.message.attack.${actionType}`);
+      fields.push(`flags.adv-reminder.message.damage.${actionType}`);
+    });
+
+    Object.keys(CONFIG.DND5E.abilities).forEach((abilityId) => {
+      fields.push(`flags.adv-reminder.message.attack.${abilityId}`);
+      fields.push(`flags.adv-reminder.message.ability.check.${abilityId}`);
+      fields.push(`flags.adv-reminder.message.ability.save.${abilityId}`);
+    });
+
+    Object.keys(CONFIG.DND5E.skills).forEach((skillId) =>
+      fields.push(`flags.adv-reminder.message.skill.${skillId}`)
+    );
+
+    window.DAE.addAutoFields(fields);
+  }
+});
+
 async function onRollAttack(wrapped, options) {
   debug("onRollAttack method called");
 
