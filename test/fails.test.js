@@ -26,12 +26,6 @@ function createEffect(key) {
   return effect;
 }
 
-function mockFailRollMessage(failChecker) {
-  return jest
-    .spyOn(failChecker, "toMessage")
-    .mockImplementation((effectData) => {});
-}
-
 function mockFailChecker(failChecker) {
   return [
     jest.spyOn(failChecker, "createMessageData").mockImplementation(() => {}),
@@ -47,7 +41,7 @@ describe("AbilitySaveFail no legit active effects", () => {
     const spies = mockFailChecker(failChecker);
 
     expect(await failChecker.fails()).toBe(false);
-    spies.forEach((spy) => expect(spy).not.toHaveBeenCalled);
+    spies.forEach((spy) => expect(spy).not.toHaveBeenCalled());
   });
 
   test("saving throw with a suppressed active effect should not fail", async () => {
@@ -60,7 +54,7 @@ describe("AbilitySaveFail no legit active effects", () => {
     const spies = mockFailChecker(failChecker);
 
     expect(await failChecker.fails()).toBe(false);
-    spies.forEach((spy) => expect(spy).not.toHaveBeenCalled);
+    spies.forEach((spy) => expect(spy).not.toHaveBeenCalled());
   });
 
   test("saving throw with a disabled active effect should not fail", async () => {
@@ -73,7 +67,7 @@ describe("AbilitySaveFail no legit active effects", () => {
     const spies = mockFailChecker(failChecker);
 
     expect(await failChecker.fails()).toBe(false);
-    spies.forEach((spy) => expect(spy).not.toHaveBeenCalled);
+    spies.forEach((spy) => expect(spy).not.toHaveBeenCalled());
   });
 });
 
@@ -85,50 +79,52 @@ describe("AbilitySaveFail fail flags", () => {
     const spies = mockFailChecker(failChecker);
 
     expect(await failChecker.fails()).toBe(true);
-    spies.forEach((spy) => expect(spy).toHaveBeenCalled);
+    spies.forEach((spy) => expect(spy).toHaveBeenCalled());
   });
 
-  test.skip("saving throw with fail.ability.all flag should fail", () => {
+  test("saving throw with fail.ability.all flag should fail", async () => {
     const actor = createActorWithEffects("flags.midi-qol.fail.ability.all");
 
     const failChecker = new AbilitySaveFail(actor, "dex");
-    const spy = mockFailRollMessage(failChecker);
+    const spies = mockFailChecker(failChecker);
 
-    expect(failChecker.fails()).toBe(true);
-    expect(spy).toHaveBeenCalled();
+    expect(await failChecker.fails()).toBe(true);
+    spies.forEach((spy) => expect(spy).toHaveBeenCalled());
   });
 
-  test.skip("saving throw with fail.ability.save.all flag should fail", () => {
+  test("saving throw with fail.ability.save.all flag should fail", async () => {
     const actor = createActorWithEffects(
       "flags.midi-qol.fail.ability.save.all"
     );
 
     const failChecker = new AbilitySaveFail(actor, "dex");
-    const spy = mockFailRollMessage(failChecker);
+    const spies = mockFailChecker(failChecker);
 
-    expect(failChecker.fails()).toBe(true);
-    expect(spy).toHaveBeenCalled();
+    expect(await failChecker.fails()).toBe(true);
+    spies.forEach((spy) => expect(spy).toHaveBeenCalled());
   });
 
-  test.skip("saving throw with fail.ability.save.dex flag should fail a Dexterity save", () => {
+  test("saving throw with fail.ability.save.dex flag should fail a Dexterity save", async () => {
     const actor = createActorWithEffects(
       "flags.midi-qol.fail.ability.save.dex"
     );
 
     const failChecker = new AbilitySaveFail(actor, "dex");
-    const spy = mockFailRollMessage(failChecker);
+    const spies = mockFailChecker(failChecker);
 
-    expect(failChecker.fails()).toBe(true);
-    expect(spy).toHaveBeenCalled();
+    expect(await failChecker.fails()).toBe(true);
+    spies.forEach((spy) => expect(spy).toHaveBeenCalled());
   });
 
-  test.skip("saving throw with fail.ability.save.dex flag should not fail a Constitution save", () => {
+  test("saving throw with fail.ability.save.dex flag should not fail a Constitution save", async () => {
     const actor = createActorWithEffects(
       "flags.midi-qol.fail.ability.save.dex"
     );
 
     const failChecker = new AbilitySaveFail(actor, "con");
+    const spies = mockFailChecker(failChecker);
 
-    expect(failChecker.fails()).toBe(false);
+    expect(await failChecker.fails()).toBe(false);
+    spies.forEach((spy) => expect(spy).not.toHaveBeenCalled());
   });
 });
