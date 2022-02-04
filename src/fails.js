@@ -66,7 +66,29 @@ class BaseFail {
     return ChatMessage.create(chatData);
   }
 
-  toMessage(messageData) {
+  /**
+   * Check for auto-fail flags to see if this roll should fail.
+   * @param {object} options the roll options
+   * @returns true if the roll should fail, false if it may continue
+   */
+  async fails(options) {
+    // get the active effect keys that will fail
+    const failKeys = this.failKeys;
+    debug("failKeys", failKeys);
+
+    const shouldFail = this.actor.effects
+      .filter((effect) => !effect.isSuppressed && !effect.data.disabled)
+      .flatMap((effect) => effect.data.changes)
+      .some((change) => failKeys.includes(change.key));
+      debug("should fail", shouldFail);
+    if (shouldFail) {
+      const messageData = this.createMessageData(options);
+      await this.toMessage(messageData);
+    }
+    return shouldFail;
+  }
+
+  async toMessage(messageData) {
     // content that immatates a die roll
     const content = await renderTemplate(
       "modules/adv-reminder/templates/fail-dice-roll.html"
@@ -111,7 +133,7 @@ export class AbilitySaveFail extends BaseFail {
     });
   }
 
-  toMessage(options = {}) {
+  createMessageData(options = {}) {
     // options was passed into rollAbilitySave to start with
 
     // build title, probably used as flavor
@@ -127,6 +149,6 @@ export class AbilitySaveFail extends BaseFail {
     // pull flavor from a few places before falling back to title
     messageData.flavor = messageData.flavor || options.flavor || title;
 
-    super.toMessage(messageData);
+    return messageData;
   }
 }

@@ -136,7 +136,11 @@ async function onRollAbilitySave(wrapped, abilityId, options) {
 
   // check if an effect says to fail this roll
   const failChecker = new AbilitySaveFail(this, abilityId);
-  if (failChecker.failCheck()) {
+  /* if (failChecker.failCheck()) {
+    return null;
+  } */
+  if (await failChecker.fails(options)) {
+    debug("failing the saving throw");
     return null;
   }
 
