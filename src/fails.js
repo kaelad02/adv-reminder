@@ -47,6 +47,7 @@ class BaseFail {
     );
     // apply the roll mode to adjust message visibility
     ChatMessage.applyRollMode(chatData, game.settings.get("core", "rollMode"));
+
     // create the chat message
     return ChatMessage.create(chatData);
   }
@@ -70,18 +71,18 @@ export class AbilitySaveFail extends BaseFail {
   }
 
   createMessageData(options = {}) {
-    // options was passed into rollAbilitySave to start with
-
-    // build title, probably used as flavor
+    // build title, probably used as chat message flavor
     const label = CONFIG.DND5E.abilities[this.abilityId];
     const title = `${game.i18n.format("DND5E.SavePromptTitle", {
       ability: label,
     })}: ${this.actor.name}`;
+
     // build chat message data
     const messageData = foundry.utils.mergeObject(options.messageData || {}, {
       speaker: options.speaker || ChatMessage.getSpeaker({ actor: this.actor }),
       "flags.dnd5e.roll": { type: "save", abilityId: this.abilityId },
     });
+
     // pull flavor from a few places before falling back to title
     messageData.flavor = messageData.flavor || options.flavor || title;
 
