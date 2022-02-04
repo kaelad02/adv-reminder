@@ -136,13 +136,7 @@ async function onRollAbilitySave(wrapped, abilityId, options) {
 
   // check if an effect says to fail this roll
   const failChecker = new AbilitySaveFail(this, abilityId);
-  /* if (failChecker.failCheck()) {
-    return null;
-  } */
-  if (await failChecker.fails(options)) {
-    debug("failing the saving throw");
-    return null;
-  }
+  if (await failChecker.fails(options)) return null;
 
   // check for adv/dis flags unless the user pressed a fast-forward key
   const isFF = isFastForwarding(options);
