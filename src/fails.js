@@ -34,7 +34,7 @@ class BaseFail {
   async toMessage(messageData) {
     // content that immatates a die roll
     const content = await renderTemplate(
-      "modules/adv-reminder/templates/fail-dice-roll.html"
+      "modules/adv-reminder/templates/fail-dice-roll.hbs"
     );
     // merge basic data with child's data
     const chatData = foundry.utils.mergeObject(
