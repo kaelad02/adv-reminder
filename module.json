@@ -11,6 +11,18 @@
       "name": "lib-wrapper"
     }
   ],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json"
+    },
+    {
+      "lang": "fr",
+      "name": "Français",
+      "path": "lang/fr.json"
+    }
+  ],
   "systems": ["dnd5e"],
   "esmodules": ["src/module.js"],
   "styles": ["css/adv-reminder.css"],
