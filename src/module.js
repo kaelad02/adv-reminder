@@ -16,12 +16,18 @@ import {
   SkillReminder,
 } from "./reminders.js";
 import { registerSettings, fetchSettings } from "./settings.js";
-import { debug, log } from "./util.js";
+import { debug, isMinVersion, log } from "./util.js";
+
+let checkArmorStealth;
 
 Hooks.once("init", () => {
   log("initializing Advantage Reminder");
   registerSettings();
   fetchSettings();
+
+  // DAE version 0.8.81 added support for "impose stealth disadvantage"
+  checkArmorStealth = !isMinVersion("dae", "0.8.81");
+  debug("checkArmorStealth", checkArmorStealth);
 
   // Attack roll wrapper
   libWrapper.register(
@@ -184,7 +190,7 @@ async function onRollSkill(wrapped, skillId, options) {
     debug("checking for message effects on this skill check");
     await new SkillMessage(this, skillId).addMessage(options);
     debug("checking for adv/dis effects on this skill check");
-    const reminder = new SkillReminder(this, skillId);
+    const reminder = new SkillReminder(this, skillId, checkArmorStealth);
     reminder.updateOptions(options);
   }
 
