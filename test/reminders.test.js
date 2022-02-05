@@ -1177,6 +1177,28 @@ describe("SkillReminder disadvantage flags", () => {
     expect(options.advantage).toBeUndefined();
     expect(options.disadvantage).toBe(true);
   });
+
+  test("Stealth check with armor that imposes disadvantage but checking is off", () => {
+    const actor = createActorWithEffects();
+    actor.items = [
+      {
+        type: "equipment",
+        data: {
+          data: {
+            equipped: true,
+            stealth: true,
+          },
+        },
+      },
+    ];
+    const options = {};
+
+    const reminder = new SkillReminder(actor, "ste", false);
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBeUndefined();
+    expect(options.disadvantage).toBeUndefined();
+  });
 });
 
 describe("SkillReminder both advantage and disadvantage flags", () => {
