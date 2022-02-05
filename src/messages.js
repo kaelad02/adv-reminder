@@ -20,30 +20,12 @@ class BaseMessage {
       .map((change) => change.value);
 
     if (messages.length > 0) {
-      // add id to dialogOptions to put the message on the correct roll dialog
-      const messageId = randomID();
-      options.dialogOptions = options.dialogOptions || {};
-      options.dialogOptions.id = messageId;
       // build message
       const message = await renderTemplate(
         "modules/adv-reminder/templates/roll-dialog-messages.hbs",
         { messages }
       );
-      debug("adding hook to renderDialog w/ ", message);
-      const hookId = Hooks.on("renderDialog", (dialog, html, data) => {
-        debug("called on hook for renderDialog");
-        if (dialog.options.id !== messageId) return;
-        // add message at the end
-        const formGroups = html.find(".form-group:last");
-        formGroups.after(message);
-        // reset dialog height
-        const position = dialog.position;
-        position.height = "auto";
-        dialog.setPosition(position);
-      });
-      setTimeout(() => {
-        Hooks.off("renderDialog", hookId);
-      }, 10_000);
+      setProperty(options, "dialogOptions.adv-reminder.message", message);
     }
 
     return messages;
