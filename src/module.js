@@ -78,6 +78,21 @@ Hooks.once("init", () => {
     onRollDamage,
     "WRAPPER"
   );
+
+  Hooks.on("renderDialog", (dialog, html, data) => {
+    debug("renderDialog hook called");
+
+    const message = dialog.options["adv-reminder"]?.message;
+    if (message) {
+      // add message at the end
+      const formGroups = html.find(".form-group:last");
+      formGroups.after(message);
+      // reset dialog height
+      const position = dialog.position;
+      position.height = "auto";
+      dialog.setPosition(position);
+    }
+  });
 });
 
 // Add message flags to DAE so it shows them in the AE editor. Should do this in
