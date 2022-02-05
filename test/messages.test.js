@@ -9,11 +9,19 @@ import {
 } from "../src/messages";
 
 // fakes
-globalThis.renderTemplate = () => {};
-globalThis.randomID = () => "";
-globalThis.Hooks = {};
-globalThis.Hooks.on = () => "";
-globalThis.Hooks.off = () => {};
+globalThis.renderTemplate = () => "";
+globalThis.setProperty = (object, key, value) => {
+  // split the key into parts, removing the last one
+  const parts = key.split(".");
+  const lastProp = parts.pop();
+  // recursively create objects out the key parts
+  const lastObj = parts.reduce((obj, prop) => {
+    if (!obj.hasOwnProperty(prop)) obj[prop] = {};
+    return obj[prop];
+  }, object);
+  // set the value using the last key part
+  lastObj[lastProp] = value;
+};
 
 function createActorWithEffects(...keyValuePairs) {
   const effects = keyValuePairs.map(createEffect);
@@ -165,7 +173,7 @@ describe("AttackMessage message flags", () => {
     const messages = await new AttackMessage(actor, item).addMessage(options);
 
     expect(messages).toStrictEqual(["message.all message"]);
-    expect(options.dialogOptions?.id).toBe("");
+    expect(options.dialogOptions["adv-reminder"].message).toBe("");
   });
 
   test("attack with message.attack.all flag should add the message", async () => {
@@ -179,7 +187,7 @@ describe("AttackMessage message flags", () => {
     const messages = await new AttackMessage(actor, item).addMessage(options);
 
     expect(messages).toStrictEqual(["message.attack.all message"]);
-    expect(options.dialogOptions?.id).toBe("");
+    expect(options.dialogOptions["adv-reminder"].message).toBe("");
   });
 
   test("attack with message.attack.mwak flag should add the message for Melee Weapon Attack", async () => {
@@ -193,7 +201,7 @@ describe("AttackMessage message flags", () => {
     const messages = await new AttackMessage(actor, item).addMessage(options);
 
     expect(messages).toStrictEqual(["message.attack.mwak message"]);
-    expect(options.dialogOptions?.id).toBe("");
+    expect(options.dialogOptions["adv-reminder"].message).toBe("");
   });
 
   test("attack with message.attack.mwak flag should not add the message for Ranged Weapon Attack", async () => {
@@ -221,7 +229,7 @@ describe("AttackMessage message flags", () => {
     const messages = await new AttackMessage(actor, item).addMessage(options);
 
     expect(messages).toStrictEqual(["message.attack.cha message"]);
-    expect(options.dialogOptions?.id).toBe("");
+    expect(options.dialogOptions["adv-reminder"].message).toBe("");
   });
 
   test("attack with message.attack.cha flag should not add the message for Intelligence Attack", async () => {
@@ -249,7 +257,7 @@ describe("AttackMessage message flags", () => {
     const messages = await new AttackMessage(actor, item).addMessage(options);
 
     expect(messages).toStrictEqual(["first", "second"]);
-    expect(options.dialogOptions?.id).toBe("");
+    expect(options.dialogOptions["adv-reminder"].message).toBe("");
   });
 });
 
@@ -312,7 +320,7 @@ describe("AbilityCheckMessage message flags", () => {
     );
 
     expect(messages).toStrictEqual(["message.all message"]);
-    expect(options.dialogOptions?.id).toBe("");
+    expect(options.dialogOptions["adv-reminder"].message).toBe("");
   });
 
   test("ability check with message.ability.all flag should add the message", async () => {
@@ -327,7 +335,7 @@ describe("AbilityCheckMessage message flags", () => {
     );
 
     expect(messages).toStrictEqual(["message.ability.all message"]);
-    expect(options.dialogOptions?.id).toBe("");
+    expect(options.dialogOptions["adv-reminder"].message).toBe("");
   });
 
   test("ability check with message.ability.check.all flag should add the message", async () => {
@@ -342,7 +350,7 @@ describe("AbilityCheckMessage message flags", () => {
     );
 
     expect(messages).toStrictEqual(["message.ability.check.all message"]);
-    expect(options.dialogOptions?.id).toBe("");
+    expect(options.dialogOptions["adv-reminder"].message).toBe("");
   });
 
   test("ability check with message.ability.check.int flag should add the message for Intelligence Check", async () => {
@@ -357,7 +365,7 @@ describe("AbilityCheckMessage message flags", () => {
     );
 
     expect(messages).toStrictEqual(["message.ability.check.int message"]);
-    expect(options.dialogOptions?.id).toBe("");
+    expect(options.dialogOptions["adv-reminder"].message).toBe("");
   });
 
   test("ability check with message.ability.check.int flag should not add the message for Dexterity Check", async () => {
@@ -387,7 +395,7 @@ describe("AbilityCheckMessage message flags", () => {
     );
 
     expect(messages).toStrictEqual(["first", "second"]);
-    expect(options.dialogOptions?.id).toBe("");
+    expect(options.dialogOptions["adv-reminder"].message).toBe("");
   });
 });
 
@@ -450,7 +458,7 @@ describe("AbilitySaveMessage message flags", () => {
     );
 
     expect(messages).toStrictEqual(["message.all message"]);
-    expect(options.dialogOptions?.id).toBe("");
+    expect(options.dialogOptions["adv-reminder"].message).toBe("");
   });
 
   test("saving throw with message.ability.all flag should add the message", async () => {
@@ -465,7 +473,7 @@ describe("AbilitySaveMessage message flags", () => {
     );
 
     expect(messages).toStrictEqual(["message.ability.all message"]);
-    expect(options.dialogOptions?.id).toBe("");
+    expect(options.dialogOptions["adv-reminder"].message).toBe("");
   });
 
   test("saving throw with message.ability.save.all flag should add the message", async () => {
@@ -480,7 +488,7 @@ describe("AbilitySaveMessage message flags", () => {
     );
 
     expect(messages).toStrictEqual(["message.ability.save.all message"]);
-    expect(options.dialogOptions?.id).toBe("");
+    expect(options.dialogOptions["adv-reminder"].message).toBe("");
   });
 
   test("saving throw with message.ability.save.int flag should add the message for Intelligence Check", async () => {
@@ -495,7 +503,7 @@ describe("AbilitySaveMessage message flags", () => {
     );
 
     expect(messages).toStrictEqual(["message.ability.save.int message"]);
-    expect(options.dialogOptions?.id).toBe("");
+    expect(options.dialogOptions["adv-reminder"].message).toBe("");
   });
 
   test("saving throw with message.ability.save.int flag should not add the message for Dexterity Check", async () => {
@@ -525,7 +533,7 @@ describe("AbilitySaveMessage message flags", () => {
     );
 
     expect(messages).toStrictEqual(["first", "second"]);
-    expect(options.dialogOptions?.id).toBe("");
+    expect(options.dialogOptions["adv-reminder"].message).toBe("");
   });
 });
 
@@ -580,7 +588,7 @@ describe("SkillMessage message flags", () => {
     const messages = await new SkillMessage(actor, "prc").addMessage(options);
 
     expect(messages).toStrictEqual(["message.all message"]);
-    expect(options.dialogOptions?.id).toBe("");
+    expect(options.dialogOptions["adv-reminder"].message).toBe("");
   });
 
   test("skill check with message.ability.all flag should add the message", async () => {
@@ -593,7 +601,7 @@ describe("SkillMessage message flags", () => {
     const messages = await new SkillMessage(actor, "prc").addMessage(options);
 
     expect(messages).toStrictEqual(["message.ability.all message"]);
-    expect(options.dialogOptions?.id).toBe("");
+    expect(options.dialogOptions["adv-reminder"].message).toBe("");
   });
 
   test("skill check with message.ability.check.all flag should add the message", async () => {
@@ -606,7 +614,7 @@ describe("SkillMessage message flags", () => {
     const messages = await new SkillMessage(actor, "prc").addMessage(options);
 
     expect(messages).toStrictEqual(["message.ability.check.all message"]);
-    expect(options.dialogOptions?.id).toBe("");
+    expect(options.dialogOptions["adv-reminder"].message).toBe("");
   });
 
   test("skill check with message.ability.check.wis flag should add the message for Perception Check", async () => {
@@ -619,7 +627,7 @@ describe("SkillMessage message flags", () => {
     const messages = await new SkillMessage(actor, "prc").addMessage(options);
 
     expect(messages).toStrictEqual(["message.ability.check.int message"]);
-    expect(options.dialogOptions?.id).toBe("");
+    expect(options.dialogOptions["adv-reminder"].message).toBe("");
   });
 
   test("skill check with message.ability.check.wis flag should not add the message for Acrobatics Check", async () => {
@@ -645,7 +653,7 @@ describe("SkillMessage message flags", () => {
     const messages = await new SkillMessage(actor, "prc").addMessage(options);
 
     expect(messages).toStrictEqual(["message.skill.all message"]);
-    expect(options.dialogOptions?.id).toBe("");
+    expect(options.dialogOptions["adv-reminder"].message).toBe("");
   });
 
   test("skill check with message.skill.prc flag should add the message for Perception Check", async () => {
@@ -658,7 +666,7 @@ describe("SkillMessage message flags", () => {
     const messages = await new SkillMessage(actor, "prc").addMessage(options);
 
     expect(messages).toStrictEqual(["message.skill.prc message"]);
-    expect(options.dialogOptions?.id).toBe("");
+    expect(options.dialogOptions["adv-reminder"].message).toBe("");
   });
 
   test("skill check with message.skill.prc flag should not add the message for Nature Check", async () => {
@@ -684,7 +692,7 @@ describe("SkillMessage message flags", () => {
     const messages = await new SkillMessage(actor, "ste").addMessage(options);
 
     expect(messages).toStrictEqual(["first", "second"]);
-    expect(options.dialogOptions?.id).toBe("");
+    expect(options.dialogOptions["adv-reminder"].message).toBe("");
   });
 });
 
@@ -739,7 +747,7 @@ describe("DeathSaveMessage message flags", () => {
     const messages = await new DeathSaveMessage(actor).addMessage(options);
 
     expect(messages).toStrictEqual(["message.all message"]);
-    expect(options.dialogOptions?.id).toBe("");
+    expect(options.dialogOptions["adv-reminder"].message).toBe("");
   });
 
   test("death save with message.ability.all flag should add the message", async () => {
@@ -752,7 +760,7 @@ describe("DeathSaveMessage message flags", () => {
     const messages = await new DeathSaveMessage(actor).addMessage(options);
 
     expect(messages).toStrictEqual(["message.ability.all message"]);
-    expect(options.dialogOptions?.id).toBe("");
+    expect(options.dialogOptions["adv-reminder"].message).toBe("");
   });
 
   test("death save with message.ability.save.all flag should add the message", async () => {
@@ -765,7 +773,7 @@ describe("DeathSaveMessage message flags", () => {
     const messages = await new DeathSaveMessage(actor).addMessage(options);
 
     expect(messages).toStrictEqual(["message.ability.save.all message"]);
-    expect(options.dialogOptions?.id).toBe("");
+    expect(options.dialogOptions["adv-reminder"].message).toBe("");
   });
 
   test("death save with message.deathSave flag should add the message", async () => {
@@ -778,7 +786,7 @@ describe("DeathSaveMessage message flags", () => {
     const messages = await new DeathSaveMessage(actor).addMessage(options);
 
     expect(messages).toStrictEqual(["message.deathSave message"]);
-    expect(options.dialogOptions?.id).toBe("");
+    expect(options.dialogOptions["adv-reminder"].message).toBe("");
   });
 
   test("death save with two messages should add both messages", async () => {
@@ -791,7 +799,7 @@ describe("DeathSaveMessage message flags", () => {
     const messages = await new DeathSaveMessage(actor).addMessage(options);
 
     expect(messages).toStrictEqual(["first", "second"]);
-    expect(options.dialogOptions?.id).toBe("");
+    expect(options.dialogOptions["adv-reminder"].message).toBe("");
   });
 });
 
@@ -850,7 +858,7 @@ describe("DamageMessage message flags", () => {
     const messages = await new DamageMessage(actor, item).addMessage(options);
 
     expect(messages).toStrictEqual(["message.all message"]);
-    expect(options.options?.dialogOptions?.id).toBe("");
+    expect(options.options?.dialogOptions["adv-reminder"].message).toBe("");
   });
 
   test("damage with message.damage.all flag should add the message", async () => {
@@ -864,7 +872,7 @@ describe("DamageMessage message flags", () => {
     const messages = await new DamageMessage(actor, item).addMessage(options);
 
     expect(messages).toStrictEqual(["message.damage.all message"]);
-    expect(options.options?.dialogOptions?.id).toBe("");
+    expect(options.options?.dialogOptions["adv-reminder"].message).toBe("");
   });
 
   test("damage with message.damage.mwak flag should add the message for Melee Weapon damage", async () => {
@@ -878,7 +886,7 @@ describe("DamageMessage message flags", () => {
     const messages = await new DamageMessage(actor, item).addMessage(options);
 
     expect(messages).toStrictEqual(["message.damage.mwak message"]);
-    expect(options.options?.dialogOptions?.id).toBe("");
+    expect(options.options?.dialogOptions["adv-reminder"].message).toBe("");
   });
 
   test("damage with message.damage.mwak flag should not add the message for Ranged Weapon damage", async () => {
@@ -906,6 +914,6 @@ describe("DamageMessage message flags", () => {
     const messages = await new DamageMessage(actor, item).addMessage(options);
 
     expect(messages).toStrictEqual(["first", "second"]);
-    expect(options.options?.dialogOptions?.id).toBe("");
+    expect(options.options?.dialogOptions["adv-reminder"].message).toBe("");
   });
 });
