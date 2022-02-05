@@ -171,13 +171,15 @@ export class AbilitySaveReminder extends AbilityBaseReminder {
 }
 
 export class SkillReminder extends AbilityCheckReminder {
-  constructor(actor, skillId) {
+  constructor(actor, skillId, checkArmorStealth = true) {
     super(actor, actor.data.data.skills[skillId].ability);
 
     /** @type {string} */
     this.skillId = skillId;
     /** @type {Item5e[]} */
     this.items = actor.items;
+    /** @type {boolean} */
+    this.checkArmorStealth = checkArmorStealth;
   }
 
   /** @override */
@@ -205,7 +207,9 @@ export class SkillReminder extends AbilityCheckReminder {
 
     // find matching keys and update options
     const accumulator = this._accumulator();
-    accumulator.disadvantage(this._armorStealthDisadvantage());
+    if (this.checkArmorStealth) {
+      accumulator.disadvantage(this._armorStealthDisadvantage());
+    }
     accumulator.add(this.actorKeys, advKeys, disKeys);
     accumulator.update(options);
   }
