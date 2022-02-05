@@ -85,20 +85,8 @@ Hooks.once("init", () => {
     "WRAPPER"
   );
 
-  Hooks.on("renderDialog", (dialog, html, data) => {
-    debug("renderDialog hook called");
-
-    const message = dialog.options["adv-reminder"]?.message;
-    if (message) {
-      // add message at the end
-      const formGroups = html.find(".form-group:last");
-      formGroups.after(message);
-      // reset dialog height
-      const position = dialog.position;
-      position.height = "auto";
-      dialog.setPosition(position);
-    }
-  });
+  // Render dialog hook
+  Hooks.on("renderDialog", renderDialogHook);
 });
 
 // Add message flags to DAE so it shows them in the AE editor. Should do this in
@@ -268,6 +256,21 @@ async function onRollDamage(wrapped, options) {
   }
 
   return wrapped(options);
+}
+
+function renderDialogHook(dialog, html, data) {
+  debug("renderDialog hook called");
+
+  const message = dialog.options["adv-reminder"]?.message;
+  if (message) {
+    // add message at the end
+    const formGroups = html.find(".form-group:last");
+    formGroups.after(message);
+    // reset dialog height
+    const position = dialog.position;
+    position.height = "auto";
+    dialog.setPosition(position);
+  }
 }
 
 /**
