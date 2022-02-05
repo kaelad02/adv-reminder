@@ -86,7 +86,7 @@ Hooks.once("init", () => {
   );
 
   // Render dialog hook
-  Hooks.on("renderDialog", renderDialogHook);
+  Hooks.on("renderDialog", addMessageHook);
 });
 
 // Add message flags to DAE so it shows them in the AE editor. Should do this in
@@ -258,8 +258,8 @@ async function onRollDamage(wrapped, options) {
   return wrapped(options);
 }
 
-function renderDialogHook(dialog, html, data) {
-  debug("renderDialog hook called");
+function addMessageHook(dialog, html, data) {
+  debug("addMessageHook function called");
 
   const message = dialog.options["adv-reminder"]?.message;
   if (message) {
