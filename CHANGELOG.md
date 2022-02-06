@@ -1,3 +1,10 @@
+# 1.1
+
+- bug fix: damage roll wrapper wasn't checking `options.fastForward`
+- feature: add message flags to DAE to show in the active effect editor
+- feature: [#19](https://github.com/kaelad02/adv-reminder/pull/19) Change the auto-fail chat message to look like a die roll
+- feature: [#15](https://github.com/kaelad02/adv-reminder/pull/15) Let DAE handle "impose stealth disadvantage" if you're using version 0.8.81 or newer
+
 # 1.0
 
 - feature: [#3](https://github.com/kaelad02/adv-reminder/issues/3) Messages that show up on the roll dialogs
