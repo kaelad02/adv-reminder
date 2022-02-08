@@ -1,3 +1,7 @@
+# 1.2
+
+- bug fix: [#22](https://github.com/kaelad02/adv-reminder/issues/22) Error during damage rolls when Midi-QOL auto-rolls damage
+
 # 1.1
 
 - bug fix: damage roll wrapper wasn't checking `options.fastForward`
