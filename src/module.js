@@ -122,7 +122,7 @@ Hooks.once("ready", () => {
   }
 });
 
-async function onRollAttack(wrapped, options) {
+async function onRollAttack(wrapped, options = {}) {
   debug("onRollAttack method called");
 
   // check for adv/dis flags unless the user pressed a fast-forward key
@@ -140,7 +140,7 @@ async function onRollAttack(wrapped, options) {
   return wrapped(options);
 }
 
-async function onRollAbilitySave(wrapped, abilityId, options) {
+async function onRollAbilitySave(wrapped, abilityId, options = {}) {
   debug("onRollAbilitySave method called");
 
   // check if an effect says to fail this roll
@@ -162,7 +162,7 @@ async function onRollAbilitySave(wrapped, abilityId, options) {
   return wrapped(abilityId, options);
 }
 
-async function onRollAbilityTest(wrapped, abilityId, options) {
+async function onRollAbilityTest(wrapped, abilityId, options = {}) {
   debug("onRollAbilityTest method called");
 
   // check for adv/dis flags unless the user pressed a fast-forward key
@@ -180,7 +180,7 @@ async function onRollAbilityTest(wrapped, abilityId, options) {
   return wrapped(abilityId, options);
 }
 
-async function onRollSkill(wrapped, skillId, options) {
+async function onRollSkill(wrapped, skillId, options = {}) {
   debug("onRollSkill method called");
 
   // check for adv/dis flags unless the user pressed a fast-forward key
@@ -198,7 +198,7 @@ async function onRollSkill(wrapped, skillId, options) {
   return wrapped(skillId, options);
 }
 
-async function onRollToolCheck(wrapped, options) {
+async function onRollToolCheck(wrapped, options = {}) {
   debug("onRollToolCheck method called");
 
   // check for adv/dis flags unless the user pressed a fast-forward key
@@ -222,7 +222,7 @@ async function onRollToolCheck(wrapped, options) {
   return wrapped(options);
 }
 
-async function onRollDeathSave(wrapped, options) {
+async function onRollDeathSave(wrapped, options = {}) {
   debug("onRollDeathSave method called");
 
   // check for adv/dis flags unless the user pressed a fast-forward key
@@ -240,7 +240,7 @@ async function onRollDeathSave(wrapped, options) {
   return wrapped(options);
 }
 
-async function onRollDamage(wrapped, options) {
+async function onRollDamage(wrapped, options = {}) {
   debug("onRollDamage method called");
 
   // check for critical flags unless the user pressed a fast-forward key
@@ -284,10 +284,10 @@ function addMessageHook(dialog, html, data) {
 function isFastForwarding({ fastForward = false, event = {} }) {
   return !!(
     fastForward ||
-    event.shiftKey ||
-    event.altKey ||
-    event.ctrlKey ||
-    event.metaKey
+    event?.shiftKey ||
+    event?.altKey ||
+    event?.ctrlKey ||
+    event?.metaKey
   );
 }
 
