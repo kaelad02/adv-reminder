@@ -79,6 +79,5 @@ Notes about other modules.
 
 - Midi QOL will ignore any advantage/disadvantage/critical settings that Advantage Reminder finds and passes along. It will perform the check for those flags itself. It is wasted work but shouldn't cause a noticable performance hit.
 - Does not show messages if Midi QOL is configured to fast forward rolls
-- Does not show messages on attack or damage rolls
 
 [Minimal Rolling Enhancements for D&D5e](https://foundryvtt.com/packages/mre-dnd5e) This module works with MRE, making rolls with advantage/disadvantage and showing messages if you hold the "Roll Dialog Modifier Key" (an MRE setting).
