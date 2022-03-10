@@ -22,6 +22,9 @@ globalThis.setProperty = (object, key, value) => {
   // set the value using the last key part
   lastObj[lastProp] = value;
 };
+globalThis.TextEditor = {
+  enrichHTML: (content, options) => content,
+};
 
 function createActorWithEffects(...keyValuePairs) {
   const effects = keyValuePairs.map(createEffect);
@@ -87,6 +90,7 @@ function createActorWithEffects(...keyValuePairs) {
       },
     },
     effects,
+    getRollData: () => {},
   };
 }
 
