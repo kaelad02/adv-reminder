@@ -266,6 +266,13 @@ function addMessageHook(dialog, html, data) {
     // add message at the end
     const formGroups = html.find(".form-group:last");
     formGroups.after(message);
+    // swap "inline-roll" class for "dialog-roll"
+    const inlineRolls = html.find("a.inline-roll");
+    if (inlineRolls) {
+      debug("found inline-roll", inlineRolls);
+      inlineRolls.removeClass("inline-roll");
+      inlineRolls.addClass("dialog-roll");
+    }
     // add onClick for inline rolls
     html.on("click", "a.dialog-roll", (event) => {
       // get the formula from the button
