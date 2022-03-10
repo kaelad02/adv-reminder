@@ -1,15 +1,15 @@
+/* Style the default buttons that aren't normal */
 .dialog .dialog-buttons button.default.advantage {
   font-weight: bold;
 }
-
 .dialog .dialog-buttons button.default.disadvantage {
   font-weight: bold;
 }
-
 .dialog .dialog-buttons button.default.critical {
   font-weight: bold;
 }
 
+/* Style the messages */
 .dialog .dialog-content .adv-reminder-messages {
   background: rgba(0, 0, 0, 0.05);
   padding: 3px 5px;
@@ -18,7 +18,19 @@
   border: 1px solid #7a7971;
   border-radius: 3px;
 }
-
 .adv-reminder-messages > div:not(:last-child) {
   margin-bottom: 10px;
+}
+
+/* Copy the style from "inline-roll" to "dialog-roll" */
+a.dialog-roll {
+  background: #ddd;
+  padding: 1px 4px;
+  border: 1px solid var(--color-border-dark-tertiary);
+  border-radius: 2px;
+  white-space: nowrap;
+  word-break: break-all;
+}
+a.dialog-roll i {
+  color: var(--color-text-dark-inactive);
 }
