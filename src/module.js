@@ -84,6 +84,9 @@ Hooks.once("init", () => {
     onRollDamage,
     "WRAPPER"
   );
+
+  // Render dialog hook
+  Hooks.on("renderDialog", addMessageHook);
 });
 
 // Add message flags to DAE so it shows them in the AE editor. Should do this in
@@ -253,6 +256,21 @@ async function onRollDamage(wrapped, options = {}) {
   }
 
   return wrapped(options);
+}
+
+function addMessageHook(dialog, html, data) {
+  debug("addMessageHook function called");
+
+  const message = dialog.options["adv-reminder"]?.message;
+  if (message) {
+    // add message at the end
+    const formGroups = html.find(".form-group:last");
+    formGroups.after(message);
+    // reset dialog height
+    const position = dialog.position;
+    position.height = "auto";
+    dialog.setPosition(position);
+  }
 }
 
 /**
