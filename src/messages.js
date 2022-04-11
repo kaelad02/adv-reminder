@@ -2,6 +2,8 @@ import { debug } from "./util.js";
 
 class BaseMessage {
   constructor(actor) {
+    /** @type {Actor5e} */
+    this.actor = actor;
     /** @type {EffectChangeData[]} */
     this.changes = actor.effects
       .filter((effect) => !effect.isSuppressed && !effect.data.disabled)
@@ -25,7 +27,16 @@ class BaseMessage {
         "modules/adv-reminder/templates/roll-dialog-messages.hbs",
         { messages }
       );
-      setProperty(options, "dialogOptions.adv-reminder.message", message);
+      // enrich message, specifically replacing rolls
+      const enriched = TextEditor.enrichHTML(message, {
+        secrets: true,
+        documents: false,
+        links: false,
+        rolls: true,
+        rollData: this.actor.getRollData(),
+      });
+      debug("message", message, "enriched", enriched);
+      setProperty(options, "dialogOptions.adv-reminder.message", enriched);
     }
 
     return messages;

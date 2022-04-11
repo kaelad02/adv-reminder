@@ -34,6 +34,10 @@ In addition to active effects adding advantage or disadvantage, you can also add
 
 You have control over when the message appears and what it contains, including HTML formatting. In the screenshot above it just reminds you to roll with advantage on saving throws against poison. You are free to change it to just include `Dwarven Resilience` if that's all the reminder you need or `Advantage against poison` that doesn't mention saving throws since it only appears on CON saving throws.
 
+You can also place deferred inline rolls (e.g. `[[/r 1d6]]`) in the messages that you can click on to add it to the Situational Bonus field. For example, if you want a reminder about Divine Fury damage, you can create a message, `[[/r 1d6+3]]{Divine Fury} damage on first hit`, to easily add that damage.
+
+![Inline roll damage button](screenshot3.png?raw=true)
+
 The active effects keys are listed below and should be set with the change mode of `Custom`.
 
 - `flags.adv-reminder.message.all` for all rolls
@@ -81,3 +85,5 @@ Notes about other modules.
 - Does not show messages if Midi QOL is configured to fast forward rolls
 
 [Minimal Rolling Enhancements for D&D5e](https://foundryvtt.com/packages/mre-dnd5e) This module works with MRE, making rolls with advantage/disadvantage and showing messages if you hold the "Roll Dialog Modifier Key" (an MRE setting).
+
+[Dynamic effects using Active Effects](https://foundryvtt.com/packages/dae) If you're using the message feature to add inline roll formulas, you need to use DAE version 0.10.01 or newer. Earlier versions would evaluate the deferred die roll in the active effect's value, making the button not work.
