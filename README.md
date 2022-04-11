@@ -34,6 +34,10 @@ In addition to active effects adding advantage or disadvantage, you can also add
 
 You have control over when the message appears and what it contains, including HTML formatting. In the screenshot above it just reminds you to roll with advantage on saving throws against poison. You are free to change it to just include `Dwarven Resilience` if that's all the reminder you need or `Advantage against poison` that doesn't mention saving throws since it only appears on CON saving throws.
 
+You can also place deferred inline rolls (e.g. `[[/r 1d6]]`) in the messages that you can click on to add it to the Situational Bonus field. For example, if you want a reminder about Divine Fury damage, you can create a message, `[[/r 1d6+3]]{Divine Fury} damage on first hit`, to easily add that damage.
+
+![](button-in-message.webm)
+
 The active effects keys are listed below and should be set with the change mode of `Custom`.
 
 - `flags.adv-reminder.message.all` for all rolls
