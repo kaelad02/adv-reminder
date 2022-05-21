@@ -23,7 +23,7 @@
       "path": "lang/fr.json"
     }
   ],
-  "systems": ["dnd5e"],
+  "systems": ["dnd5e", "sw5e"],
   "esmodules": ["src/module.js"],
   "styles": ["css/adv-reminder.css"],
   "url": "https://github.com/kaelad02/adv-reminder",

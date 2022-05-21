@@ -103,7 +103,11 @@ Hooks.once("ready", () => {
     fields.push("flags.adv-reminder.message.deathSave");
     fields.push("flags.adv-reminder.message.damage.all");
 
-    ["mwak", "rwak", "msak", "rsak"].forEach((actionType) => {
+    const actionTypes =
+      game.system.id === "sw5e"
+        ? ["mwak", "rwak", "mpak", "rpak"]
+        : ["mwak", "rwak", "msak", "rsak"];
+    actionTypes.forEach((actionType) => {
       fields.push(`flags.adv-reminder.message.attack.${actionType}`);
       fields.push(`flags.adv-reminder.message.damage.${actionType}`);
     });
