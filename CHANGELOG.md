@@ -1,3 +1,7 @@
+# 1.3.1
+
+- feature: [#24](https://github.com/kaelad02/adv-reminder/pull/24) Add sw5e support
+
 # 1.3
 
 - feature: [#23](https://github.com/kaelad02/adv-reminder/pull/23) Include inline die rolls in messages, click on them to include in situational bonus field
