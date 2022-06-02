@@ -21,6 +21,19 @@ Some of the terms used in the keys are further explained in [Terms and Abbreviat
 | flags.midi-qol.grants.disadvantage.attack.all | Disadvantage when targeted by any attack roll |
 | flags.midi-qol.grants.disadvantage.attack.mwak/rwak/msak/rsak | Disadvantage when targeted by attacks with a specific Action Type |
 
+## Critical Hits
+
+| Attribute Key | Description |
+|----|----|
+| flags.midi-qol.critical.all | Critical hit on all attacks |
+| flags.midi-qol.critical.mwak/rwak/msak/rsak | Critical hit on attacks with a specific Action Type |
+| flags.midi-qol.noCritical.all | Normal hit on all attacks |
+| flags.midi-qol.noCritical.mwak/rwak/msak/rsak | Normal hit on attacks with a specific Action Type |
+| flags.midi-qol.grants.critical.all | Critical hit when targeted by any attack |
+| flags.midi-qol.grants.critical.mwak/rwak/msak/rsak | Critical hit when targeted by attacks with a specific Action Type |
+| flags.midi-qol.fail.critical.all | Normal hit when targeted by any attack |
+| flags.midi-qol.fail.critical.mwak/rwak/msak/rsak | Normal hit when targeted by attacks with a specific Action Type |
+
 ## Ability Checks
 
 | Attribute Key | Description |
@@ -33,6 +46,17 @@ Some of the terms used in the keys are further explained in [Terms and Abbreviat
 | flags.midi-qol.disadvantage.ability.all | Disadvantage on all ability checks, saves, and skills |
 | flags.midi-qol.disadvantage.ability.check.all | Disadvantage on all ability checks |
 | flags.midi-qol.disadvantage.ability.check.str/dex/con/int/wis/cha | Disadvantage on ability checks with a specific Ability Modifier |
+
+## Skill Checks
+
+Since all skill checks are also ability checks, this list is in addition to the keys for Ability Checks.
+
+| Attribute Key | Description |
+|----|----|
+| flags.midi-qol.advantage.skill.all | Advantage on all skill checks |
+| flags.midi-qol.advantage.skill.acr/ani/arc/ath/dec/his/ins/itm/inv/med/nat/prc/prf/per/rel/slt/ste/sur | Advantage on specific Skills |
+| flags.midi-qol.disadvantage.skill.all | Disadvantage on all skill checks |
+| flags.midi-qol.disadvantage.skill.acr/ani/arc/ath/dec/his/ins/itm/inv/med/nat/prc/prf/per/rel/slt/ste/sur | Disadvantage on specific Skills |
 
 ## Saving Throws
 
@@ -47,17 +71,6 @@ Some of the terms used in the keys are further explained in [Terms and Abbreviat
 | flags.midi-qol.disadvantage.ability.save.all | Disadvantage on all saving throws |
 | flags.midi-qol.disadvantage.ability.save.str/dex/con/int/wis/cha | Disadvantage on saving throws with a specific Ability Modifier |
 
-## Skill Checks
-
-Since all skill checks are also ability checks, this list is in addition to the keys for Ability Checks.
-
-| Attribute Key | Description |
-|----|----|
-| flags.midi-qol.advantage.skill.all | Advantage on all skill checks |
-| flags.midi-qol.advantage.skill.acr/ani/arc/ath/dec/his/ins/itm/inv/med/nat/prc/prf/per/rel/slt/ste/sur | Advantage on specific Skills |
-| flags.midi-qol.disadvantage.skill.all | Disadvantage on all skill checks |
-| flags.midi-qol.disadvantage.skill.acr/ani/arc/ath/dec/his/ins/itm/inv/med/nat/prc/prf/per/rel/slt/ste/sur | Disadvantage on specific Skills |
-
 ## Death Saving Throw
 
 | Attribute Key | Description |
@@ -70,16 +83,3 @@ Since all skill checks are also ability checks, this list is in addition to the 
 | flags.midi-qol.disadvantage.ability.all | Disadvantage on all ability checks, saves, and skills |
 | flags.midi-qol.disadvantage.ability.save.all | Disadvantage on all saving throws |
 | flags.midi-qol.disadvantage.deathSave | Disadvantage on death saving throws |
-
-## Critical Hits
-
-| Attribute Key | Description |
-|----|----|
-| flags.midi-qol.critical.all | Critical hit on all attacks |
-| flags.midi-qol.critical.mwak/rwak/msak/rsak | Critical hit on attacks with a specific Action Type |
-| flags.midi-qol.noCritical.all | Normal hit on all attacks |
-| flags.midi-qol.noCritical.mwak/rwak/msak/rsak | Normal hit on attacks with a specific Action Type |
-| flags.midi-qol.grants.critical.all | Critical hit when targeted by any attack |
-| flags.midi-qol.grants.critical.mwak/rwak/msak/rsak | Critical hit when targeted by attacks with a specific Action Type |
-| flags.midi-qol.fail.critical.all | Normal hit when targeted by any attack |
-| flags.midi-qol.fail.critical.mwak/rwak/msak/rsak | Normal hit when targeted by attacks with a specific Action Type |
