@@ -2,21 +2,13 @@
 
 Want to use active effects to give your barbarian advantage on strength ability checks and saving throws when Raging? Don't want to install Midi QOL to do it? Then this module might be for you.
 
-![Saving Throw screenshot with advantage](screenshot1.png?raw=true)
+![Saving Throw screenshot with advantage](docs/screenshot1.png?raw=true)
 
 The basic die roller the D&D 5e system uses provides a pop-up dialog to give the player a chance to add situational bonuses or make d20 rolls with advantage/disadvantage or damage rolls as critical hits. It does not change the default button to remind you when to roll with advantage, disadvantage, or a critical hit. This module uses the active effect keys defined by Midi QOL to change the default button. This is useful if you want to be reminded to roll with advantage on a Strength saving throw while Raging, for example, but you do not want to use Midi QOL. Midi QOL is great at automating combat with its workflow, however not every game group wants that level of automation. If all you want is a reminder but remain in control of the die rolls, then this module is for you.
 
 In addition to the active effects, this module supports armor that imposes stealth disadvantage when equipped. It also makes some small CSS changes (bold text) in order to make the advantage, disadvantage, and critical hit buttons more obvious when they should be clicked.
 
-Supports active effects on the following rolls:
-
-- Attack rolls
-- Ability checks
-- Saving throws, including auto-fail (e.g. Stunned)
-- Skill checks
-- Tool checks
-- Death saves
-- Damage rolls
+[Midi Flags](docs/midi-flags.md) lists the supported Midi active effect flags.
 
 ## Auto-Fail Rolls
 
@@ -30,30 +22,9 @@ If the player holds down one of the Ctrl/Alt/Shift/Meta keys to fast-forward the
 
 In addition to active effects adding advantage or disadvantage, you can also add messages to remind you of conditional bonuses or advantage. For example, features like Dwarven Resilience give advantage on saving throws against poison don't work with the advantage flags since there isn't a way to limit it to poison. Now you can add a message to the dialog right above the buttons to remind you about Dwarven Resilience.
 
-![Saving Throw screenshot with message](screenshot2.png?raw=true)
+![Saving Throw screenshot with message](docs/poison-message.png?raw=true)
 
-You have control over when the message appears and what it contains, including HTML formatting. In the screenshot above it just reminds you to roll with advantage on saving throws against poison. You are free to change it to just include `Dwarven Resilience` if that's all the reminder you need or `Advantage against poison` that doesn't mention saving throws since it only appears on CON saving throws.
-
-You can also place deferred inline rolls (e.g. `[[/r 1d6]]`) in the messages that you can click on to add it to the Situational Bonus field. For example, if you want a reminder about Divine Fury damage, you can create a message, `[[/r 1d6+3]]{Divine Fury} damage on first hit`, to easily add that damage.
-
-![Inline roll damage button](screenshot3.png?raw=true)
-
-The active effects keys are listed below and should be set with the change mode of `Custom`.
-
-- `flags.adv-reminder.message.all` for all rolls
-- `flags.adv-reminder.message.attack.all` for all Attack rolls
-- `flags.adv-reminder.message.attack.mwak/rwak/msak/rsak` for Attack rolls of a specific action type
-- `flags.adv-reminder.message.attack.str/dex/con/int/wis/cha` for Attack rolls using a specific ability
-- `flags.adv-reminder.message.ability.all` for all Ability checks, Saving throws, Skill checks, and Death saves
-- `flags.adv-reminder.message.ability.check.all` for all Ability checks and Skill checks
-- `flags.adv-reminder.message.ability.check.str/dex/con/int/wis/cha` for specific Ability checks and Skill checks
-- `flags.adv-reminder.message.ability.save.all` for all Saving throws and Death saves
-- `flags.adv-reminder.message.ability.save.str/dex/con/int/wis/cha` for specific Saving throws
-- `flags.adv-reminder.message.skill.all` for all Skill checks
-- `flags.adv-reminder.message.skill.acr/ath/.../sur` for specific Skill checks
-- `flags.adv-reminder.message.deathSave` for Death saves
-- `flags.adv-reminder.message.damage.all` for all Damage rolls
-- `flags.adv-reminder.message.damage.mwak/rwak/msak/rsak` for Damage rolls of a specific action type
+[Messages](docs/messages.md) has more information about the messages feature, including the active effect keys.
 
 ## Other Modules
 
