@@ -30,7 +30,7 @@ If the player holds down one of the Ctrl/Alt/Shift/Meta keys to fast-forward the
 
 In addition to active effects adding advantage or disadvantage, you can also add messages to remind you of conditional bonuses or advantage. For example, features like Dwarven Resilience give advantage on saving throws against poison don't work with the advantage flags since there isn't a way to limit it to poison. Now you can add a message to the dialog right above the buttons to remind you about Dwarven Resilience.
 
-![Saving Throw screenshot with message](screenshot2.png?raw=true)
+![Saving Throw screenshot with message](docs/poison-message.png?raw=true)
 
 You have control over when the message appears and what it contains, including HTML formatting. In the screenshot above it just reminds you to roll with advantage on saving throws against poison. You are free to change it to just include `Dwarven Resilience` if that's all the reminder you need or `Advantage against poison` that doesn't mention saving throws since it only appears on CON saving throws.
 
