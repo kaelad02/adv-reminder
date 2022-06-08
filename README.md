@@ -1,5 +1,9 @@
 # Advantage Reminder for dnd5e
 
+![GitHub release (latest by date and asset)](https://img.shields.io/github/downloads/kaelad02/adv-reminder/latest/module.zip)
+[![Forge Installs](https://img.shields.io/badge/dynamic/json?label=Forge%20Installs&query=package.installs&suffix=%25&url=https%3A%2F%2Fforge-vtt.com%2Fapi%2Fbazaar%2Fpackage%2Fadv-reminder&colorB=4aa94a)](https://forge-vtt.com/bazaar#package=adv-reminder)
+![Supported Foundry Versions](https://img.shields.io/endpoint?url=https://foundryshields.com/version?url=https://github.com/kaelad02/adv-reminder/releases/latest/download/module.json)
+
 Want to use active effects to give your barbarian advantage on strength ability checks and saving throws when Raging? Don't want to install Midi QOL to do it? Then this module might be for you.
 
 ![Saving Throw screenshot with advantage](docs/screenshot1.png?raw=true)
