@@ -1,11 +1,42 @@
 {
+  "id": "adv-reminder",
   "name": "adv-reminder",
   "title": "Advantage Reminder for dnd5e",
   "description": "Using the active effect keys defined by Midi QOL, set the default of certain die rolls to advantage/disadvantage/critical.",
-  "author": "kaelad",
+  "authors": [
+    {
+      "name": "kaelad",
+      "discord": "kaelad#1693"
+    }
+  ],
   "version": "0.1",
-  "minimumCoreVersion": "0.8.9",
-  "compatibleCoreVersion": "9",
+  "compatibility": {
+    "minimum": "9",
+    "verified": "10.272"
+  },
+  "minimumCoreVersion": "9",
+  "compatibleCoreVersion": "10.272",
+  "relationships": {
+    "requires": [
+      {
+        "id": "lib-wrapper",
+        "type": "module",
+        "compatibility": {}
+      }
+    ],
+    "systems": [
+      {
+        "id": "dnd5e",
+        "type": "system",
+        "compatibility": {}
+      },
+      {
+        "id": "sw5e",
+        "type": "system",
+        "compatibility": {}
+      }
+    ]
+  },
   "dependencies": [
     {
       "name": "lib-wrapper"

@@ -34,6 +34,7 @@ class BaseMessage {
         links: false,
         rolls: true,
         rollData: this.actor.getRollData(),
+        async: false,
       });
       debug("message", message, "enriched", enriched);
       setProperty(options, "dialogOptions.adv-reminder.message", enriched);

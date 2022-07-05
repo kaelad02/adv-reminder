@@ -14,5 +14,6 @@ export const log = (...args) => console.log("adv-reminder | ", ...args);
  */
 export function isMinVersion(name, version) {
   const module = game.modules.get(name);
-  return module?.active && isNewerVersion(module.data.version, version);
+  // TODO remove module.data.version after Foundry v10 is minimum
+  return module?.active && isNewerVersion(module.version ?? module.data.version, version);
 }
