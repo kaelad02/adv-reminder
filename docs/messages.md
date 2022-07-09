@@ -20,3 +20,9 @@ Instead of just a text reminder to add to the Situational Bonus field on a dialo
 |----|----|
 | `[[/r 2d6]] Sneak Attack` | ![sneak attack 1 screenshot](sneak-message1.png?raw=true) |
 | `[[/r 2d6]]{Sneak Attack}` | ![sneak attack 2 screenshot](sneak-message2.png?raw=true) |
+
+## Document Links, a.k.a. Run Macros
+
+The module can also show document links in the dialogs. If you include a document link, following the [Dynamic Document Links](https://foundryvtt.com/article/journal/#links) syntax, the module will turn that into a link when presenting it in a dialog. This was primarly added in order to put links to macros to run them, but they will work for any document type. If you're not sure how to create a link, drag the macro/item/etc. you want to link to into the chat window and it will create the link to it for you.
+
+![document link example](document-link1.png?raw=true)
