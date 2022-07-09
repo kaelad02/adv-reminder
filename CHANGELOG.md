@@ -1,3 +1,7 @@
+# 1.3.2
+
+- feature: add document links to messages
+
 # 1.3.1
 
 - feature: [#24](https://github.com/kaelad02/adv-reminder/pull/24) Add sw5e support
