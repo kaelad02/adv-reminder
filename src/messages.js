@@ -30,7 +30,7 @@ class BaseMessage {
       // enrich message, specifically replacing rolls
       const enriched = TextEditor.enrichHTML(message, {
         secrets: true,
-        documents: false,
+        documents: true,
         links: false,
         rolls: true,
         rollData: this.actor.getRollData(),
