@@ -9,7 +9,10 @@
 }
 
 /* Style the default buttons */
-.dialog .dialog-buttons button.default {
+.dialog .dialog-buttons button.default.normal,
+.dialog .dialog-buttons button.default.advantage,
+.dialog .dialog-buttons button.default.disadvantage,
+.dialog .dialog-buttons button.default.critical {
   background-color: var(--adv-reminder-color-green-5pct);
   border-color: var(--adv-reminder-color-green);
   color: var(--adv-reminder-color-green);
