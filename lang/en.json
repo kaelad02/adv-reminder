@@ -1,3 +1,7 @@
 {
-  "adv-reminder.AutoFail": "Auto fail"
+  "adv-reminder.AutoFail": "Auto fail",
+  "adv-reminder.DefaultButtonColor": "Default button color",
+  "adv-reminder.None": "No color change",
+  "adv-reminder.Player": "Player color",
+  "adv-reminder.Green": "Green"
 }
