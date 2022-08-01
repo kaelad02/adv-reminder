@@ -15,15 +15,12 @@ import {
   DeathSaveReminder,
   SkillReminder,
 } from "./reminders.js";
-import { registerSettings, fetchSettings, initDefaultButtonColor } from "./settings.js";
 import { debug, isMinVersion, log } from "./util.js";
 
 let checkArmorStealth;
 
 Hooks.once("init", () => {
   log("initializing Advantage Reminder");
-  registerSettings();
-  fetchSettings();
 
   // DAE version 0.8.81 added support for "impose stealth disadvantage"
   checkArmorStealth = !isMinVersion("dae", "0.8.81");
@@ -92,8 +89,6 @@ Hooks.once("init", () => {
 // Add message flags to DAE so it shows them in the AE editor. Should do this in
 // a setup hook, but this module is loaded before DAE so do it in ready instead.
 Hooks.once("ready", () => {
-  initDefaultButtonColor();
-
   if (game.modules.get("dae")?.active) {
     const fields = [];
     fields.push("flags.adv-reminder.message.all");

@@ -1,6 +1,7 @@
 export var debugEnabled;
 
-export const registerSettings = function () {
+Hooks.once("init", () => {
+  // register settings
   game.settings.register("adv-reminder", "debugLogging", {
     name: "Debug logging",
     scope: "world",
@@ -11,7 +12,6 @@ export const registerSettings = function () {
       debugEnabled = value;
     },
   });
-
   game.settings.register("adv-reminder", "defaultButtonColor", {
     name: "adv-reminder.DefaultButtonColor.Name",
     hint: "adv-reminder.DefaultButtonColor.Hint",
@@ -31,7 +31,6 @@ export const registerSettings = function () {
         game.settings.get("adv-reminder", "customColor")
       ),
   });
-
   game.settings.register("adv-reminder", "customColor", {
     name: "adv-reminder.CustomColor.Name",
     hint: "adv-reminder.CustomColor.Hint",
@@ -45,18 +44,18 @@ export const registerSettings = function () {
         customColor
       ),
   });
-};
 
-export const fetchSettings = function () {
+  // initialize settings
   debugEnabled = game.settings.get("adv-reminder", "debugLogging");
-};
+});
 
-export const initDefaultButtonColor = function () {
+Hooks.once("ready", () => {
+  // initialize the color variables
   setStyleVariables(
     game.settings.get("adv-reminder", "defaultButtonColor"),
     game.settings.get("adv-reminder", "customColor")
   );
-};
+});
 
 function setStyleVariables(option, customColor) {
   // set four color variables based on the option
@@ -93,6 +92,9 @@ function setStyleVariables(option, customColor) {
   setStyle("--adv-reminder-message-border-color", varMessageBorder);
 }
 
+/**
+ * Customize the settings dialog to handle the custom color (hide/show and color picker)
+ */
 Hooks.on("renderSettingsConfig", (app, html, data) => {
   // Create color picker
   const settingId = "adv-reminder.customColor";
