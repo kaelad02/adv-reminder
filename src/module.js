@@ -15,15 +15,12 @@ import {
   DeathSaveReminder,
   SkillReminder,
 } from "./reminders.js";
-import { registerSettings, fetchSettings } from "./settings.js";
 import { debug, isMinVersion, log } from "./util.js";
 
 let checkArmorStealth;
 
 Hooks.once("init", () => {
   log("initializing Advantage Reminder");
-  registerSettings();
-  fetchSettings();
 
   // DAE version 0.8.81 added support for "impose stealth disadvantage"
   checkArmorStealth = !isMinVersion("dae", "0.8.81");

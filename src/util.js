@@ -1,10 +1,14 @@
-import { debugEnabled } from "./settings.js";
-
 export const debug = (...args) => {
-  if (debugEnabled) console.log("adv-reminder | ", ...args);
+  try {
+    const debugEnabled = game.modules
+      .get("_dev-mode")
+      ?.api?.getPackageDebugValue("adv-reminder");
+
+    if (debugEnabled) log(...args);
+  } catch (e) {}
 };
 
-export const log = (...args) => console.log("adv-reminder | ", ...args);
+export const log = (...args) => console.log("adv-reminder |", ...args);
 
 /**
  * Check if a module is active and at least a minimum version.
