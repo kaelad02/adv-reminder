@@ -80,9 +80,6 @@ function setStyleVariables(option, customColor) {
     case "green":
       setColorVars("#008000");
       break;
-    case "orange":
-      setColorVars("#ff6400");
-      break;
     case "custom":
       setColorVars(customColor);
       break;
