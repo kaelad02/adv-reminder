@@ -22,11 +22,14 @@ export const registerSettings = function () {
       none: "adv-reminder.DefaultButtonColor.None",
       player: "adv-reminder.DefaultButtonColor.Player",
       green: "adv-reminder.DefaultButtonColor.Green",
-      orange: "adv-reminder.DefaultButtonColor.Orange",
       custom: "adv-reminder.DefaultButtonColor.CustomColor",
     },
     default: "none",
-    onChange: setStyleVariables,
+    onChange: (option) =>
+      setStyleVariables(
+        option,
+        game.settings.get("adv-reminder", "customColor")
+      ),
   });
 
   game.settings.register("adv-reminder", "customColor", {
@@ -36,6 +39,11 @@ export const registerSettings = function () {
     config: true,
     type: String,
     default: "#000000",
+    onChange: (customColor) =>
+      setStyleVariables(
+        game.settings.get("adv-reminder", "defaultButtonColor"),
+        customColor
+      ),
   });
 };
 
@@ -44,10 +52,13 @@ export const fetchSettings = function () {
 };
 
 export const initDefaultButtonColor = function () {
-  setStyleVariables(game.settings.get("adv-reminder", "defaultButtonColor"));
+  setStyleVariables(
+    game.settings.get("adv-reminder", "defaultButtonColor"),
+    game.settings.get("adv-reminder", "customColor")
+  );
 };
 
-function setStyleVariables(option) {
+function setStyleVariables(option, customColor) {
   // set four color variables based on the option
   var varColor, varBackground, varButtonBorder, varMessageBorder;
   const setColorVars = (color) => {
@@ -73,7 +84,7 @@ function setStyleVariables(option) {
       setColorVars("#ff6400");
       break;
     case "custom":
-      // TODO
+      setColorVars(customColor);
       break;
   }
 
