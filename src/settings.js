@@ -10,7 +10,7 @@ Hooks.once("init", () => {
       none: "adv-reminder.DefaultButtonColor.None",
       player: "adv-reminder.DefaultButtonColor.Player",
       green: "adv-reminder.DefaultButtonColor.Green",
-      custom: "adv-reminder.DefaultButtonColor.CustomColor",
+      custom: "adv-reminder.DefaultButtonColor.Custom",
     },
     default: "none",
     onChange: (option) =>
