@@ -1,17 +1,5 @@
-export var debugEnabled;
-
 Hooks.once("init", () => {
   // register settings
-  game.settings.register("adv-reminder", "debugLogging", {
-    name: "Debug logging",
-    scope: "world",
-    config: false,
-    type: Boolean,
-    default: false,
-    onChange: (value) => {
-      debugEnabled = value;
-    },
-  });
   game.settings.register("adv-reminder", "defaultButtonColor", {
     name: "adv-reminder.DefaultButtonColor.Name",
     hint: "adv-reminder.DefaultButtonColor.Hint",
@@ -44,9 +32,6 @@ Hooks.once("init", () => {
         customColor
       ),
   });
-
-  // initialize settings
-  debugEnabled = game.settings.get("adv-reminder", "debugLogging");
 });
 
 Hooks.once("ready", () => {
@@ -56,6 +41,10 @@ Hooks.once("ready", () => {
     game.settings.get("adv-reminder", "customColor")
   );
 });
+
+Hooks.once("devModeReady", ({ registerPackageDebugFlag }) =>
+  registerPackageDebugFlag("adv-reminder")
+);
 
 function setStyleVariables(option, customColor) {
   // set four color variables based on the option
