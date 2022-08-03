@@ -12,28 +12,25 @@
   "version": "0.1",
   "compatibility": {
     "minimum": "9",
-    "verified": "10.272"
+    "verified": "10"
   },
   "minimumCoreVersion": "9",
-  "compatibleCoreVersion": "10.272",
+  "compatibleCoreVersion": "10",
   "relationships": {
-    "requires": [
-      {
-        "id": "lib-wrapper",
-        "type": "module",
-        "compatibility": {}
-      }
-    ],
     "systems": [
       {
         "id": "dnd5e",
-        "type": "system",
-        "compatibility": {}
+        "type": "system"
       },
       {
         "id": "sw5e",
-        "type": "system",
-        "compatibility": {}
+        "type": "system"
+      }
+    ],
+    "requires": [
+      {
+        "id": "lib-wrapper",
+        "type": "module"
       }
     ]
   },
