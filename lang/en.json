@@ -1,3 +1,15 @@
 {
-  "adv-reminder.AutoFail": "Auto fail"
+  "adv-reminder.AutoFail": "Auto fail",
+  "adv-reminder.DefaultButtonColor": {
+    "Name": "Default button color",
+    "Hint": "Colors the text and tints the background of the buttons and messages.",
+    "None": "No color change",
+    "Player": "Player color",
+    "Green": "Green",
+    "Custom": "Custom color"
+  },
+  "adv-reminder.CustomColor": {
+    "Name": "Custom Color",
+    "Hint": "Dark colors work better than light colors"
+  }
 }
