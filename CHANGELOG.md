@@ -1,3 +1,8 @@
+# 2.0
+
+- feature: add player setting to style the buttons and messages
+- feature: initial v10 compatibility (now requires v9 or higher)
+
 # 1.3.2
 
 - feature: add document links to messages
