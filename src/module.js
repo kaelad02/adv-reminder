@@ -99,6 +99,7 @@ Hooks.once("ready", () => {
     fields.push("flags.adv-reminder.message.skill.all");
     fields.push("flags.adv-reminder.message.deathSave");
     fields.push("flags.adv-reminder.message.damage.all");
+    fields.push("flags.adv-reminder.message.damage.critical");
 
     const actionTypes =
       game.system.id === "sw5e"

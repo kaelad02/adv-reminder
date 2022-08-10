@@ -135,17 +135,22 @@ export class DamageMessage extends BaseMessage {
 
     /** @type {string} */
     this.actionType = item.data.data.actionType;
+    /** @type {boolean} */
+    this.critical = false;
   }
 
   /** @override */
   get messageKeys() {
-    return super.messageKeys.concat(
+    const keys = super.messageKeys.concat(
       "flags.adv-reminder.message.damage.all",
       `flags.adv-reminder.message.damage.${this.actionType}`
     );
+    if (this.critical) keys.push("flags.adv-reminder.message.damage.critical");
+    return keys;
   }
 
   async addMessage(options) {
+    if (options?.critical) this.critical = true;
     // Damage options has a nested options variable, add that and pass it to super
     options.options = options.options || {};
     return super.addMessage(options.options);

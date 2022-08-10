@@ -20,6 +20,7 @@ Some of the terms used in the keys are further explained in [Terms and Abbreviat
 | flags.adv-reminder.message.all | Message on all rolls, including damage rolls |
 | flags.adv-reminder.message.damage.all | Message on all damage rolls |
 | flags.adv-reminder.message.damage.mwak/rwak/msak/rsak | Message on damage rolls with a specific Action Type |
+| flags.adv-reminder.message.damage.critical | Message on critical damage rolls |
 
 ## Ability Checks 
 
