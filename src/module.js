@@ -210,12 +210,12 @@ async function onRollToolCheck(wrapped, options = {}) {
     debug("checking for message effects on this tool check");
     await new AbilityCheckMessage(
       this.actor,
-      this.data.data.ability
+      this.system.ability
     ).addMessage(options);
     debug("checking for adv/dis effects on this tool check");
     const reminder = new AbilityCheckReminder(
       this.actor,
-      this.data.data.ability
+      this.system.ability
     );
     reminder.updateOptions(options);
   }

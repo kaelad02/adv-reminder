@@ -21,8 +21,8 @@ class BaseFail {
     debug("failKeys", failKeys);
 
     const shouldFail = this.actor.effects
-      .filter((effect) => !effect.isSuppressed && !effect.data.disabled)
-      .flatMap((effect) => effect.data.changes)
+      .filter((effect) => !effect.isSuppressed && !effect.disabled)
+      .flatMap((effect) => effect.changes)
       .some((change) => failKeys.includes(change.key));
     if (shouldFail) {
       const messageData = this.createMessageData(options);

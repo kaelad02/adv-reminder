@@ -6,8 +6,8 @@ class BaseMessage {
     this.actor = actor;
     /** @type {EffectChangeData[]} */
     this.changes = actor.effects
-      .filter((effect) => !effect.isSuppressed && !effect.data.disabled)
-      .flatMap((effect) => effect.data.changes)
+      .filter((effect) => !effect.isSuppressed && !effect.disabled)
+      .flatMap((effect) => effect.changes)
       .sort((a, b) => a.priority - b.priority);
   }
 
@@ -49,7 +49,7 @@ export class AttackMessage extends BaseMessage {
     super(actor);
 
     /** @type {string} */
-    this.actionType = item.data.data.actionType;
+    this.actionType = item.system.actionType;
     /** @type {string} */
     this.abilityId = item.abilityMod;
   }
@@ -100,7 +100,7 @@ export class AbilitySaveMessage extends AbilityBaseMessage {
 
 export class SkillMessage extends AbilityCheckMessage {
   constructor(actor, skillId) {
-    super(actor, actor.data.data.skills[skillId].ability);
+    super(actor, actor.system.skills[skillId].ability);
 
     /** @type {string} */
     this.skillId = skillId;
@@ -134,7 +134,7 @@ export class DamageMessage extends BaseMessage {
     super(actor);
 
     /** @type {string} */
-    this.actionType = item.data.data.actionType;
+    this.actionType = item.system.actionType;
   }
 
   /** @override */
