@@ -26,13 +26,8 @@ Hooks.once("init", () => {
   checkArmorStealth = !isMinVersion("dae", "0.8.81");
   debug("checkArmorStealth", checkArmorStealth);
 
-  // Attack roll wrapper
-  libWrapper.register(
-    "adv-reminder",
-    "CONFIG.Item.documentClass.prototype.rollAttack",
-    onRollAttack,
-    "WRAPPER"
-  );
+  // Attack roll hook
+  Hooks.on("dnd5e.preRollAttack", preRollAttack);
 
   // Saving throw wrapper
   libWrapper.register(
@@ -123,22 +118,20 @@ Hooks.once("ready", () => {
   }
 });
 
-async function onRollAttack(wrapped, options = {}) {
-  debug("onRollAttack method called");
+async function preRollAttack(item, config) {
+  debug("preRollAttack method called");
 
   // check for adv/dis flags unless the user pressed a fast-forward key
-  const isFF = isFastForwarding(options);
+  const isFF = isFastForwarding(config);
   if (isFF) {
     debug("fast-forwarding the roll, skip checking for adv/dis");
   } else {
-    debug("checking for message effects on this attack roll");
-    await new AttackMessage(this.actor, this).addMessage(options);
     debug("checking for adv/dis effects on this attack roll");
-    const reminder = new AttackReminder(this.actor, getTarget(), this);
-    reminder.updateOptions(options);
+    const reminder = new AttackReminder(item.actor, getTarget(), item);
+    reminder.updateOptions(config);
+    debug("checking for message effects on this attack roll");
+    await new AttackMessage(item.actor, item).addMessage(config);
   }
-
-  return wrapped(options);
 }
 
 async function onRollAbilitySave(wrapped, abilityId, options = {}) {
