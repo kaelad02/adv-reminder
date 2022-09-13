@@ -2,6 +2,7 @@
   --adv-reminder-color: #191813; /* copied from --color-text-dark-primary */
   --adv-reminder-background-color: rgba(0, 0, 0, 0.05);
   --adv-reminder-button-border-color: #c9c7b8;  /* copied from --color-border-light-secondary */
+  --adv-reminder-button-shadow-color: #ff0000; /* copied from --color-shadow-primary */
   --adv-reminder-message-border-color: #7a7971; /* copied from --color-border-light-tertiary */
 }
 
@@ -14,6 +15,18 @@
   border-color: var(--adv-reminder-button-border-color);
   color: var(--adv-reminder-color);
   font-weight: bold;
+}
+
+.dialog .dialog-buttons button.default.normal:hover,
+.dialog .dialog-buttons button.default.normal:focus,
+.dialog .dialog-buttons button.default.advantage:hover,
+.dialog .dialog-buttons button.default.advantage:focus,
+.dialog .dialog-buttons button.default.disadvantage:hover,
+.dialog .dialog-buttons button.default.disadvantage:focus,
+.dialog .dialog-buttons button.default.critical:hover,
+.dialog .dialog-buttons button.default.critical:focus {
+  outline: none;
+  box-shadow: 0 0 5px var(--adv-reminder-button-shadow-color);
 }
 
 /* Style the messages */

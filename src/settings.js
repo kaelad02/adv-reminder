@@ -48,11 +48,12 @@ Hooks.once("devModeReady", ({ registerPackageDebugFlag }) =>
 
 function setStyleVariables(option, customColor) {
   // set four color variables based on the option
-  var varColor, varBackground, varButtonBorder, varMessageBorder;
+  var varColor, varBackground, varButtonBorder, varButtonShadow, varMessageBorder;
   const setColorVars = (color) => {
     varColor = color;
     varBackground = hexToRGBAString(colorStringToHex(color), 0.05);
     varButtonBorder = color;
+    varButtonShadow = color;
     varMessageBorder = color;
   };
   switch (option) {
@@ -60,6 +61,7 @@ function setStyleVariables(option, customColor) {
       varColor = "#191813";
       varBackground = "rgba(0, 0, 0, 0.05)";
       varButtonBorder = "#c9c7b8";
+      varButtonShadow = "#ff0000";
       varMessageBorder = "#7a7971";
       break;
     case "player":
@@ -78,6 +80,7 @@ function setStyleVariables(option, customColor) {
   setStyle("--adv-reminder-color", varColor);
   setStyle("--adv-reminder-background-color", varBackground);
   setStyle("--adv-reminder-button-border-color", varButtonBorder);
+  setStyle("--adv-reminder-button-shadow-color", varButtonShadow);
   setStyle("--adv-reminder-message-border-color", varMessageBorder);
 }
 

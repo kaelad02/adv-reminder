@@ -1,3 +1,7 @@
+# 2.0.1
+
+- feature: style the shadow around the button to match style's color, if set
+
 # 2.0
 
 - feature: add player setting to style the buttons and messages
