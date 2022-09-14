@@ -118,7 +118,7 @@ Hooks.once("ready", () => {
   }
 });
 
-async function preRollAttack(item, config) {
+function preRollAttack(item, config) {
   debug("preRollAttack method called");
 
   // check for adv/dis flags unless the user pressed a fast-forward key
@@ -126,11 +126,11 @@ async function preRollAttack(item, config) {
   if (isFF) {
     debug("fast-forwarding the roll, skip checking for adv/dis");
   } else {
+    debug("checking for message effects on this attack roll");
+    new AttackMessage(item.actor, item).addMessage(config);
     debug("checking for adv/dis effects on this attack roll");
     const reminder = new AttackReminder(item.actor, getTarget(), item);
     reminder.updateOptions(config);
-    debug("checking for message effects on this attack roll");
-    await new AttackMessage(item.actor, item).addMessage(config);
   }
 }
 
@@ -252,10 +252,10 @@ async function onRollDamage(wrapped, options = {}) {
   return wrapped(options);
 }
 
-function addMessageHook(dialog, html, data) {
+async function addMessageHook(dialog, html, data) {
   debug("addMessageHook function called");
 
-  const message = dialog.options["adv-reminder"]?.message;
+  const message = await prepareMessage(dialog.options);
   if (message) {
     // add message at the end
     const formGroups = html.find(".form-group:last");
@@ -282,6 +282,30 @@ function addMessageHook(dialog, html, data) {
     const position = dialog.position;
     position.height = "auto";
     dialog.setPosition(position);
+  }
+}
+
+async function prepareMessage(dialogOptions) {
+  const messages = dialogOptions["adv-reminder"]?.messages;
+  const rollData = dialogOptions["adv-reminder"]?.rollData;
+
+  if (messages && rollData) {
+    // build message
+    const message = await renderTemplate(
+      "modules/adv-reminder/templates/roll-dialog-messages.hbs",
+      { messages }
+    );
+    // enrich message, specifically replacing rolls
+    const enriched = TextEditor.enrichHTML(message, {
+      secrets: true,
+      documents: true,
+      links: false,
+      rolls: true,
+      rollData,
+      async: false,
+    });
+    debug("message", message, "enriched", enriched);
+    return enriched;
   }
 }
 

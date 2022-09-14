@@ -15,29 +15,15 @@ class BaseMessage {
     return ["flags.adv-reminder.message.all"];
   }
 
-  async addMessage(options) {
+  addMessage(options) {
     const keys = this.messageKeys;
     const messages = this.changes
       .filter((change) => keys.includes(change.key))
       .map((change) => change.value);
 
     if (messages.length > 0) {
-      // build message
-      const message = await renderTemplate(
-        "modules/adv-reminder/templates/roll-dialog-messages.hbs",
-        { messages }
-      );
-      // enrich message, specifically replacing rolls
-      const enriched = TextEditor.enrichHTML(message, {
-        secrets: true,
-        documents: true,
-        links: false,
-        rolls: true,
-        rollData: this.actor.getRollData(),
-        async: false,
-      });
-      debug("message", message, "enriched", enriched);
-      setProperty(options, "dialogOptions.adv-reminder.message", enriched);
+      setProperty(options, "dialogOptions.adv-reminder.messages", messages);
+      setProperty(options, "dialogOptions.adv-reminder.rollData", this.actor.getRollData());
     }
 
     return messages;
