@@ -122,20 +122,17 @@ Hooks.once("ready", () => {
 function preRollAttack(item, config) {
   debug("preRollAttack method called");
 
-  // check for adv/dis flags unless the user pressed a fast-forward key
-  const isFF = isFastForwarding(config);
-  if (isFF) {
+  if (isFastForwarding(config)) {
     debug("fast-forwarding the roll, skip checking for adv/dis");
-  } else {
-    debug("checking for message effects on this attack roll");
-    new AttackMessage(item.actor, item).addMessage(config);
-    debug("getting the source of advantage on this attack roll");
-    const source = new AttackSource(item.actor, getTarget(), item);
-    source.updateOptions(config);
-    debug("checking for adv/dis effects on this attack roll");
-    const reminder = new AttackReminder(item.actor, getTarget(), item);
-    reminder.updateOptions(config);
+    return;
   }
+
+  debug("checking for message effects on this attack roll");
+  new AttackMessage(item.actor, item).addMessage(config);
+  debug("getting the source of advantage on this attack roll");
+  new AttackSource(item.actor, getTarget(), item).updateOptions(config);
+  debug("checking for adv/dis effects on this attack roll");
+  new AttackReminder(item.actor, getTarget(), item).updateOptions(config);
 }
 
 async function onRollAbilitySave(wrapped, abilityId, options = {}) {
