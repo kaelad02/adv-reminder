@@ -34,14 +34,7 @@ Hooks.once("init", () => {
   Hooks.on("dnd5e.preRollSkill", preRollSkill);
   Hooks.on("dnd5e.preRollToolCheck", preRollToolCheck);
   Hooks.on("dnd5e.preRollDeathSave", preRollDeathSave);
-
-  // Critical hit wrapper
-  libWrapper.register(
-    "adv-reminder",
-    "CONFIG.Item.documentClass.prototype.rollDamage",
-    onRollDamage,
-    "WRAPPER"
-  );
+  Hooks.on("dnd5e.preRollDamage", preRollDamage);
 
   // Render dialog hook
   Hooks.on("renderDialog", addMessageHook);
@@ -174,22 +167,19 @@ function preRollDeathSave(actor, config) {
   new DeathSaveReminder(actor).updateOptions(config);
 }
 
-async function onRollDamage(wrapped, options = {}) {
-  debug("onRollDamage method called");
+function preRollDamage(item, config) {
+  debug("preRollDamage method called");
 
   // check for critical flags unless the user pressed a fast-forward key
-  const isFF = isFastForwardingDamage(options);
-  if (isFF) {
+  if (isFastForwarding(config)) {
     debug("fast-forwarding the roll, skip checking for adv/dis");
-  } else {
-    debug("checking for message effects on this damage roll");
-    await new DamageMessage(this.actor, this).addMessage(options);
-    debug("checking for critical/normal effects on this damage roll");
-    const reminder = new CriticalReminder(this.actor, getTarget(), this);
-    reminder.updateOptions(options);
+    return;
   }
 
-  return wrapped(options);
+  debug("checking for message effects on this damage roll");
+  new DamageMessage(item.actor, item).addMessage(config);
+  debug("checking for critical/normal effects on this damage roll");
+  new CriticalReminder(item.actor, getTarget(), item).updateOptions(config);
 }
 
 async function addMessageHook(dialog, html, data) {
@@ -274,19 +264,6 @@ function isFastForwarding({ fastForward = false, event = {} }) {
     event?.ctrlKey ||
     event?.metaKey
   );
-}
-
-/**
- * Check if the user is holding down a fast-forward key for a damage roll.
- * @param {object} [options] the options
- * @param {Event} [options.event] the triggering event
- * @param {object} [options.options] the nested options
- * @returns {boolean} true if they are fast-forwarding, false otherwise
- */
-function isFastForwardingDamage({ event = {}, options = {} }) {
-  // special handling for MRE and damage rolls, always process since it will run after this module
-  if (game.modules.get("mre-dnd5e")?.active) return false;
-  return isFastForwarding({ fastForward: options.fastForward, event });
 }
 
 /**
