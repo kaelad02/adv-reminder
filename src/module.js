@@ -27,16 +27,9 @@ Hooks.once("init", () => {
   checkArmorStealth = !isMinVersion("dae", "0.8.81");
   debug("checkArmorStealth", checkArmorStealth);
 
-  // Attack roll hook
+  // Use hooks introduced in dnd5e v2.0 to adjust rolls
   Hooks.on("dnd5e.preRollAttack", preRollAttack);
-
-  // Saving throw wrapper
-  libWrapper.register(
-    "adv-reminder",
-    "CONFIG.Actor.documentClass.prototype.rollAbilitySave",
-    onRollAbilitySave,
-    "MIXED"
-  );
+  Hooks.on("dnd5e.preRollAbilitySave", preRollAbilitySave);
 
   // Ability check wrapper
   libWrapper.register(
@@ -135,26 +128,22 @@ function preRollAttack(item, config) {
   new AttackReminder(item.actor, getTarget(), item).updateOptions(config);
 }
 
-async function onRollAbilitySave(wrapped, abilityId, options = {}) {
-  debug("onRollAbilitySave method called");
+function preRollAbilitySave(actor, config, abilityId) {
+  debug("preRollAbilitySave method called");
 
   // check if an effect says to fail this roll
-  const failChecker = new AbilitySaveFail(this, abilityId);
-  if (await failChecker.fails(options)) return null;
+  const failChecker = new AbilitySaveFail(actor, abilityId);
+  if (failChecker.fails(config)) return false;
 
-  // check for adv/dis flags unless the user pressed a fast-forward key
-  const isFF = isFastForwarding(options);
-  if (isFF) {
+  if (isFastForwarding(config)) {
     debug("fast-forwarding the roll, skip checking for adv/dis");
-  } else {
-    debug("checking for message effects on this saving throw");
-    await new AbilitySaveMessage(this, abilityId).addMessage(options);
-    debug("checking for adv/dis effects on this saving throw");
-    const reminder = new AbilitySaveReminder(this, abilityId);
-    reminder.updateOptions(options);
+    return;
   }
 
-  return wrapped(abilityId, options);
+  debug("checking for message effects on this saving throw");
+  new AbilitySaveMessage(actor, abilityId).addMessage(config);
+  debug("checking for adv/dis effects on this saving throw");
+  new AbilitySaveReminder(actor, abilityId).updateOptions(config);
 }
 
 async function onRollAbilityTest(wrapped, abilityId, options = {}) {

@@ -15,7 +15,7 @@ class BaseFail {
    * @param {object} options the roll options
    * @returns true if the roll should fail, false if it may continue
    */
-  async fails(options) {
+  fails(options) {
     // get the active effect keys that will fail
     const failKeys = this.failKeys;
     debug("failKeys", failKeys);
@@ -26,7 +26,7 @@ class BaseFail {
       .some((change) => failKeys.includes(change.key));
     if (shouldFail) {
       const messageData = this.createMessageData(options);
-      await this.toMessage(messageData);
+      this.toMessage(messageData);
     }
     return shouldFail;
   }
