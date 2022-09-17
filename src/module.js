@@ -16,7 +16,7 @@ import {
   DeathSaveReminder,
   SkillReminder,
 } from "./reminders.js";
-import { debug, isMinVersion, log } from "./util.js";
+import { debug, log } from "./util.js";
 
 let checkArmorStealth;
 
@@ -24,7 +24,7 @@ Hooks.once("init", () => {
   log("initializing Advantage Reminder");
 
   // DAE version 0.8.81 added support for "impose stealth disadvantage"
-  checkArmorStealth = !isMinVersion("dae", "0.8.81");
+  checkArmorStealth = !game.modules.get("dae")?.active;
   debug("checkArmorStealth", checkArmorStealth);
 
   // Use hooks introduced in dnd5e v2.0 to adjust rolls
