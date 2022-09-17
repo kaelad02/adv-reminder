@@ -40,41 +40,36 @@ Hooks.once("init", () => {
   Hooks.on("renderDialog", addMessageHook);
 });
 
-// Add message flags to DAE so it shows them in the AE editor. Should do this in
-// a setup hook, but this module is loaded before DAE so do it in ready instead.
-Hooks.once("ready", () => {
-  if (game.modules.get("dae")?.active) {
-    const fields = [];
-    fields.push("flags.adv-reminder.message.all");
-    fields.push("flags.adv-reminder.message.attack.all");
-    fields.push("flags.adv-reminder.message.ability.all");
-    fields.push("flags.adv-reminder.message.ability.check.all");
-    fields.push("flags.adv-reminder.message.ability.save.all");
-    fields.push("flags.adv-reminder.message.skill.all");
-    fields.push("flags.adv-reminder.message.deathSave");
-    fields.push("flags.adv-reminder.message.damage.all");
+// Add message flags to DAE so it shows them in the AE editor
+Hooks.once("DAE.setupComplete", () => {
+  const fields = [];
+  fields.push("flags.adv-reminder.message.all");
+  fields.push("flags.adv-reminder.message.attack.all");
+  fields.push("flags.adv-reminder.message.ability.all");
+  fields.push("flags.adv-reminder.message.ability.check.all");
+  fields.push("flags.adv-reminder.message.ability.save.all");
+  fields.push("flags.adv-reminder.message.skill.all");
+  fields.push("flags.adv-reminder.message.deathSave");
+  fields.push("flags.adv-reminder.message.damage.all");
 
-    const actionTypes =
-      game.system.id === "sw5e"
-        ? ["mwak", "rwak", "mpak", "rpak"]
-        : ["mwak", "rwak", "msak", "rsak"];
-    actionTypes.forEach((actionType) => {
-      fields.push(`flags.adv-reminder.message.attack.${actionType}`);
-      fields.push(`flags.adv-reminder.message.damage.${actionType}`);
-    });
+  const actionTypes =
+    game.system.id === "sw5e" ? ["mwak", "rwak", "mpak", "rpak"] : ["mwak", "rwak", "msak", "rsak"];
+  actionTypes.forEach((actionType) => {
+    fields.push(`flags.adv-reminder.message.attack.${actionType}`);
+    fields.push(`flags.adv-reminder.message.damage.${actionType}`);
+  });
 
-    Object.keys(CONFIG.DND5E.abilities).forEach((abilityId) => {
-      fields.push(`flags.adv-reminder.message.attack.${abilityId}`);
-      fields.push(`flags.adv-reminder.message.ability.check.${abilityId}`);
-      fields.push(`flags.adv-reminder.message.ability.save.${abilityId}`);
-    });
+  Object.keys(CONFIG.DND5E.abilities).forEach((abilityId) => {
+    fields.push(`flags.adv-reminder.message.attack.${abilityId}`);
+    fields.push(`flags.adv-reminder.message.ability.check.${abilityId}`);
+    fields.push(`flags.adv-reminder.message.ability.save.${abilityId}`);
+  });
 
-    Object.keys(CONFIG.DND5E.skills).forEach((skillId) =>
-      fields.push(`flags.adv-reminder.message.skill.${skillId}`)
-    );
+  Object.keys(CONFIG.DND5E.skills).forEach((skillId) =>
+    fields.push(`flags.adv-reminder.message.skill.${skillId}`)
+  );
 
-    window.DAE.addAutoFields(fields);
-  }
+  window.DAE.addAutoFields(fields);
 });
 
 function preRollAttack(item, config) {
