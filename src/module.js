@@ -32,22 +32,8 @@ Hooks.once("init", () => {
   Hooks.on("dnd5e.preRollAbilitySave", preRollAbilitySave);
   Hooks.on("dnd5e.preRollAbilityTest", preRollAbilityTest);
   Hooks.on("dnd5e.preRollSkill", preRollSkill);
-
-  // Tool check wrapper
-  libWrapper.register(
-    "adv-reminder",
-    "CONFIG.Item.documentClass.prototype.rollToolCheck",
-    onRollToolCheck,
-    "WRAPPER"
-  );
-
-  // Death save wrapper
-  libWrapper.register(
-    "adv-reminder",
-    "CONFIG.Actor.documentClass.prototype.rollDeathSave",
-    onRollDeathSave,
-    "WRAPPER"
-  );
+  Hooks.on("dnd5e.preRollToolCheck", preRollToolCheck);
+  Hooks.on("dnd5e.preRollDeathSave", preRollDeathSave);
 
   // Critical hit wrapper
   libWrapper.register(
@@ -160,46 +146,32 @@ function preRollSkill(actor, config, skillId) {
   new SkillReminder(actor, skillId, checkArmorStealth).updateOptions(config);
 }
 
-async function onRollToolCheck(wrapped, options = {}) {
-  debug("onRollToolCheck method called");
+function preRollToolCheck(item, config) {
+  debug("preRollToolCheck method called");
 
-  // check for adv/dis flags unless the user pressed a fast-forward key
-  const isFF = isFastForwarding(options);
-  if (isFF) {
+  if (isFastForwarding(config)) {
     debug("fast-forwarding the roll, skip checking for adv/dis");
-  } else {
-    debug("checking for message effects on this tool check");
-    await new AbilityCheckMessage(
-      this.actor,
-      this.system.ability
-    ).addMessage(options);
-    debug("checking for adv/dis effects on this tool check");
-    const reminder = new AbilityCheckReminder(
-      this.actor,
-      this.system.ability
-    );
-    reminder.updateOptions(options);
+    return;
   }
 
-  return wrapped(options);
+  debug("checking for message effects on this tool check");
+  new AbilityCheckMessage(item.actor, item.system.ability).addMessage(config);
+  debug("checking for adv/dis effects on this tool check");
+  new AbilityCheckReminder(item.actor, item.system.ability).updateOptions(config);
 }
 
-async function onRollDeathSave(wrapped, options = {}) {
-  debug("onRollDeathSave method called");
+function preRollDeathSave(actor, config) {
+  debug("preRollDeathSave method called");
 
-  // check for adv/dis flags unless the user pressed a fast-forward key
-  const isFF = isFastForwarding(options);
-  if (isFF) {
+  if (isFastForwarding(config)) {
     debug("fast-forwarding the roll, skip checking for adv/dis");
-  } else {
-    debug("checking for message effects on this death save");
-    await new DeathSaveMessage(this).addMessage(options);
-    debug("checking for adv/dis effects on this death save");
-    const reminder = new DeathSaveReminder(this);
-    reminder.updateOptions(options);
+    return;
   }
 
-  return wrapped(options);
+  debug("checking for message effects on this death save");
+  new DeathSaveMessage(actor).addMessage(config);
+  debug("checking for adv/dis effects on this death save");
+  new DeathSaveReminder(actor).updateOptions(config);
 }
 
 async function onRollDamage(wrapped, options = {}) {
