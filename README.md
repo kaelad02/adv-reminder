@@ -34,10 +34,6 @@ In addition to active effects adding advantage or disadvantage, you can also add
 
 Notes about other modules.
 
-### Required Modules
-
-[libWrapper](https://foundryvtt.com/packages/lib-wrapper) - A library that makes it easy to wrap core Foundry VTT code. It's used to check the active effects before one of the supported rolls happens to pass along the advantage, disadvantage, or critical option.
-
 ### Suggested Modules
 
 [Dynamic Active Effects](https://foundryvtt.com/packages/dae) A module that improves the Active Effects system used by dnd5e.

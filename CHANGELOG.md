@@ -1,3 +1,8 @@
+# new
+
+- feature: now requires v10, removes warnings about using deprecated functions
+- feature: removed dependency on lib-wrapper, switched to new hooks that the dnd5e system introduced
+
 # 2.0.1
 
 - feature: style the shadow around the button to match style's color, if set
