@@ -1,4 +1,3 @@
-import { AttackSource } from "./adv-source.js";
 import { AbilitySaveFail } from "./fails.js";
 import {
   AbilityCheckMessage,
@@ -70,8 +69,6 @@ Hooks.on("dnd5e.preRollAttack", (item, config) => {
 
   debug("checking for message effects on this attack roll");
   new AttackMessage(item.actor, item).addMessage(config);
-  debug("getting the source of advantage on this attack roll");
-  new AttackSource(item.actor, getTarget(), item).updateOptions(config);
   debug("checking for adv/dis effects on this attack roll");
   new AttackReminder(item.actor, getTarget(), item).updateOptions(config);
 });
@@ -190,20 +187,12 @@ Hooks.on("renderDialog", async (dialog, html, data) => {
 async function prepareMessage(dialogOptions) {
   const messages = dialogOptions["adv-reminder"]?.messages ?? [];
   const rollData = dialogOptions["adv-reminder"]?.rollData ?? {};
-  const advantageLabels = dialogOptions["adv-reminder"]?.advantageLabels ?? [];
-  const disadvantageLabels = dialogOptions["adv-reminder"]?.disadvantageLabels ?? [];
 
-  // merge the messages with the advantage/disadvantage from hints
-  const combined = [...messages];
-  if (advantageLabels.length) combined.push(`Advantage from ${advantageLabels.join(", ")}`);
-  if (disadvantageLabels.length)
-    combined.push(`Disadvantage from ${disadvantageLabels.join(", ")}`);
-
-  if (combined) {
+  if (messages.length) {
     // build message
     const message = await renderTemplate(
       "modules/adv-reminder/templates/roll-dialog-messages.hbs",
-      { messages: combined }
+      { messages }
     );
     // enrich message, specifically replacing rolls
     const enriched = TextEditor.enrichHTML(message, {
@@ -214,7 +203,7 @@ async function prepareMessage(dialogOptions) {
       rollData,
       async: false,
     });
-    debug("combined", combined, "enriched", enriched);
+    debug("messages", messages, "enriched", enriched);
     return enriched;
   }
 }
