@@ -64,10 +64,7 @@ Hooks.once("DAE.setupComplete", () => {
 Hooks.on("dnd5e.preRollAttack", (item, config) => {
   debug("preRollAttack hook called");
 
-  if (isFastForwarding(config)) {
-    debug("fast-forwarding the roll, skip checking for adv/dis");
-    return;
-  }
+  if (isFastForwarding(config)) return;
 
   debug("checking for message effects on this attack roll");
   new AttackMessage(item.actor, item).addMessage(config);
@@ -85,10 +82,7 @@ Hooks.on("dnd5e.preRollAbilitySave", (actor, config, abilityId) => {
   const failChecker = new AbilitySaveFail(actor, abilityId);
   if (failChecker.fails(config)) return false;
 
-  if (isFastForwarding(config)) {
-    debug("fast-forwarding the roll, skip checking for adv/dis");
-    return;
-  }
+  if (isFastForwarding(config)) return;
 
   debug("checking for message effects on this saving throw");
   new AbilitySaveMessage(actor, abilityId).addMessage(config);
@@ -100,10 +94,7 @@ Hooks.on("dnd5e.preRollAbilitySave", (actor, config, abilityId) => {
 Hooks.on("dnd5e.preRollAbilityTest", (actor, config, abilityId) => {
   debug("preRollAbilityTest hook called");
 
-  if (isFastForwarding(config)) {
-    debug("fast-forwarding the roll, skip checking for adv/dis");
-    return;
-  }
+  if (isFastForwarding(config)) return;
 
   debug("checking for message effects on this ability check");
   new AbilityCheckMessage(actor, abilityId).addMessage(config);
@@ -115,10 +106,7 @@ Hooks.on("dnd5e.preRollAbilityTest", (actor, config, abilityId) => {
 Hooks.on("dnd5e.preRollSkill", (actor, config, skillId) => {
   debug("preRollSkill hook called");
 
-  if (isFastForwarding(config)) {
-    debug("fast-forwarding the roll, skip checking for adv/dis");
-    return;
-  }
+  if (isFastForwarding(config)) return;
 
   debug("checking for message effects on this skill check");
   new SkillMessage(actor, skillId).addMessage(config);
@@ -130,10 +118,7 @@ Hooks.on("dnd5e.preRollSkill", (actor, config, skillId) => {
 Hooks.on("dnd5e.preRollToolCheck", (item, config) => {
   debug("preRollToolCheck hook called");
 
-  if (isFastForwarding(config)) {
-    debug("fast-forwarding the roll, skip checking for adv/dis");
-    return;
-  }
+  if (isFastForwarding(config)) return;
 
   debug("checking for message effects on this tool check");
   new AbilityCheckMessage(item.actor, item.system.ability).addMessage(config);
@@ -145,10 +130,7 @@ Hooks.on("dnd5e.preRollToolCheck", (item, config) => {
 Hooks.on("dnd5e.preRollDeathSave", (actor, config) => {
   debug("preRollDeathSave hook called");
 
-  if (isFastForwarding(config)) {
-    debug("fast-forwarding the roll, skip checking for adv/dis");
-    return;
-  }
+  if (isFastForwarding(config)) return;
 
   debug("checking for message effects on this death save");
   new DeathSaveMessage(actor).addMessage(config);
@@ -161,10 +143,7 @@ Hooks.on("dnd5e.preRollDamage", (item, config) => {
   debug("preRollDamage hook called");
 
   // check for critical flags unless the user pressed a fast-forward key
-  if (isFastForwarding(config)) {
-    debug("fast-forwarding the roll, skip checking for adv/dis");
-    return;
-  }
+  if (isFastForwarding(config)) return;
 
   debug("checking for message effects on this damage roll");
   new DamageMessage(item.actor, item).addMessage(config);
@@ -214,8 +193,7 @@ async function prepareMessage(dialogOptions) {
 
   // merge the messages with the advantage/disadvantage from hints
   const combined = [...messages];
-  if (advantageLabels.length)
-    combined.push(`Advantage from ${advantageLabels.join(", ")}`);
+  if (advantageLabels.length) combined.push(`Advantage from ${advantageLabels.join(", ")}`);
   if (disadvantageLabels.length)
     combined.push(`Disadvantage from ${disadvantageLabels.join(", ")}`);
 
@@ -248,13 +226,15 @@ async function prepareMessage(dialogOptions) {
  * @returns {boolean} true if they are fast-forwarding, false otherwise
  */
 function isFastForwarding({ fastForward = false, event = {} }) {
-  return !!(
+  const isFF = !!(
     fastForward ||
     event?.shiftKey ||
     event?.altKey ||
     event?.ctrlKey ||
     event?.metaKey
   );
+  if (isFF) debug("fast-forwarding the roll, stop processing");
+  return isFF;
 }
 
 /**
