@@ -30,14 +30,7 @@ Hooks.once("init", () => {
   // Use hooks introduced in dnd5e v2.0 to adjust rolls
   Hooks.on("dnd5e.preRollAttack", preRollAttack);
   Hooks.on("dnd5e.preRollAbilitySave", preRollAbilitySave);
-
-  // Ability check wrapper
-  libWrapper.register(
-    "adv-reminder",
-    "CONFIG.Actor.documentClass.prototype.rollAbilityTest",
-    onRollAbilityTest,
-    "WRAPPER"
-  );
+  Hooks.on("dnd5e.preRollAbilityTest", preRollAbilityTest);
 
   // Skill check wrapper
   libWrapper.register(
@@ -146,22 +139,18 @@ function preRollAbilitySave(actor, config, abilityId) {
   new AbilitySaveReminder(actor, abilityId).updateOptions(config);
 }
 
-async function onRollAbilityTest(wrapped, abilityId, options = {}) {
-  debug("onRollAbilityTest method called");
+function preRollAbilityTest(actor, config, abilityId) {
+  debug("preRollAbilityTest method called");
 
-  // check for adv/dis flags unless the user pressed a fast-forward key
-  const isFF = isFastForwarding(options);
-  if (isFF) {
+  if (isFastForwarding(config)) {
     debug("fast-forwarding the roll, skip checking for adv/dis");
-  } else {
-    debug("checking for message effects on this ability check");
-    await new AbilityCheckMessage(this, abilityId).addMessage(options);
-    debug("checking for adv/dis effects on this ability check");
-    const reminder = new AbilityCheckReminder(this, abilityId);
-    reminder.updateOptions(options);
+    return;
   }
 
-  return wrapped(abilityId, options);
+  debug("checking for message effects on this ability check");
+  new AbilityCheckMessage(actor, abilityId).addMessage(config);
+  debug("checking for adv/dis effects on this ability check");
+  new AbilityCheckReminder(actor, abilityId).updateOptions(config);
 }
 
 async function onRollSkill(wrapped, skillId, options = {}) {
