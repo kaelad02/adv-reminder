@@ -2,12 +2,7 @@
   "id": "adv-reminder",
   "title": "Advantage Reminder for dnd5e",
   "description": "Use active effects to remind you to roll with advantage, disadvantage, or show messages on the dialog for situational adv/dis or bonuses.",
-  "authors": [
-    {
-      "name": "kaelad",
-      "discord": "kaelad#1693"
-    }
-  ],
+  "authors": [{ "name": "kaelad", "discord": "kaelad#1693" }],
   "version": "0.1",
   "compatibility": {
     "minimum": "10",
