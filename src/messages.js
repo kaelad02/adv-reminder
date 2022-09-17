@@ -21,8 +21,8 @@ class BaseMessage {
       .filter((change) => keys.includes(change.key))
       .map((change) => change.value);
 
-    debug("messages found:", messages);
     if (messages.length > 0) {
+      debug("messages found:", messages);
       setProperty(options, "dialogOptions.adv-reminder.messages", messages);
       setProperty(options, "dialogOptions.adv-reminder.rollData", this.actor.getRollData());
     }
