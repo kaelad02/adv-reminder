@@ -26,18 +26,6 @@ Hooks.once("init", () => {
   // DAE version 0.8.81 added support for "impose stealth disadvantage"
   checkArmorStealth = !game.modules.get("dae")?.active;
   debug("checkArmorStealth", checkArmorStealth);
-
-  // Use hooks introduced in dnd5e v2.0 to adjust rolls
-  Hooks.on("dnd5e.preRollAttack", preRollAttack);
-  Hooks.on("dnd5e.preRollAbilitySave", preRollAbilitySave);
-  Hooks.on("dnd5e.preRollAbilityTest", preRollAbilityTest);
-  Hooks.on("dnd5e.preRollSkill", preRollSkill);
-  Hooks.on("dnd5e.preRollToolCheck", preRollToolCheck);
-  Hooks.on("dnd5e.preRollDeathSave", preRollDeathSave);
-  Hooks.on("dnd5e.preRollDamage", preRollDamage);
-
-  // Render dialog hook
-  Hooks.on("renderDialog", addMessageHook);
 });
 
 // Add message flags to DAE so it shows them in the AE editor
@@ -72,8 +60,9 @@ Hooks.once("DAE.setupComplete", () => {
   window.DAE.addAutoFields(fields);
 });
 
-function preRollAttack(item, config) {
-  debug("preRollAttack method called");
+// Attack rolls
+Hooks.on("dnd5e.preRollAttack", (item, config) => {
+  debug("preRollAttack hook called");
 
   if (isFastForwarding(config)) {
     debug("fast-forwarding the roll, skip checking for adv/dis");
@@ -86,10 +75,11 @@ function preRollAttack(item, config) {
   new AttackSource(item.actor, getTarget(), item).updateOptions(config);
   debug("checking for adv/dis effects on this attack roll");
   new AttackReminder(item.actor, getTarget(), item).updateOptions(config);
-}
+});
 
-function preRollAbilitySave(actor, config, abilityId) {
-  debug("preRollAbilitySave method called");
+// Saving throws
+Hooks.on("dnd5e.preRollAbilitySave", (actor, config, abilityId) => {
+  debug("preRollAbilitySave hook called");
 
   // check if an effect says to fail this roll
   const failChecker = new AbilitySaveFail(actor, abilityId);
@@ -104,10 +94,11 @@ function preRollAbilitySave(actor, config, abilityId) {
   new AbilitySaveMessage(actor, abilityId).addMessage(config);
   debug("checking for adv/dis effects on this saving throw");
   new AbilitySaveReminder(actor, abilityId).updateOptions(config);
-}
+});
 
-function preRollAbilityTest(actor, config, abilityId) {
-  debug("preRollAbilityTest method called");
+// Ability checks
+Hooks.on("dnd5e.preRollAbilityTest", (actor, config, abilityId) => {
+  debug("preRollAbilityTest hook called");
 
   if (isFastForwarding(config)) {
     debug("fast-forwarding the roll, skip checking for adv/dis");
@@ -118,10 +109,11 @@ function preRollAbilityTest(actor, config, abilityId) {
   new AbilityCheckMessage(actor, abilityId).addMessage(config);
   debug("checking for adv/dis effects on this ability check");
   new AbilityCheckReminder(actor, abilityId).updateOptions(config);
-}
+});
 
-function preRollSkill(actor, config, skillId) {
-  debug("preRollSkill method called");
+// Skill checks
+Hooks.on("dnd5e.preRollSkill", (actor, config, skillId) => {
+  debug("preRollSkill hook called");
 
   if (isFastForwarding(config)) {
     debug("fast-forwarding the roll, skip checking for adv/dis");
@@ -132,10 +124,11 @@ function preRollSkill(actor, config, skillId) {
   new SkillMessage(actor, skillId).addMessage(config);
   debug("checking for adv/dis effects on this skill check");
   new SkillReminder(actor, skillId, checkArmorStealth).updateOptions(config);
-}
+});
 
-function preRollToolCheck(item, config) {
-  debug("preRollToolCheck method called");
+// Tool checks
+Hooks.on("dnd5e.preRollToolCheck", (item, config) => {
+  debug("preRollToolCheck hook called");
 
   if (isFastForwarding(config)) {
     debug("fast-forwarding the roll, skip checking for adv/dis");
@@ -146,10 +139,11 @@ function preRollToolCheck(item, config) {
   new AbilityCheckMessage(item.actor, item.system.ability).addMessage(config);
   debug("checking for adv/dis effects on this tool check");
   new AbilityCheckReminder(item.actor, item.system.ability).updateOptions(config);
-}
+});
 
-function preRollDeathSave(actor, config) {
-  debug("preRollDeathSave method called");
+// Death saves
+Hooks.on("dnd5e.preRollDeathSave", (actor, config) => {
+  debug("preRollDeathSave hook called");
 
   if (isFastForwarding(config)) {
     debug("fast-forwarding the roll, skip checking for adv/dis");
@@ -160,10 +154,11 @@ function preRollDeathSave(actor, config) {
   new DeathSaveMessage(actor).addMessage(config);
   debug("checking for adv/dis effects on this death save");
   new DeathSaveReminder(actor).updateOptions(config);
-}
+});
 
-function preRollDamage(item, config) {
-  debug("preRollDamage method called");
+// Damage rolls
+Hooks.on("dnd5e.preRollDamage", (item, config) => {
+  debug("preRollDamage hook called");
 
   // check for critical flags unless the user pressed a fast-forward key
   if (isFastForwarding(config)) {
@@ -175,10 +170,11 @@ function preRollDamage(item, config) {
   new DamageMessage(item.actor, item).addMessage(config);
   debug("checking for critical/normal effects on this damage roll");
   new CriticalReminder(item.actor, getTarget(), item).updateOptions(config);
-}
+});
 
-async function addMessageHook(dialog, html, data) {
-  debug("addMessageHook function called");
+// Render dialog hook
+Hooks.on("renderDialog", async (dialog, html, data) => {
+  debug("renderDialog hook called");
 
   const message = await prepareMessage(dialog.options);
   if (message) {
@@ -208,7 +204,7 @@ async function addMessageHook(dialog, html, data) {
     position.height = "auto";
     dialog.setPosition(position);
   }
-}
+});
 
 async function prepareMessage(dialogOptions) {
   const messages = dialogOptions["adv-reminder"]?.messages ?? [];
