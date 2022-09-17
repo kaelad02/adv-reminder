@@ -30,6 +30,8 @@ Hooks.once("init", () => {
 
 // Add message flags to DAE so it shows them in the AE editor
 Hooks.once("DAE.setupComplete", () => {
+  debug("adding Advantage Reminder flags to DAE");
+
   const fields = [];
   fields.push("flags.adv-reminder.message.all");
   fields.push("flags.adv-reminder.message.attack.all");
