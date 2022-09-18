@@ -44,17 +44,13 @@ Notes about other modules.
 
 ### Compatibility Notes
 
-[Better Rolls for 5e](https://foundryvtt.com/packages/betterrolls5e) This module works with Better Rolls, making rolls with advantage and disadvantage with the following known issues.
-
-- Active effects for critical hits do not work.
-- The "d20 Mode" Better Rolls setting of "Single Roll Upgradeable" does not give the hint in the pop-up asking what kind of roll to perform. It will still apply the active effects though possibly leading to some confusion, especially since advantage and disadvantage will not cancel each other out like they should.
-- Does not show messages, even if "d20 Mode" is set to "Query for (Dis)Advantage"
-
 [Midi QOL](https://foundryvtt.com/packages/midi-qol) This module works with Midi QOL, however there is a lot of crossover. Both modules will handle the advantage/disadvantage/critical flags, so you don't need this module for that. If you want the CSS change and messages feature, then it works with these known issues:
 
 - Midi QOL will ignore any advantage/disadvantage/critical settings that Advantage Reminder finds and passes along. It will perform the check for those flags itself. It is wasted work but shouldn't cause a noticable performance hit.
 - Does not show messages if Midi QOL is configured to fast forward rolls
 
-[Minimal Rolling Enhancements for D&D5e](https://foundryvtt.com/packages/mre-dnd5e) This module works with MRE, making rolls with advantage/disadvantage and showing messages if you hold the "Roll Dialog Modifier Key" (an MRE setting).
+[Faster Rolling by Default DnD5e](https://foundryvtt.com/packages/faster-rolling-by-default-5e) This moodule works with Faster Rolling by Default. If the dialog is shown, it will show any messages and have the default button set correctly.
 
-[Dynamic effects using Active Effects](https://foundryvtt.com/packages/dae) If you're using the message feature to add inline roll formulas, you need to use DAE version 0.10.01 or newer. Earlier versions would evaluate the deferred die roll in the active effect's value, making the button not work.
+[Roll Groups](https://foundryvtt.com/packages/rollgroups) This module works with Roll Groups.
+
+[Ready Set Roll for D&D5e](https://foundryvtt.com/packages/ready-set-roll-5e) This module works with Ready Set Roll but does nothing when quick rolls are enabled. Since quick rolls fast forward, skipping the dialog, this module does nothing. However, if you have quick rolls disabled for certain rolls then it will work, processing advantage/disadvantage/critical defaults and showing messages.
