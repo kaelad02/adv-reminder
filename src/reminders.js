@@ -14,8 +14,8 @@ class BaseReminder {
   _getActiveEffectKeys(actor) {
     return actor
       ? actor.effects
-          .filter((effect) => !effect.isSuppressed && !effect.data.disabled)
-          .flatMap((effect) => effect.data.changes)
+          .filter((effect) => !effect.isSuppressed && !effect.disabled)
+          .flatMap((effect) => effect.changes)
           .map((change) => change.key)
           .filter((key) => key.startsWith("flags.midi-qol."))
       : [];
@@ -57,7 +57,7 @@ export class AttackReminder extends BaseReminder {
     /** @type {string[]} */
     this.targetKeys = this._getActiveEffectKeys(targetActor);
     /** @type {string} */
-    this.actionType = item.data.data.actionType;
+    this.actionType = item.system.actionType;
     /** @type {string} */
     this.abilityId = item.abilityMod;
   }
@@ -172,7 +172,7 @@ export class AbilitySaveReminder extends AbilityBaseReminder {
 
 export class SkillReminder extends AbilityCheckReminder {
   constructor(actor, skillId, checkArmorStealth = true) {
-    super(actor, actor.data.data.skills[skillId].ability);
+    super(actor, actor.system.skills[skillId].ability);
 
     /** @type {string} */
     this.skillId = skillId;
@@ -223,8 +223,8 @@ export class SkillReminder extends AbilityCheckReminder {
       const item = this.items.find(
         (item) =>
           item.type === "equipment" &&
-          item.data?.data?.equipped &&
-          item.data?.data?.stealth
+          item.system?.equipped &&
+          item.system?.stealth
       );
       debug("equiped item that imposes stealth disadvantage", item?.name);
       return !!item;
@@ -262,7 +262,7 @@ export class CriticalReminder extends BaseReminder {
     /** @type {string[]} */
     this.targetKeys = this._getActiveEffectKeys(targetActor);
     /** @type {string} */
-    this.actionType = item.data.data.actionType;
+    this.actionType = item.system.actionType;
   }
 
   updateOptions(options) {

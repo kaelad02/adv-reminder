@@ -6,8 +6,8 @@ class BaseMessage {
     this.actor = actor;
     /** @type {EffectChangeData[]} */
     this.changes = actor.effects
-      .filter((effect) => !effect.isSuppressed && !effect.data.disabled)
-      .flatMap((effect) => effect.data.changes)
+      .filter((effect) => !effect.isSuppressed && !effect.disabled)
+      .flatMap((effect) => effect.changes)
       .sort((a, b) => a.priority - b.priority);
   }
 
@@ -15,32 +15,17 @@ class BaseMessage {
     return ["flags.adv-reminder.message.all"];
   }
 
-  async addMessage(options) {
+  addMessage(options) {
     const keys = this.messageKeys;
     const messages = this.changes
       .filter((change) => keys.includes(change.key))
       .map((change) => change.value);
 
     if (messages.length > 0) {
-      // build message
-      const message = await renderTemplate(
-        "modules/adv-reminder/templates/roll-dialog-messages.hbs",
-        { messages }
-      );
-      // enrich message, specifically replacing rolls
-      const enriched = TextEditor.enrichHTML(message, {
-        secrets: true,
-        documents: true,
-        links: false,
-        rolls: true,
-        rollData: this.actor.getRollData(),
-        async: false,
-      });
-      debug("message", message, "enriched", enriched);
-      setProperty(options, "dialogOptions.adv-reminder.message", enriched);
+      debug("messages found:", messages);
+      setProperty(options, "dialogOptions.adv-reminder.messages", messages);
+      setProperty(options, "dialogOptions.adv-reminder.rollData", this.actor.getRollData());
     }
-
-    return messages;
   }
 }
 
@@ -49,7 +34,7 @@ export class AttackMessage extends BaseMessage {
     super(actor);
 
     /** @type {string} */
-    this.actionType = item.data.data.actionType;
+    this.actionType = item.system.actionType;
     /** @type {string} */
     this.abilityId = item.abilityMod;
   }
@@ -100,7 +85,7 @@ export class AbilitySaveMessage extends AbilityBaseMessage {
 
 export class SkillMessage extends AbilityCheckMessage {
   constructor(actor, skillId) {
-    super(actor, actor.data.data.skills[skillId].ability);
+    super(actor, actor.system.skills[skillId].ability);
 
     /** @type {string} */
     this.skillId = skillId;
@@ -134,7 +119,7 @@ export class DamageMessage extends BaseMessage {
     super(actor);
 
     /** @type {string} */
-    this.actionType = item.data.data.actionType;
+    this.actionType = item.system.actionType;
   }
 
   /** @override */
@@ -143,11 +128,5 @@ export class DamageMessage extends BaseMessage {
       "flags.adv-reminder.message.damage.all",
       `flags.adv-reminder.message.damage.${this.actionType}`
     );
-  }
-
-  async addMessage(options) {
-    // Damage options has a nested options variable, add that and pass it to super
-    options.options = options.options || {};
-    return super.addMessage(options.options);
   }
 }

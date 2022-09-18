@@ -15,7 +15,7 @@ import {
   DeathSaveReminder,
   SkillReminder,
 } from "./reminders.js";
-import { debug, isMinVersion, log } from "./util.js";
+import { debug, log } from "./util.js";
 
 let checkArmorStealth;
 
@@ -23,246 +23,138 @@ Hooks.once("init", () => {
   log("initializing Advantage Reminder");
 
   // DAE version 0.8.81 added support for "impose stealth disadvantage"
-  checkArmorStealth = !isMinVersion("dae", "0.8.81");
+  checkArmorStealth = !game.modules.get("dae")?.active;
   debug("checkArmorStealth", checkArmorStealth);
-
-  // Attack roll wrapper
-  libWrapper.register(
-    "adv-reminder",
-    "CONFIG.Item.documentClass.prototype.rollAttack",
-    onRollAttack,
-    "WRAPPER"
-  );
-
-  // Saving throw wrapper
-  libWrapper.register(
-    "adv-reminder",
-    "CONFIG.Actor.documentClass.prototype.rollAbilitySave",
-    onRollAbilitySave,
-    "MIXED"
-  );
-
-  // Ability check wrapper
-  libWrapper.register(
-    "adv-reminder",
-    "CONFIG.Actor.documentClass.prototype.rollAbilityTest",
-    onRollAbilityTest,
-    "WRAPPER"
-  );
-
-  // Skill check wrapper
-  libWrapper.register(
-    "adv-reminder",
-    "CONFIG.Actor.documentClass.prototype.rollSkill",
-    onRollSkill,
-    "WRAPPER"
-  );
-
-  // Tool check wrapper
-  libWrapper.register(
-    "adv-reminder",
-    "CONFIG.Item.documentClass.prototype.rollToolCheck",
-    onRollToolCheck,
-    "WRAPPER"
-  );
-
-  // Death save wrapper
-  libWrapper.register(
-    "adv-reminder",
-    "CONFIG.Actor.documentClass.prototype.rollDeathSave",
-    onRollDeathSave,
-    "WRAPPER"
-  );
-
-  // Critical hit wrapper
-  libWrapper.register(
-    "adv-reminder",
-    "CONFIG.Item.documentClass.prototype.rollDamage",
-    onRollDamage,
-    "WRAPPER"
-  );
-
-  // Render dialog hook
-  Hooks.on("renderDialog", addMessageHook);
 });
 
-// Add message flags to DAE so it shows them in the AE editor. Should do this in
-// a setup hook, but this module is loaded before DAE so do it in ready instead.
-Hooks.once("ready", () => {
-  if (game.modules.get("dae")?.active) {
-    const fields = [];
-    fields.push("flags.adv-reminder.message.all");
-    fields.push("flags.adv-reminder.message.attack.all");
-    fields.push("flags.adv-reminder.message.ability.all");
-    fields.push("flags.adv-reminder.message.ability.check.all");
-    fields.push("flags.adv-reminder.message.ability.save.all");
-    fields.push("flags.adv-reminder.message.skill.all");
-    fields.push("flags.adv-reminder.message.deathSave");
-    fields.push("flags.adv-reminder.message.damage.all");
+// Add message flags to DAE so it shows them in the AE editor
+Hooks.once("DAE.setupComplete", () => {
+  debug("adding Advantage Reminder flags to DAE");
 
-    const actionTypes =
-      game.system.id === "sw5e"
-        ? ["mwak", "rwak", "mpak", "rpak"]
-        : ["mwak", "rwak", "msak", "rsak"];
-    actionTypes.forEach((actionType) => {
-      fields.push(`flags.adv-reminder.message.attack.${actionType}`);
-      fields.push(`flags.adv-reminder.message.damage.${actionType}`);
-    });
+  const fields = [];
+  fields.push("flags.adv-reminder.message.all");
+  fields.push("flags.adv-reminder.message.attack.all");
+  fields.push("flags.adv-reminder.message.ability.all");
+  fields.push("flags.adv-reminder.message.ability.check.all");
+  fields.push("flags.adv-reminder.message.ability.save.all");
+  fields.push("flags.adv-reminder.message.skill.all");
+  fields.push("flags.adv-reminder.message.deathSave");
+  fields.push("flags.adv-reminder.message.damage.all");
 
-    Object.keys(CONFIG.DND5E.abilities).forEach((abilityId) => {
-      fields.push(`flags.adv-reminder.message.attack.${abilityId}`);
-      fields.push(`flags.adv-reminder.message.ability.check.${abilityId}`);
-      fields.push(`flags.adv-reminder.message.ability.save.${abilityId}`);
-    });
+  const actionTypes =
+    game.system.id === "sw5e" ? ["mwak", "rwak", "mpak", "rpak"] : ["mwak", "rwak", "msak", "rsak"];
+  actionTypes.forEach((actionType) => {
+    fields.push(`flags.adv-reminder.message.attack.${actionType}`);
+    fields.push(`flags.adv-reminder.message.damage.${actionType}`);
+  });
 
-    Object.keys(CONFIG.DND5E.skills).forEach((skillId) =>
-      fields.push(`flags.adv-reminder.message.skill.${skillId}`)
-    );
+  Object.keys(CONFIG.DND5E.abilities).forEach((abilityId) => {
+    fields.push(`flags.adv-reminder.message.attack.${abilityId}`);
+    fields.push(`flags.adv-reminder.message.ability.check.${abilityId}`);
+    fields.push(`flags.adv-reminder.message.ability.save.${abilityId}`);
+  });
 
-    window.DAE.addAutoFields(fields);
-  }
+  Object.keys(CONFIG.DND5E.skills).forEach((skillId) =>
+    fields.push(`flags.adv-reminder.message.skill.${skillId}`)
+  );
+
+  window.DAE.addAutoFields(fields);
 });
 
-async function onRollAttack(wrapped, options = {}) {
-  debug("onRollAttack method called");
+// Attack rolls
+Hooks.on("dnd5e.preRollAttack", (item, config) => {
+  debug("preRollAttack hook called");
 
-  // check for adv/dis flags unless the user pressed a fast-forward key
-  const isFF = isFastForwarding(options);
-  if (isFF) {
-    debug("fast-forwarding the roll, skip checking for adv/dis");
-  } else {
-    debug("checking for message effects on this attack roll");
-    await new AttackMessage(this.actor, this).addMessage(options);
-    debug("checking for adv/dis effects on this attack roll");
-    const reminder = new AttackReminder(this.actor, getTarget(), this);
-    reminder.updateOptions(options);
-  }
+  if (isFastForwarding(config)) return;
 
-  return wrapped(options);
-}
+  debug("checking for message effects on this attack roll");
+  new AttackMessage(item.actor, item).addMessage(config);
+  debug("checking for adv/dis effects on this attack roll");
+  new AttackReminder(item.actor, getTarget(), item).updateOptions(config);
+});
 
-async function onRollAbilitySave(wrapped, abilityId, options = {}) {
-  debug("onRollAbilitySave method called");
+// Saving throws
+Hooks.on("dnd5e.preRollAbilitySave", (actor, config, abilityId) => {
+  debug("preRollAbilitySave hook called");
 
   // check if an effect says to fail this roll
-  const failChecker = new AbilitySaveFail(this, abilityId);
-  if (await failChecker.fails(options)) return null;
+  const failChecker = new AbilitySaveFail(actor, abilityId);
+  if (failChecker.fails(config)) return false;
 
-  // check for adv/dis flags unless the user pressed a fast-forward key
-  const isFF = isFastForwarding(options);
-  if (isFF) {
-    debug("fast-forwarding the roll, skip checking for adv/dis");
-  } else {
-    debug("checking for message effects on this saving throw");
-    await new AbilitySaveMessage(this, abilityId).addMessage(options);
-    debug("checking for adv/dis effects on this saving throw");
-    const reminder = new AbilitySaveReminder(this, abilityId);
-    reminder.updateOptions(options);
-  }
+  if (isFastForwarding(config)) return;
 
-  return wrapped(abilityId, options);
-}
+  debug("checking for message effects on this saving throw");
+  new AbilitySaveMessage(actor, abilityId).addMessage(config);
+  debug("checking for adv/dis effects on this saving throw");
+  new AbilitySaveReminder(actor, abilityId).updateOptions(config);
+});
 
-async function onRollAbilityTest(wrapped, abilityId, options = {}) {
-  debug("onRollAbilityTest method called");
+// Ability checks
+Hooks.on("dnd5e.preRollAbilityTest", (actor, config, abilityId) => {
+  debug("preRollAbilityTest hook called");
 
-  // check for adv/dis flags unless the user pressed a fast-forward key
-  const isFF = isFastForwarding(options);
-  if (isFF) {
-    debug("fast-forwarding the roll, skip checking for adv/dis");
-  } else {
-    debug("checking for message effects on this ability check");
-    await new AbilityCheckMessage(this, abilityId).addMessage(options);
-    debug("checking for adv/dis effects on this ability check");
-    const reminder = new AbilityCheckReminder(this, abilityId);
-    reminder.updateOptions(options);
-  }
+  if (isFastForwarding(config)) return;
 
-  return wrapped(abilityId, options);
-}
+  debug("checking for message effects on this ability check");
+  new AbilityCheckMessage(actor, abilityId).addMessage(config);
+  debug("checking for adv/dis effects on this ability check");
+  new AbilityCheckReminder(actor, abilityId).updateOptions(config);
+});
 
-async function onRollSkill(wrapped, skillId, options = {}) {
-  debug("onRollSkill method called");
+// Skill checks
+Hooks.on("dnd5e.preRollSkill", (actor, config, skillId) => {
+  debug("preRollSkill hook called");
 
-  // check for adv/dis flags unless the user pressed a fast-forward key
-  const isFF = isFastForwarding(options);
-  if (isFF) {
-    debug("fast-forwarding the roll, skip checking for adv/dis");
-  } else {
-    debug("checking for message effects on this skill check");
-    await new SkillMessage(this, skillId).addMessage(options);
-    debug("checking for adv/dis effects on this skill check");
-    const reminder = new SkillReminder(this, skillId, checkArmorStealth);
-    reminder.updateOptions(options);
-  }
+  if (isFastForwarding(config)) return;
 
-  return wrapped(skillId, options);
-}
+  debug("checking for message effects on this skill check");
+  new SkillMessage(actor, skillId).addMessage(config);
+  debug("checking for adv/dis effects on this skill check");
+  new SkillReminder(actor, skillId, checkArmorStealth).updateOptions(config);
+});
 
-async function onRollToolCheck(wrapped, options = {}) {
-  debug("onRollToolCheck method called");
+// Tool checks
+Hooks.on("dnd5e.preRollToolCheck", (item, config) => {
+  debug("preRollToolCheck hook called");
 
-  // check for adv/dis flags unless the user pressed a fast-forward key
-  const isFF = isFastForwarding(options);
-  if (isFF) {
-    debug("fast-forwarding the roll, skip checking for adv/dis");
-  } else {
-    debug("checking for message effects on this tool check");
-    await new AbilityCheckMessage(
-      this.actor,
-      this.data.data.ability
-    ).addMessage(options);
-    debug("checking for adv/dis effects on this tool check");
-    const reminder = new AbilityCheckReminder(
-      this.actor,
-      this.data.data.ability
-    );
-    reminder.updateOptions(options);
-  }
+  if (isFastForwarding(config)) return;
 
-  return wrapped(options);
-}
+  debug("checking for message effects on this tool check");
+  new AbilityCheckMessage(item.actor, item.system.ability).addMessage(config);
+  debug("checking for adv/dis effects on this tool check");
+  new AbilityCheckReminder(item.actor, item.system.ability).updateOptions(config);
+});
 
-async function onRollDeathSave(wrapped, options = {}) {
-  debug("onRollDeathSave method called");
+// Death saves
+Hooks.on("dnd5e.preRollDeathSave", (actor, config) => {
+  debug("preRollDeathSave hook called");
 
-  // check for adv/dis flags unless the user pressed a fast-forward key
-  const isFF = isFastForwarding(options);
-  if (isFF) {
-    debug("fast-forwarding the roll, skip checking for adv/dis");
-  } else {
-    debug("checking for message effects on this death save");
-    await new DeathSaveMessage(this).addMessage(options);
-    debug("checking for adv/dis effects on this death save");
-    const reminder = new DeathSaveReminder(this);
-    reminder.updateOptions(options);
-  }
+  if (isFastForwarding(config)) return;
 
-  return wrapped(options);
-}
+  debug("checking for message effects on this death save");
+  new DeathSaveMessage(actor).addMessage(config);
+  debug("checking for adv/dis effects on this death save");
+  new DeathSaveReminder(actor).updateOptions(config);
+});
 
-async function onRollDamage(wrapped, options = {}) {
-  debug("onRollDamage method called");
+// Damage rolls
+Hooks.on("dnd5e.preRollDamage", (item, config) => {
+  debug("preRollDamage hook called");
 
   // check for critical flags unless the user pressed a fast-forward key
-  const isFF = isFastForwardingDamage(options);
-  if (isFF) {
-    debug("fast-forwarding the roll, skip checking for adv/dis");
-  } else {
-    debug("checking for message effects on this damage roll");
-    await new DamageMessage(this.actor, this).addMessage(options);
-    debug("checking for critical/normal effects on this damage roll");
-    const reminder = new CriticalReminder(this.actor, getTarget(), this);
-    reminder.updateOptions(options);
-  }
+  if (isFastForwarding(config)) return;
 
-  return wrapped(options);
-}
+  debug("checking for message effects on this damage roll");
+  new DamageMessage(item.actor, item).addMessage(config);
+  debug("checking for critical/normal effects on this damage roll");
+  new CriticalReminder(item.actor, getTarget(), item).updateOptions(config);
+});
 
-function addMessageHook(dialog, html, data) {
-  debug("addMessageHook function called");
+// Render dialog hook
+Hooks.on("renderDialog", async (dialog, html, data) => {
+  debug("renderDialog hook called");
 
-  const message = dialog.options["adv-reminder"]?.message;
+  const message = await prepareMessage(dialog.options);
   if (message) {
     // add message at the end
     const formGroups = html.find(".form-group:last");
@@ -290,6 +182,30 @@ function addMessageHook(dialog, html, data) {
     position.height = "auto";
     dialog.setPosition(position);
   }
+});
+
+async function prepareMessage(dialogOptions) {
+  const messages = dialogOptions["adv-reminder"]?.messages ?? [];
+  const rollData = dialogOptions["adv-reminder"]?.rollData ?? {};
+
+  if (messages.length) {
+    // build message
+    const message = await renderTemplate(
+      "modules/adv-reminder/templates/roll-dialog-messages.hbs",
+      { messages }
+    );
+    // enrich message, specifically replacing rolls
+    const enriched = TextEditor.enrichHTML(message, {
+      secrets: true,
+      documents: true,
+      links: false,
+      rolls: true,
+      rollData,
+      async: false,
+    });
+    debug("messages", messages, "enriched", enriched);
+    return enriched;
+  }
 }
 
 /**
@@ -301,26 +217,15 @@ function addMessageHook(dialog, html, data) {
  * @returns {boolean} true if they are fast-forwarding, false otherwise
  */
 function isFastForwarding({ fastForward = false, event = {} }) {
-  return !!(
+  const isFF = !!(
     fastForward ||
     event?.shiftKey ||
     event?.altKey ||
     event?.ctrlKey ||
     event?.metaKey
   );
-}
-
-/**
- * Check if the user is holding down a fast-forward key for a damage roll.
- * @param {object} [options] the options
- * @param {Event} [options.event] the triggering event
- * @param {object} [options.options] the nested options
- * @returns {boolean} true if they are fast-forwarding, false otherwise
- */
-function isFastForwardingDamage({ event = {}, options = {} }) {
-  // special handling for MRE and damage rolls, always process since it will run after this module
-  if (game.modules.get("mre-dnd5e")?.active) return false;
-  return isFastForwarding({ fastForward: options.fastForward, event });
+  if (isFF) debug("fast-forwarding the roll, stop processing");
+  return isFF;
 }
 
 /**

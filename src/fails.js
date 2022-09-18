@@ -15,18 +15,18 @@ class BaseFail {
    * @param {object} options the roll options
    * @returns true if the roll should fail, false if it may continue
    */
-  async fails(options) {
+  fails(options) {
     // get the active effect keys that will fail
     const failKeys = this.failKeys;
     debug("failKeys", failKeys);
 
     const shouldFail = this.actor.effects
-      .filter((effect) => !effect.isSuppressed && !effect.data.disabled)
-      .flatMap((effect) => effect.data.changes)
+      .filter((effect) => !effect.isSuppressed && !effect.disabled)
+      .flatMap((effect) => effect.changes)
       .some((change) => failKeys.includes(change.key));
     if (shouldFail) {
       const messageData = this.createMessageData(options);
-      await this.toMessage(messageData);
+      this.toMessage(messageData);
     }
     return shouldFail;
   }

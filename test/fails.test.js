@@ -9,20 +9,16 @@ function createActorWithEffects(...keys) {
 function createEffect(key) {
   const effect = {
     isSuppressed: false,
-    data: {
-      changes: [
-        {
-          key,
-          value: "1",
-          mode: 0,
-          priority: "0",
-        },
-      ],
-      disabled: false,
-    },
+    changes: [
+      {
+        key,
+        value: "1",
+        mode: 0,
+        priority: "0",
+      },
+    ],
+    disabled: false,
   };
-  // link the change back to the effect
-  effect.data.changes[0].document = effect;
   return effect;
 }
 
@@ -45,9 +41,7 @@ describe("AbilitySaveFail no legit active effects", () => {
   });
 
   test("saving throw with a suppressed active effect should not fail", async () => {
-    const actor = createActorWithEffects(
-      "flags.midi-qol.fail.ability.save.all"
-    );
+    const actor = createActorWithEffects("flags.midi-qol.fail.ability.save.all");
     actor.effects[0].isSuppressed = true;
 
     const failChecker = new AbilitySaveFail(actor, "dex");
@@ -58,10 +52,8 @@ describe("AbilitySaveFail no legit active effects", () => {
   });
 
   test("saving throw with a disabled active effect should not fail", async () => {
-    const actor = createActorWithEffects(
-      "flags.midi-qol.fail.ability.save.all"
-    );
-    actor.effects[0].data.disabled = true;
+    const actor = createActorWithEffects("flags.midi-qol.fail.ability.save.all");
+    actor.effects[0].disabled = true;
 
     const failChecker = new AbilitySaveFail(actor, "dex");
     const spies = mockFailChecker(failChecker);
@@ -93,9 +85,7 @@ describe("AbilitySaveFail fail flags", () => {
   });
 
   test("saving throw with fail.ability.save.all flag should fail", async () => {
-    const actor = createActorWithEffects(
-      "flags.midi-qol.fail.ability.save.all"
-    );
+    const actor = createActorWithEffects("flags.midi-qol.fail.ability.save.all");
 
     const failChecker = new AbilitySaveFail(actor, "dex");
     const spies = mockFailChecker(failChecker);
@@ -105,9 +95,7 @@ describe("AbilitySaveFail fail flags", () => {
   });
 
   test("saving throw with fail.ability.save.dex flag should fail a Dexterity save", async () => {
-    const actor = createActorWithEffects(
-      "flags.midi-qol.fail.ability.save.dex"
-    );
+    const actor = createActorWithEffects("flags.midi-qol.fail.ability.save.dex");
 
     const failChecker = new AbilitySaveFail(actor, "dex");
     const spies = mockFailChecker(failChecker);
@@ -117,9 +105,7 @@ describe("AbilitySaveFail fail flags", () => {
   });
 
   test("saving throw with fail.ability.save.dex flag should not fail a Constitution save", async () => {
-    const actor = createActorWithEffects(
-      "flags.midi-qol.fail.ability.save.dex"
-    );
+    const actor = createActorWithEffects("flags.midi-qol.fail.ability.save.dex");
 
     const failChecker = new AbilitySaveFail(actor, "con");
     const spies = mockFailChecker(failChecker);
