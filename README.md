@@ -44,9 +44,9 @@ Notes about other modules.
 
 ### Compatibility Notes
 
-[Midi QOL](https://foundryvtt.com/packages/midi-qol) This module works with Midi QOL, however there is a lot of crossover. Both modules will handle the advantage/disadvantage/critical flags, so you don't need this module for that. If you want the CSS change and messages feature, then it works with these known issues:
+[Midi QOL](https://foundryvtt.com/packages/midi-qol) This module works with Midi QOL, however there is a lot of crossover. Both modules can handle the advantage/disadvantage/critical flags, so you don't need this module for that. If you want the CSS change and messages feature, then it works with the following notes:
 
-- Midi QOL will ignore any advantage/disadvantage/critical settings that Advantage Reminder finds and passes along. It will perform the check for those flags itself. It is wasted work but shouldn't cause a noticable performance hit.
+- This module will not process the advantage/disadvantage/critical flags if Midi QOL is active, since it will process them already
 - Does not show messages if Midi QOL is configured to fast forward rolls
 
 [Faster Rolling by Default DnD5e](https://foundryvtt.com/packages/faster-rolling-by-default-5e) This moodule works with Faster Rolling by Default. If the dialog is shown, it will show any messages and have the default button set correctly.
