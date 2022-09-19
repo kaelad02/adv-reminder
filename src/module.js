@@ -18,6 +18,7 @@ import {
 import { debug, log } from "./util.js";
 
 let checkArmorStealth;
+let skipReminders;
 
 Hooks.once("init", () => {
   log("initializing Advantage Reminder");
@@ -25,6 +26,10 @@ Hooks.once("init", () => {
   // DAE version 0.8.81 added support for "impose stealth disadvantage"
   checkArmorStealth = !game.modules.get("dae")?.active;
   debug("checkArmorStealth", checkArmorStealth);
+
+  // skip all reminder checks if Midi is active since it will do it anyways
+  skipReminders = game.modules.get("midi-qol")?.active;
+  debug("skipReminders", skipReminders);
 });
 
 // Add message flags to DAE so it shows them in the AE editor
@@ -69,6 +74,8 @@ Hooks.on("dnd5e.preRollAttack", (item, config) => {
 
   debug("checking for message effects on this attack roll");
   new AttackMessage(item.actor, item).addMessage(config);
+
+  if (skipReminders) return;
   debug("checking for adv/dis effects on this attack roll");
   new AttackReminder(item.actor, getTarget(), item).updateOptions(config);
 });
@@ -85,6 +92,8 @@ Hooks.on("dnd5e.preRollAbilitySave", (actor, config, abilityId) => {
 
   debug("checking for message effects on this saving throw");
   new AbilitySaveMessage(actor, abilityId).addMessage(config);
+
+  if (skipReminders) return;
   debug("checking for adv/dis effects on this saving throw");
   new AbilitySaveReminder(actor, abilityId).updateOptions(config);
 });
@@ -97,6 +106,8 @@ Hooks.on("dnd5e.preRollAbilityTest", (actor, config, abilityId) => {
 
   debug("checking for message effects on this ability check");
   new AbilityCheckMessage(actor, abilityId).addMessage(config);
+
+  if (skipReminders) return;
   debug("checking for adv/dis effects on this ability check");
   new AbilityCheckReminder(actor, abilityId).updateOptions(config);
 });
@@ -109,6 +120,8 @@ Hooks.on("dnd5e.preRollSkill", (actor, config, skillId) => {
 
   debug("checking for message effects on this skill check");
   new SkillMessage(actor, skillId).addMessage(config);
+
+  if (skipReminders) return;
   debug("checking for adv/dis effects on this skill check");
   new SkillReminder(actor, skillId, checkArmorStealth).updateOptions(config);
 });
@@ -121,6 +134,8 @@ Hooks.on("dnd5e.preRollToolCheck", (item, config) => {
 
   debug("checking for message effects on this tool check");
   new AbilityCheckMessage(item.actor, item.system.ability).addMessage(config);
+
+  if (skipReminders) return;
   debug("checking for adv/dis effects on this tool check");
   new AbilityCheckReminder(item.actor, item.system.ability).updateOptions(config);
 });
@@ -133,6 +148,8 @@ Hooks.on("dnd5e.preRollDeathSave", (actor, config) => {
 
   debug("checking for message effects on this death save");
   new DeathSaveMessage(actor).addMessage(config);
+
+  if (skipReminders) return;
   debug("checking for adv/dis effects on this death save");
   new DeathSaveReminder(actor).updateOptions(config);
 });
@@ -146,6 +163,8 @@ Hooks.on("dnd5e.preRollDamage", (item, config) => {
 
   debug("checking for message effects on this damage roll");
   new DamageMessage(item.actor, item).addMessage(config);
+
+  if (skipReminders) return;
   debug("checking for critical/normal effects on this damage roll");
   new CriticalReminder(item.actor, getTarget(), item).updateOptions(config);
 });
