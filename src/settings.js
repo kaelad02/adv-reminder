@@ -1,3 +1,5 @@
+export let showSources;
+
 Hooks.once("init", () => {
   // register settings
   game.settings.register("adv-reminder", "defaultButtonColor", {
@@ -32,6 +34,16 @@ Hooks.once("init", () => {
         customColor
       ),
   });
+
+  game.settings.register("adv-reminder", "showSources", {
+    name: "adv-reminder.ShowSources.Name",
+    hint: "adv-reminder.ShowSources.Hint",
+    scope: "client",
+    config: true,
+    type: Boolean,
+    default: true,
+    onChange: (value) => (showSources = value),
+  });
 });
 
 Hooks.once("ready", () => {
@@ -40,6 +52,8 @@ Hooks.once("ready", () => {
     game.settings.get("adv-reminder", "defaultButtonColor"),
     game.settings.get("adv-reminder", "customColor")
   );
+
+  showSources = game.settings.get("adv-reminder", "showSources");
 });
 
 Hooks.once("devModeReady", ({ registerPackageDebugFlag }) =>

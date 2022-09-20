@@ -12,6 +12,10 @@
     "Name": "Custom Color",
     "Hint": "Dark colors work better than light colors"
   },
+  "adv-reminder.ShowSources": {
+    "Name": "Show Sources of Adv/Dis/Crit",
+    "Hint": "If an active effect determines adv/dis/crit on a roll, show its name as a message in the dialog"
+  },
   "adv-reminder.Source": {
     "Adv": "Advantage from {sources}",
     "Dis": "Disadvantage from {sources}",

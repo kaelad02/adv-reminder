@@ -15,6 +15,7 @@ import {
   DeathSaveReminder,
   SkillReminder,
 } from "./reminders.js";
+import { showSources } from "./settings.js";
 import {
   AbilityCheckSource,
   AbilitySaveSource,
@@ -83,8 +84,10 @@ Hooks.on("dnd5e.preRollAttack", (item, config) => {
 
   debug("checking for message effects on this attack roll");
   new AttackMessage(item.actor, item).addMessage(config);
-  debug("checking for adv/dis effects to display their source");
-  new AttackSource(item.actor, getTarget(), item).updateOptions(config);
+  if (showSources) {
+    debug("checking for adv/dis effects to display their source");
+    new AttackSource(item.actor, getTarget(), item).updateOptions(config);
+  }
 
   if (skipReminders) return;
   debug("checking for adv/dis effects on this attack roll");
@@ -103,8 +106,10 @@ Hooks.on("dnd5e.preRollAbilitySave", (actor, config, abilityId) => {
 
   debug("checking for message effects on this saving throw");
   new AbilitySaveMessage(actor, abilityId).addMessage(config);
-  debug("checking for adv/dis effects to display their source");
-  new AbilitySaveSource(actor, abilityId).updateOptions(config);
+  if (showSources) {
+    debug("checking for adv/dis effects to display their source");
+    new AbilitySaveSource(actor, abilityId).updateOptions(config);
+  }
 
   if (skipReminders) return;
   debug("checking for adv/dis effects on this saving throw");
@@ -119,8 +124,10 @@ Hooks.on("dnd5e.preRollAbilityTest", (actor, config, abilityId) => {
 
   debug("checking for message effects on this ability check");
   new AbilityCheckMessage(actor, abilityId).addMessage(config);
-  debug("checking for adv/dis effects to display their source");
-  new AbilityCheckSource(actor, abilityId).updateOptions(config);
+  if (showSources) {
+    debug("checking for adv/dis effects to display their source");
+    new AbilityCheckSource(actor, abilityId).updateOptions(config);
+  }
 
   if (skipReminders) return;
   debug("checking for adv/dis effects on this ability check");
@@ -135,8 +142,10 @@ Hooks.on("dnd5e.preRollSkill", (actor, config, skillId) => {
 
   debug("checking for message effects on this skill check");
   new SkillMessage(actor, skillId).addMessage(config);
-  debug("checking for adv/dis effects to display their source");
-  new SkillSource(actor, skillId, checkArmorStealth).updateOptions(config);
+  if (showSources) {
+    debug("checking for adv/dis effects to display their source");
+    new SkillSource(actor, skillId, checkArmorStealth).updateOptions(config);
+  }
 
   if (skipReminders) return;
   debug("checking for adv/dis effects on this skill check");
@@ -151,8 +160,10 @@ Hooks.on("dnd5e.preRollToolCheck", (item, config) => {
 
   debug("checking for message effects on this tool check");
   new AbilityCheckMessage(item.actor, item.system.ability).addMessage(config);
-  debug("checking for adv/dis effects to display their source");
-  new AbilityCheckSource(item.actor, item.system.ability).updateOptions(config);
+  if (showSources) {
+    debug("checking for adv/dis effects to display their source");
+    new AbilityCheckSource(item.actor, item.system.ability).updateOptions(config);
+  }
 
   if (skipReminders) return;
   debug("checking for adv/dis effects on this tool check");
@@ -167,8 +178,10 @@ Hooks.on("dnd5e.preRollDeathSave", (actor, config) => {
 
   debug("checking for message effects on this death save");
   new DeathSaveMessage(actor).addMessage(config);
-  debug("checking for adv/dis effects to display their source");
-  new DeathSaveSource(actor).updateOptions(config);
+  if (showSources) {
+    debug("checking for adv/dis effects to display their source");
+    new DeathSaveSource(actor).updateOptions(config);
+  }
 
   if (skipReminders) return;
   debug("checking for adv/dis effects on this death save");
@@ -184,8 +197,10 @@ Hooks.on("dnd5e.preRollDamage", (item, config) => {
 
   debug("checking for message effects on this damage roll");
   new DamageMessage(item.actor, item).addMessage(config);
-  debug("checking for adv/dis effects to display their source");
-  new CriticalSource(item.actor, getTarget(), item).updateOptions(config);
+  if (showSources) {
+    debug("checking for adv/dis effects to display their source");
+    new CriticalSource(item.actor, getTarget(), item).updateOptions(config);
+  }
 
   if (skipReminders) return;
   debug("checking for critical/normal effects on this damage roll");
