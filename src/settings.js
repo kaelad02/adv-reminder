@@ -107,8 +107,8 @@ class MessageColorSettings extends FormApplication {
   }
 
   async _updateObject(event, formData) {
-    game.settings.set("adv-reminder", "defaultButtonColor", formData.defaultButtonColor);
-    game.settings.set("adv-reminder", "customColor", formData.customColor);
+    await game.settings.set("adv-reminder", "defaultButtonColor", formData.defaultButtonColor);
+    await game.settings.set("adv-reminder", "customColor", formData.customColor);
   }
 }
 
