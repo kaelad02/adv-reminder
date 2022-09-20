@@ -10,11 +10,6 @@ import { debug } from "./util.js";
 
 const SourceMixin = (superclass) =>
   class extends superclass {
-    /**
-     * Get Midi QOL's active effect changes plus the label to idenfiy where it came from.
-     * @param {Actor5e} actor the actor
-     * @returns {Object[]} an array of objects with the active effect's `label` and change's `key`
-     */
     _getActiveEffectKeys(actor) {
       return actor
         ? actor.effects
@@ -46,14 +41,15 @@ const SourceMixin = (superclass) =>
         },
         update: (options) => {
           debug("advantageLabels", advantageLabels, "disadvantageLabels", disadvantageLabels);
-          if (advantageLabels.length)
-            setProperty(options, "dialogOptions.adv-reminder.advantageLabels", advantageLabels);
-          if (disadvantageLabels.length)
-            setProperty(
-              options,
-              "dialogOptions.adv-reminder.disadvantageLabels",
-              disadvantageLabels
-            );
+          const merge = (newLabels, key) => {
+            if (newLabels.length) {
+              const labels = getProperty(options, key);
+              if (labels) newLabels.push(...labels);
+              setProperty(options, key, newLabels);
+            }
+          };
+          merge(advantageLabels, "dialogOptions.adv-reminder.advantageLabels");
+          merge(disadvantageLabels, "dialogOptions.adv-reminder.disadvantageLabels");
         },
       };
     }
@@ -83,10 +79,15 @@ export class CriticalSource extends SourceMixin(CriticalReminder) {
       },
       update: (options) => {
         debug("criticalLabels", criticalLabels, "normalLabels", normalLabels);
-        if (criticalLabels.length)
-          setProperty(options, "dialogOptions.adv-reminder.criticalLabels", criticalLabels);
-        if (normalLabels.length)
-          setProperty(options, "dialogOptions.adv-reminder.normalLabels", normalLabels);
+        const merge = (newLabels, key) => {
+          if (newLabels.length) {
+            const labels = getProperty(options, key);
+            if (labels) newLabels.push(...labels);
+            setProperty(options, key, newLabels);
+          }
+        };
+        merge(criticalLabels, "dialogOptions.adv-reminder.criticalLabels");
+        merge(normalLabels, "dialogOptions.adv-reminder.normalLabels");
       },
     };
   }
