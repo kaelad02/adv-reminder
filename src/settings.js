@@ -82,6 +82,30 @@ class MessageColorSettings extends FormApplication {
     };
   }
 
+  activateListeners(html) {
+    super.activateListeners(html);
+
+    // set listener on select to enable/disable custom color
+    html.find('select[name="defaultButtonColor"]').change(this._onChangeSelect.bind(this));
+    // Enable or disable the custom color settings based on the current setting
+    const defaultButtonColor = game.settings.get("adv-reminder", "defaultButtonColor");
+    this._setCustomEnabled(defaultButtonColor);
+  }
+
+  async _onChangeSelect(event) {
+    event.preventDefault();
+    this._setCustomEnabled(event.currentTarget.value);
+  }
+
+  _setCustomEnabled(value) {
+    const section = this.element.find("div.adv-reminder-customColor");
+    if (section) {
+      const enabled = value === "custom";
+      section.css("opacity", enabled ? 1.0 : 0.5);
+      section.find("input").prop("disabled", !enabled);
+    }
+  }
+
   async _updateObject(event, formData) {
     game.settings.set("adv-reminder", "defaultButtonColor", formData.defaultButtonColor);
     game.settings.set("adv-reminder", "customColor", formData.customColor);
