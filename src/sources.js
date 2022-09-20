@@ -1,4 +1,4 @@
-import { AbilityCheckReminder, AbilitySaveReminder, AttackReminder } from "./reminders.js";
+import { AbilityCheckReminder, AbilitySaveReminder, AttackReminder, SkillReminder } from "./reminders.js";
 import { debug } from "./util.js";
 
 const SourceMixin = (superclass) =>
@@ -34,8 +34,8 @@ const SourceMixin = (superclass) =>
             if (disKeys.includes(change.key)) disadvantageLabels.push(change.label);
           });
         },
-        disadvantage: (value, label) => {
-          if (value) disadvantageLabels.push(label);
+        disadvantage: (label) => {
+          if (label) disadvantageLabels.push(label);
         },
         update: (options) => {
           debug(
@@ -62,3 +62,5 @@ export class AttackSource extends SourceMixin(AttackReminder) {}
 export class AbilitySaveSource extends SourceMixin(AbilitySaveReminder) {}
 
 export class AbilityCheckSource extends SourceMixin(AbilityCheckReminder) {}
+
+export class SkillSource extends SourceMixin(SkillReminder) {}

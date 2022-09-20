@@ -15,7 +15,7 @@ import {
   DeathSaveReminder,
   SkillReminder,
 } from "./reminders.js";
-import { AbilityCheckSource, AbilitySaveSource, AttackSource } from "./sources.js";
+import { AbilityCheckSource, AbilitySaveSource, AttackSource, SkillSource } from "./sources.js";
 import { debug, log } from "./util.js";
 
 const CIRCLE_INFO = `<i class="fa-solid fa-circle-info"></i> `;
@@ -128,6 +128,8 @@ Hooks.on("dnd5e.preRollSkill", (actor, config, skillId) => {
 
   debug("checking for message effects on this skill check");
   new SkillMessage(actor, skillId).addMessage(config);
+  debug("checking for adv/dis effects to display their source");
+  new SkillSource(actor, skillId, checkArmorStealth).updateOptions(config);
 
   if (skipReminders) return;
   debug("checking for adv/dis effects on this skill check");

@@ -35,8 +35,8 @@ class BaseReminder {
           if (disKeys.includes(key)) disadvantage = true;
         });
       },
-      disadvantage: (value) => {
-        if (value) disadvantage = true;
+      disadvantage: (label) => {
+        if (label) disadvantage = true;
       },
       update: (options) => {
         debug(
@@ -227,9 +227,8 @@ export class SkillReminder extends AbilityCheckReminder {
           item.system?.stealth
       );
       debug("equiped item that imposes stealth disadvantage", item?.name);
-      return !!item;
+      return item?.name;
     }
-    return false;
   }
 }
 
