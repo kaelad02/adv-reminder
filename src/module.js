@@ -15,7 +15,14 @@ import {
   DeathSaveReminder,
   SkillReminder,
 } from "./reminders.js";
-import { AbilityCheckSource, AbilitySaveSource, AttackSource, DeathSaveSource, SkillSource } from "./sources.js";
+import {
+  AbilityCheckSource,
+  AbilitySaveSource,
+  AttackSource,
+  CriticalSource,
+  DeathSaveSource,
+  SkillSource,
+} from "./sources.js";
 import { debug, log } from "./util.js";
 
 const CIRCLE_INFO = `<i class="fa-solid fa-circle-info"></i> `;
@@ -177,6 +184,8 @@ Hooks.on("dnd5e.preRollDamage", (item, config) => {
 
   debug("checking for message effects on this damage roll");
   new DamageMessage(item.actor, item).addMessage(config);
+  debug("checking for adv/dis effects to display their source");
+  new CriticalSource(item.actor, getTarget(), item).updateOptions(config);
 
   if (skipReminders) return;
   debug("checking for critical/normal effects on this damage roll");
@@ -218,22 +227,29 @@ Hooks.on("renderDialog", async (dialog, html, data) => {
 });
 
 async function prepareMessage(dialogOptions) {
-  if (!dialogOptions["adv-reminder"]) return;
+  const opt = dialogOptions["adv-reminder"];
+  if (!opt) return;
 
-  const messages = dialogOptions["adv-reminder"]?.messages ?? [];
-  const rollData = dialogOptions["adv-reminder"]?.rollData ?? {};
-  const advantageLabels = dialogOptions["adv-reminder"]?.advantageLabels;
-  const disadvantageLabels = dialogOptions["adv-reminder"]?.disadvantageLabels;
+  const messages = opt.messages ?? [];
+  const rollData = opt.rollData ?? {};
 
-  // merge the messages with the advantage/disadvantage from hints
-  const combined = [...messages];
-  if (advantageLabels) {
-    const sources = advantageLabels.join(", ");
+  // merge the messages with the advantage/disadvantage from sources
+  const combined = [...messages];  
+  if (opt.advantageLabels) {
+    const sources = opt.advantageLabels.join(", ");
     combined.push(CIRCLE_INFO + game.i18n.format("adv-reminder.Source.Adv", { sources }));
   }
-  if (disadvantageLabels) {
-    const sources = disadvantageLabels.join(", ");
+  if (opt.disadvantageLabels) {
+    const sources = opt.disadvantageLabels.join(", ");
     combined.push(CIRCLE_INFO + game.i18n.format("adv-reminder.Source.Dis", { sources }));
+  }
+  if (opt.criticalLabels) {
+    const sources = opt.criticalLabels.join(", ");
+    combined.push(CIRCLE_INFO + game.i18n.format("adv-reminder.Source.Crit", { sources }));
+  }
+  if (opt.normalLabels) {
+    const sources = opt.normalLabels.join(", ");
+    combined.push(CIRCLE_INFO + game.i18n.format("adv-reminder.Source.Norm", { sources }));
   }
 
   if (combined.length) {

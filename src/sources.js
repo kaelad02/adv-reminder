@@ -1,4 +1,11 @@
-import { AbilityCheckReminder, AbilitySaveReminder, AttackReminder, DeathSaveReminder, SkillReminder } from "./reminders.js";
+import {
+  AbilityCheckReminder,
+  AbilitySaveReminder,
+  AttackReminder,
+  CriticalReminder,
+  DeathSaveReminder,
+  SkillReminder,
+} from "./reminders.js";
 import { debug } from "./util.js";
 
 const SourceMixin = (superclass) =>
@@ -38,12 +45,7 @@ const SourceMixin = (superclass) =>
           if (label) disadvantageLabels.push(label);
         },
         update: (options) => {
-          debug(
-            "advantage source results, advantageLabels and disadvantageLabels:",
-            advantageLabels,
-            disadvantageLabels
-          );
-          // TODO
+          debug("advantageLabels", advantageLabels, "disadvantageLabels", disadvantageLabels);
           if (advantageLabels.length)
             setProperty(options, "dialogOptions.adv-reminder.advantageLabels", advantageLabels);
           if (disadvantageLabels.length)
@@ -66,3 +68,26 @@ export class AbilityCheckSource extends SourceMixin(AbilityCheckReminder) {}
 export class SkillSource extends SourceMixin(SkillReminder) {}
 
 export class DeathSaveSource extends SourceMixin(DeathSaveReminder) {}
+
+export class CriticalSource extends SourceMixin(CriticalReminder) {
+  _accumulator() {
+    const criticalLabels = [];
+    const normalLabels = [];
+
+    return {
+      add: (changes, critKeys, normalKeys) => {
+        changes.forEach((change) => {
+          if (critKeys.includes(change.key)) criticalLabels.push(change.label);
+          if (normalKeys.includes(change.key)) normalLabels.push(change.label);
+        });
+      },
+      update: (options) => {
+        debug("criticalLabels", criticalLabels, "normalLabels", normalLabels);
+        if (criticalLabels.length)
+          setProperty(options, "dialogOptions.adv-reminder.criticalLabels", criticalLabels);
+        if (normalLabels.length)
+          setProperty(options, "dialogOptions.adv-reminder.normalLabels", normalLabels);
+      },
+    };
+  }
+}

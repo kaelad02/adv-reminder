@@ -14,6 +14,8 @@
   },
   "adv-reminder.Source": {
     "Adv": "Advantage from {sources}",
-    "Dis": "Disadvantage from {sources}"
+    "Dis": "Disadvantage from {sources}",
+    "Crit": "Critical Hit from {sources}",
+    "Norm": "Normal from {sources}"
   }
 }
