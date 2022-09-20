@@ -15,7 +15,7 @@ import {
   DeathSaveReminder,
   SkillReminder,
 } from "./reminders.js";
-import { AbilityCheckSource, AbilitySaveSource, AttackSource, SkillSource } from "./sources.js";
+import { AbilityCheckSource, AbilitySaveSource, AttackSource, DeathSaveSource, SkillSource } from "./sources.js";
 import { debug, log } from "./util.js";
 
 const CIRCLE_INFO = `<i class="fa-solid fa-circle-info"></i> `;
@@ -160,6 +160,8 @@ Hooks.on("dnd5e.preRollDeathSave", (actor, config) => {
 
   debug("checking for message effects on this death save");
   new DeathSaveMessage(actor).addMessage(config);
+  debug("checking for adv/dis effects to display their source");
+  new DeathSaveSource(actor).updateOptions(config);
 
   if (skipReminders) return;
   debug("checking for adv/dis effects on this death save");

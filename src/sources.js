@@ -1,4 +1,4 @@
-import { AbilityCheckReminder, AbilitySaveReminder, AttackReminder, SkillReminder } from "./reminders.js";
+import { AbilityCheckReminder, AbilitySaveReminder, AttackReminder, DeathSaveReminder, SkillReminder } from "./reminders.js";
 import { debug } from "./util.js";
 
 const SourceMixin = (superclass) =>
@@ -64,3 +64,5 @@ export class AbilitySaveSource extends SourceMixin(AbilitySaveReminder) {}
 export class AbilityCheckSource extends SourceMixin(AbilityCheckReminder) {}
 
 export class SkillSource extends SourceMixin(SkillReminder) {}
+
+export class DeathSaveSource extends SourceMixin(DeathSaveReminder) {}
