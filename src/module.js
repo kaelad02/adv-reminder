@@ -15,7 +15,7 @@ import {
   DeathSaveReminder,
   SkillReminder,
 } from "./reminders.js";
-import { AttackSource } from "./sources.js";
+import { AbilityCheckSource, AbilitySaveSource, AttackSource } from "./sources.js";
 import { debug, log } from "./util.js";
 
 const CIRCLE_INFO = `<i class="fa-solid fa-circle-info"></i> `;
@@ -96,6 +96,8 @@ Hooks.on("dnd5e.preRollAbilitySave", (actor, config, abilityId) => {
 
   debug("checking for message effects on this saving throw");
   new AbilitySaveMessage(actor, abilityId).addMessage(config);
+  debug("checking for adv/dis effects to display their source");
+  new AbilitySaveSource(actor, abilityId).updateOptions(config);
 
   if (skipReminders) return;
   debug("checking for adv/dis effects on this saving throw");
@@ -110,6 +112,8 @@ Hooks.on("dnd5e.preRollAbilityTest", (actor, config, abilityId) => {
 
   debug("checking for message effects on this ability check");
   new AbilityCheckMessage(actor, abilityId).addMessage(config);
+  debug("checking for adv/dis effects to display their source");
+  new AbilityCheckSource(actor, abilityId).updateOptions(config);
 
   if (skipReminders) return;
   debug("checking for adv/dis effects on this ability check");

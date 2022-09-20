@@ -1,4 +1,4 @@
-import { AttackReminder } from "./reminders.js";
+import { AbilityCheckReminder, AbilitySaveReminder, AttackReminder } from "./reminders.js";
 import { debug } from "./util.js";
 
 const SourceMixin = (superclass) =>
@@ -58,3 +58,7 @@ const SourceMixin = (superclass) =>
   };
 
 export class AttackSource extends SourceMixin(AttackReminder) {}
+
+export class AbilitySaveSource extends SourceMixin(AbilitySaveReminder) {}
+
+export class AbilityCheckSource extends SourceMixin(AbilityCheckReminder) {}
