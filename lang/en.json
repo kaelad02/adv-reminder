@@ -11,5 +11,9 @@
   "adv-reminder.CustomColor": {
     "Name": "Custom Color",
     "Hint": "Dark colors work better than light colors"
+  },
+  "adv-reminder.Source": {
+    "Adv": "Advantage from {sources}",
+    "Dis": "Disadvantage from {sources}"
   }
 }

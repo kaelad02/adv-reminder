@@ -15,8 +15,10 @@ import {
   DeathSaveReminder,
   SkillReminder,
 } from "./reminders.js";
+import { AttackSource } from "./sources.js";
 import { debug, log } from "./util.js";
 
+const CIRCLE_INFO = `<i class="fa-solid fa-circle-info"></i> `;
 let checkArmorStealth;
 let skipReminders;
 
@@ -74,6 +76,8 @@ Hooks.on("dnd5e.preRollAttack", (item, config) => {
 
   debug("checking for message effects on this attack roll");
   new AttackMessage(item.actor, item).addMessage(config);
+  debug("checking for adv/dis effects to display their source");
+  new AttackSource(item.actor, getTarget(), item).updateOptions(config);
 
   if (skipReminders) return;
   debug("checking for adv/dis effects on this attack roll");
@@ -204,14 +208,29 @@ Hooks.on("renderDialog", async (dialog, html, data) => {
 });
 
 async function prepareMessage(dialogOptions) {
+  if (!dialogOptions["adv-reminder"]) return;
+
   const messages = dialogOptions["adv-reminder"]?.messages ?? [];
   const rollData = dialogOptions["adv-reminder"]?.rollData ?? {};
+  const advantageLabels = dialogOptions["adv-reminder"]?.advantageLabels;
+  const disadvantageLabels = dialogOptions["adv-reminder"]?.disadvantageLabels;
 
-  if (messages.length) {
+  // merge the messages with the advantage/disadvantage from hints
+  const combined = [...messages];
+  if (advantageLabels) {
+    const sources = advantageLabels.join(", ");
+    combined.push(CIRCLE_INFO + game.i18n.format("adv-reminder.Source.Adv", { sources }));
+  }
+  if (disadvantageLabels) {
+    const sources = disadvantageLabels.join(", ");
+    combined.push(CIRCLE_INFO + game.i18n.format("adv-reminder.Source.Dis", { sources }));
+  }
+
+  if (combined.length) {
     // build message
     const message = await renderTemplate(
       "modules/adv-reminder/templates/roll-dialog-messages.hbs",
-      { messages }
+      { messages: combined }
     );
     // enrich message, specifically replacing rolls
     const enriched = TextEditor.enrichHTML(message, {
@@ -222,7 +241,7 @@ async function prepareMessage(dialogOptions) {
       rollData,
       async: false,
     });
-    debug("messages", messages, "enriched", enriched);
+    debug("combined", combined, "enriched", enriched);
     return enriched;
   }
 }
