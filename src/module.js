@@ -144,6 +144,8 @@ Hooks.on("dnd5e.preRollToolCheck", (item, config) => {
 
   debug("checking for message effects on this tool check");
   new AbilityCheckMessage(item.actor, item.system.ability).addMessage(config);
+  debug("checking for adv/dis effects to display their source");
+  new AbilityCheckSource(item.actor, item.system.ability).updateOptions(config);
 
   if (skipReminders) return;
   debug("checking for adv/dis effects on this tool check");
