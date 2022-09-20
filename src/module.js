@@ -230,33 +230,24 @@ async function prepareMessage(dialogOptions) {
   const opt = dialogOptions["adv-reminder"];
   if (!opt) return;
 
-  const messages = opt.messages ?? [];
-  const rollData = opt.rollData ?? {};
-
   // merge the messages with the advantage/disadvantage from sources
-  const combined = [...messages];  
-  if (opt.advantageLabels) {
-    const sources = opt.advantageLabels.join(", ");
-    combined.push(CIRCLE_INFO + game.i18n.format("adv-reminder.Source.Adv", { sources }));
-  }
-  if (opt.disadvantageLabels) {
-    const sources = opt.disadvantageLabels.join(", ");
-    combined.push(CIRCLE_INFO + game.i18n.format("adv-reminder.Source.Dis", { sources }));
-  }
-  if (opt.criticalLabels) {
-    const sources = opt.criticalLabels.join(", ");
-    combined.push(CIRCLE_INFO + game.i18n.format("adv-reminder.Source.Crit", { sources }));
-  }
-  if (opt.normalLabels) {
-    const sources = opt.normalLabels.join(", ");
-    combined.push(CIRCLE_INFO + game.i18n.format("adv-reminder.Source.Norm", { sources }));
-  }
+  const messages = [...(opt.messages ?? [])];
+  const addLabels = (labels, stringId) => {
+    if (labels) {
+      const sources = labels.join(", ");
+      messages.push(CIRCLE_INFO + game.i18n.format(stringId, { sources }));
+    }
+  };
+  addLabels(opt.advantageLabels, "adv-reminder.Source.Adv");
+  addLabels(opt.disadvantageLabels, "adv-reminder.Source.Dis");
+  addLabels(opt.criticalLabels, "adv-reminder.Source.Crit");
+  addLabels(opt.normalLabels, "adv-reminder.Source.Norm");
 
-  if (combined.length) {
+  if (messages.length) {
     // build message
     const message = await renderTemplate(
       "modules/adv-reminder/templates/roll-dialog-messages.hbs",
-      { messages: combined }
+      { messages }
     );
     // enrich message, specifically replacing rolls
     const enriched = TextEditor.enrichHTML(message, {
@@ -264,10 +255,10 @@ async function prepareMessage(dialogOptions) {
       documents: true,
       links: false,
       rolls: true,
-      rollData,
+      rollData: opt.rollData ?? {},
       async: false,
     });
-    debug("combined", combined, "enriched", enriched);
+    debug("messages", messages, "enriched", enriched);
     return enriched;
   }
 }
