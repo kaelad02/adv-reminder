@@ -1,10 +1,18 @@
 Hooks.once("init", () => {
   // register settings
+  game.settings.registerMenu("adv-reminder", "colorMenu", {
+    name: "Roll Dialog Style",
+    hint: "Colorize the messages and default buttons on roll dialogs",
+    label: "Configure Colors",
+    icon: "fas fa-palette",
+    type: MessageColorSettings,
+    restricted: false
+  });
   game.settings.register("adv-reminder", "defaultButtonColor", {
     name: "adv-reminder.DefaultButtonColor.Name",
     hint: "adv-reminder.DefaultButtonColor.Hint",
     scope: "client",
-    config: true,
+    config: false,
     type: String,
     choices: {
       none: "adv-reminder.DefaultButtonColor.None",
@@ -23,7 +31,7 @@ Hooks.once("init", () => {
     name: "adv-reminder.CustomColor.Name",
     hint: "adv-reminder.CustomColor.Hint",
     scope: "client",
-    config: true,
+    config: false,
     type: String,
     default: "#000000",
     onChange: (customColor) =>
@@ -45,6 +53,40 @@ Hooks.once("ready", () => {
 Hooks.once("devModeReady", ({ registerPackageDebugFlag }) =>
   registerPackageDebugFlag("adv-reminder")
 );
+
+class MessageColorSettings extends FormApplication {
+  static get defaultOptions() {
+    return mergeObject(super.defaultOptions, {
+      title: "Roll Dialog Style",
+      template: "modules/adv-reminder/templates/color-settings.hbs",
+      width: 400,
+    });
+  }
+
+  getData() {
+    const defaultButtonColor = game.settings.settings.get("adv-reminder.defaultButtonColor");
+    const customColor = game.settings.settings.get("adv-reminder.customColor");
+
+    return {
+      defaultButtonColor: {
+        name: defaultButtonColor.name,
+        hint: defaultButtonColor.hint,
+        choices: defaultButtonColor.choices,
+        value: game.settings.get("adv-reminder", "defaultButtonColor"),
+      },
+      customColor: {
+        name: customColor.name,
+        hint: customColor.hint,
+        value: game.settings.get("adv-reminder", "customColor"),
+      },
+    };
+  }
+
+  async _updateObject(event, formData) {
+    game.settings.set("adv-reminder", "defaultButtonColor", formData.defaultButtonColor);
+    game.settings.set("adv-reminder", "customColor", formData.customColor);
+  }
+}
 
 function setStyleVariables(option, customColor) {
   // set four color variables based on the option
@@ -87,7 +129,7 @@ function setStyleVariables(option, customColor) {
 /**
  * Customize the settings dialog to handle the custom color (hide/show and color picker)
  */
-Hooks.on("renderSettingsConfig", (app, html, data) => {
+/*Hooks.on("renderSettingsConfig", (app, html, data) => {
   // Create color picker
   const settingId = "adv-reminder.customColor";
   const customColor = game.settings.get("adv-reminder", "customColor");
@@ -125,4 +167,4 @@ Hooks.on("renderSettingsConfig", (app, html, data) => {
   optionElement.addEventListener("click", (event) =>
     disableCustomColor(event.target.value)
   );
-});
+});*/
