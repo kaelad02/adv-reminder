@@ -3,6 +3,7 @@
 - feature: now requires v10, removes warnings about using deprecated functions
 - feature: removed dependency on lib-wrapper, switched to new hooks that the dnd5e system introduced
 - feature: [#16](https://github.com/kaelad02/adv-reminder/issues/16) do not process the advantage/disadvantage/critical flags if Midi is active
+- feature: [#30](https://github.com/kaelad02/adv-reminder/issues/30) show the source of advantage/disadvantage/critical as a message
 
 # 2.0.1
 
