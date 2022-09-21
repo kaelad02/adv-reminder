@@ -1,9 +1,9 @@
 Hooks.once("init", () => {
   // register settings
   game.settings.registerMenu("adv-reminder", "colorMenu", {
-    name: "Roll Dialog Style",
-    hint: "Colorize the messages and default buttons on roll dialogs",
-    label: "Configure Colors",
+    name: "adv-reminder.ColorMenu.Name",
+    hint: "adv-reminder.ColorMenu.Hint",
+    label: "adv-reminder.ColorMenu.Label",
     icon: "fas fa-palette",
     type: MessageColorSettings,
     restricted: false
@@ -57,7 +57,7 @@ Hooks.once("devModeReady", ({ registerPackageDebugFlag }) =>
 class MessageColorSettings extends FormApplication {
   static get defaultOptions() {
     return mergeObject(super.defaultOptions, {
-      title: "Roll Dialog Style",
+      title: game.i18n.localize("adv-reminder.ColorMenu.Name"),
       template: "modules/adv-reminder/templates/color-settings.hbs",
       width: 400,
     });
