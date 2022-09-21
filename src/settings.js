@@ -63,7 +63,7 @@ function setStyleVariables(option, customColor) {
   var varColor, varBackground, varButtonBorder, varButtonShadow, varMessageBorder;
   const setColorVars = (color) => {
     varColor = color;
-    varBackground = hexToRGBAString(colorStringToHex(color), 0.05);
+    varBackground = Color.from(color).toRGBA(0.05);
     varButtonBorder = color;
     varButtonShadow = color;
     varMessageBorder = color;
