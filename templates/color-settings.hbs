@@ -1,0 +1,33 @@
+<form autocomplete="off">
+  {{#with defaultButtonColor}}
+    <div class="form-group">
+      <label>{{localize this.name}}</label>
+
+      <div class="form-fields">
+        <select name="defaultButtonColor" data-dtype="String">
+          {{#select this.value}}
+            {{#each this.choices as |name k|}}
+              <option value="{{k}}">{{localize name}}</option>
+            {{/each}}
+          {{/select}}
+        </select>
+      </div>
+
+      <p class="notes">{{localize this.hint}}</p>
+    </div>
+  {{/with}}
+
+  {{#with customColor}}
+    <div class="form-group adv-reminder-customColor">
+      <label>{{localize this.name}}</label>
+
+      <div class="form-fields">
+        {{colorPicker name="customColor" value=this.value}}
+      </div>
+
+      <p class="notes">{{localize this.hint}}</p>
+    </div>
+  {{/with}}
+
+  <button type="test"><i class="fas fa-eye"></i> {{localize "adv-reminder.ColorMenu.Test"}}</button>
+</form>
