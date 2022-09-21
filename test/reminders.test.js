@@ -838,6 +838,7 @@ describe("SkillReminder no legit active effects", () => {
     const actor = createActorWithEffects();
     actor.items = [
       {
+        name: "Scale Mail",
         type: "spell",
         system: {
           equipped: true,
@@ -858,6 +859,7 @@ describe("SkillReminder no legit active effects", () => {
     const actor = createActorWithEffects();
     actor.items = [
       {
+        name: "Scale Mail",
         type: "equipment",
         system: {
           equipped: false,
@@ -1058,6 +1060,7 @@ describe("SkillReminder disadvantage flags", () => {
     const actor = createActorWithEffects();
     actor.items = [
       {
+        name: "Scale Mail",
         type: "equipment",
         system: {
           equipped: true,
@@ -1078,6 +1081,7 @@ describe("SkillReminder disadvantage flags", () => {
     const actor = createActorWithEffects();
     actor.items = [
       {
+        name: "Scale Mail",
         type: "equipment",
         system: {
           equipped: true,
