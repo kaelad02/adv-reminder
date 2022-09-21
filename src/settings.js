@@ -1,3 +1,5 @@
+import { debug } from "./util.js";
+
 Hooks.once("init", () => {
   // register settings
   game.settings.registerMenu("adv-reminder", "colorMenu", {
@@ -60,6 +62,9 @@ class MessageColorSettings extends FormApplication {
       title: game.i18n.localize("adv-reminder.ColorMenu.Name"),
       template: "modules/adv-reminder/templates/color-settings.hbs",
       width: 400,
+      height: "auto",
+      closeOnSubmit: false,
+      submitOnChange: true,
     });
   }
 
@@ -90,6 +95,8 @@ class MessageColorSettings extends FormApplication {
     // Enable or disable the custom color settings based on the current setting
     const defaultButtonColor = game.settings.get("adv-reminder", "defaultButtonColor");
     this._setCustomEnabled(defaultButtonColor);
+    // test button
+    html.find('button[type="test"]').click(this._onTest.bind(this));
   }
 
   async _onChangeSelect(event) {
@@ -106,13 +113,32 @@ class MessageColorSettings extends FormApplication {
     }
   }
 
+  async _onTest(event) {
+    debug("_onTest called");
+    event.preventDefault();
+
+    const rollData = {
+      parts: ["@mod", "@prof"],
+      data: { mod: 3, prof: 2 },
+      title: "Sample Roll",
+      chatMessage: false,
+      dialogOptions: { "adv-reminder": { messages: ["Conditional bonus [[/r +2]]"] } },
+    };
+    dnd5e.dice.d20Roll(rollData);
+  }
+
   async _updateObject(event, formData) {
-    await game.settings.set("adv-reminder", "defaultButtonColor", formData.defaultButtonColor);
-    await game.settings.set("adv-reminder", "customColor", formData.customColor);
+    debug("_updateObject called with formData:", formData);
+    if (formData.defaultButtonColor)
+      await game.settings.set("adv-reminder", "defaultButtonColor", formData.defaultButtonColor);
+    if (formData.customColor)
+      await game.settings.set("adv-reminder", "customColor", formData.customColor);
   }
 }
 
 function setStyleVariables(option, customColor) {
+  debug("setStyleVariables called");
+
   // set four color variables based on the option
   var varColor, varBackground, varButtonBorder, varButtonShadow, varMessageBorder;
   const setColorVars = (color) => {
