@@ -56,6 +56,50 @@ Hooks.once("devModeReady", ({ registerPackageDebugFlag }) =>
   registerPackageDebugFlag("adv-reminder")
 );
 
+function setStyleVariables(option, customColor) {
+  debug("setStyleVariables called");
+
+  // set four color variables based on the option
+  var varColor, varBackground, varButtonBorder, varButtonShadow, varMessageBorder;
+  const setColorVars = (color) => {
+    varColor = color;
+    varBackground = hexToRGBAString(colorStringToHex(color), 0.05);
+    varButtonBorder = color;
+    varButtonShadow = color;
+    varMessageBorder = color;
+  };
+  switch (option) {
+    case "none":
+      varColor = "#191813";
+      varBackground = "rgba(0, 0, 0, 0.05)";
+      varButtonBorder = "#c9c7b8";
+      varButtonShadow = "#ff0000";
+      varMessageBorder = "#7a7971";
+      break;
+    case "player":
+      setColorVars(game.user.color);
+      break;
+    case "green":
+      setColorVars("#008000");
+      break;
+    case "custom":
+      setColorVars(customColor);
+      break;
+  }
+
+  const root = document.querySelector(":root");
+  const setStyle = (varName, value) => root.style.setProperty(varName, value);
+  setStyle("--adv-reminder-color", varColor);
+  setStyle("--adv-reminder-background-color", varBackground);
+  setStyle("--adv-reminder-button-border-color", varButtonBorder);
+  setStyle("--adv-reminder-button-shadow-color", varButtonShadow);
+  setStyle("--adv-reminder-message-border-color", varMessageBorder);
+}
+
+/**
+ * An app to change the defaultButtonColor and customColor settings.
+ * Includes a test button to show a sample roll dialog to see the color changes.
+ */
 class MessageColorSettings extends FormApplication {
   static get defaultOptions() {
     return mergeObject(super.defaultOptions, {
@@ -134,44 +178,4 @@ class MessageColorSettings extends FormApplication {
     if (formData.customColor)
       await game.settings.set("adv-reminder", "customColor", formData.customColor);
   }
-}
-
-function setStyleVariables(option, customColor) {
-  debug("setStyleVariables called");
-
-  // set four color variables based on the option
-  var varColor, varBackground, varButtonBorder, varButtonShadow, varMessageBorder;
-  const setColorVars = (color) => {
-    varColor = color;
-    varBackground = hexToRGBAString(colorStringToHex(color), 0.05);
-    varButtonBorder = color;
-    varButtonShadow = color;
-    varMessageBorder = color;
-  };
-  switch (option) {
-    case "none":
-      varColor = "#191813";
-      varBackground = "rgba(0, 0, 0, 0.05)";
-      varButtonBorder = "#c9c7b8";
-      varButtonShadow = "#ff0000";
-      varMessageBorder = "#7a7971";
-      break;
-    case "player":
-      setColorVars(game.user.color);
-      break;
-    case "green":
-      setColorVars("#008000");
-      break;
-    case "custom":
-      setColorVars(customColor);
-      break;
-  }
-
-  const root = document.querySelector(":root");
-  const setStyle = (varName, value) => root.style.setProperty(varName, value);
-  setStyle("--adv-reminder-color", varColor);
-  setStyle("--adv-reminder-background-color", varBackground);
-  setStyle("--adv-reminder-button-border-color", varButtonBorder);
-  setStyle("--adv-reminder-button-shadow-color", varButtonShadow);
-  setStyle("--adv-reminder-message-border-color", varMessageBorder);
 }
