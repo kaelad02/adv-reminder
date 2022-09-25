@@ -305,3 +305,68 @@ function isFastForwarding({ fastForward = false, event = {} }) {
 function getTarget() {
   return [...game.user.targets][0]?.actor;
 }
+
+// create compendium content by copying from SRD, updating, then exporting to our pack
+async function makeSamplePack() {
+  const samplePack = game.packs.get("adv-reminder.sample-items");
+
+  for (const sampleInput of await getPackData()) {
+    debug("sample name", sampleInput.name);
+
+    // get the source pack and document ID
+    const sourcePack = game.packs.get(sampleInput.sourcePackId);
+    const sourceId = (await sourcePack.getIndex()).getName(sampleInput.name)._id;
+
+    const item = await game.items.importFromCompendium(
+      sourcePack,
+      sourceId,
+      {},
+      { temporary: true }
+    );
+
+    debug("imported item", item);
+
+    // create ActiveEffect
+    const activeEffect = {
+      changes: sampleInput.changes,
+      disabled: false,
+      duration: {
+        startTime: 0,
+        seconds: null,
+        rounds: null,
+        turns: null,
+        startRound: 1,
+        startTurn: 0,
+        type: "none",
+        duration: null,
+        remaining: null,
+        label: "None",
+      },
+      icon: item.img,
+      isSuppressed: false,
+      label: item.name,
+      //origin: item.uuid,
+      tint: null,
+      transfer: true,
+    };
+    debug("activeEffect", activeEffect);
+    const res = await item.createEmbeddedDocuments("ActiveEffect", [activeEffect], { temporary: true });
+    debug("res", res);
+
+    // could await this
+    samplePack.importDocument(item);
+  }
+}
+// TODO temporary
+window.makeSamplePack = makeSamplePack;
+
+async function getPackData() {
+  let data = {};
+  try {
+    const res = await fetch("modules/adv-reminder/src/sample-pack-data.json");
+    data = await res.json();
+  } catch (err) {
+    console.warn(`Failed to retrieve token map data: ${err.message}`);
+  }
+  return data;
+}

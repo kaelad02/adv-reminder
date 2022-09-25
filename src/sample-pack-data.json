@@ -1,0 +1,12 @@
+[
+  {
+    "name": "Fey Ancestry",
+    "sourcePackId": "dnd5e.races",
+    "changes": [
+      {
+        "key": "flags.adv-reminder.message.ability.save.wis",
+        "value": "You have advantage when saving against being charmed."
+      }
+    ]
+  }
+]
