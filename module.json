@@ -13,6 +13,15 @@
   },
   "esmodules": ["src/module.js", "src/settings.js"],
   "styles": ["css/adv-reminder.css"],
+  "packs": [
+    {
+      "name": "sample-items",
+      "label": "AR Message Sample Items",
+      "system": "dnd5e",
+      "path": "packs/sample-items.db",
+      "type": "Item"
+    }
+  ],
   "languages": [
     { "lang": "en", "name": "English", "path": "lang/en.json" },
     { "lang": "fr", "name": "Français", "path": "lang/fr.json" }
