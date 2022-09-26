@@ -1,6 +1,18 @@
 {
   "dnd5e.races": [
     {
+      "name": "Dwarven Resilience",
+      "data": {
+        "changes": [
+          {
+            "key": "flags.adv-reminder.message.ability.save.con",
+            "mode": 0,
+            "value": "Advantage against poison"
+          }
+        ]
+      }
+    },
+    {
       "name": "Fey Ancestry",
       "data": {
         "changes": [

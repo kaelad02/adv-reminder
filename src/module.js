@@ -332,10 +332,21 @@ async function makeSamplePack() {
       item = await samplePack.importDocument(item);
       debug("imported item", item);
 
-      // add an active effect on the item
-      await item.createEmbeddedDocuments("ActiveEffect", [
-        buildActiveEffect(item, sampleInput.data),
-      ]);
+      // add or update an active effect on the item
+      if (item.effects.size) {
+        // only updates changes
+        const original = item.effects.contents[0];
+        const update = {
+          _id: original.id,
+          changes: [...original.changes, ...sampleInput.data.changes],
+        };
+        debug("update active effect", update);
+        await item.updateEmbeddedDocuments("ActiveEffect", [update]);
+      } else {
+        const effect = buildActiveEffect(item, sampleInput.data);
+        debug("create active effect", effect);
+        await item.createEmbeddedDocuments("ActiveEffect", [effect]);
+      }
       debug("created effect, done copying", item.name);
     }
 
@@ -344,6 +355,11 @@ async function makeSamplePack() {
 }
 // TODO temporary
 window.makeSamplePack = makeSamplePack;
+window.clearSamplePack = () => {
+  const key = "adv-reminder.sample-items";
+  const deleteIds = game.packs.get(key).index.map((i) => i._id);
+  Item.deleteDocuments(deleteIds, { pack: key });
+};
 
 async function getPackData() {
   let data = {};
