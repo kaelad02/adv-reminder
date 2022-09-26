@@ -1,10 +1,10 @@
+export function debugEnabled() {
+  return game.modules.get("_dev-mode")?.api?.getPackageDebugValue("adv-reminder");
+}
+
 export const debug = (...args) => {
   try {
-    const debugEnabled = game.modules
-      .get("_dev-mode")
-      ?.api?.getPackageDebugValue("adv-reminder");
-
-    if (debugEnabled) log(...args);
+    if (debugEnabled()) log(...args);
   } catch (e) {}
 };
 

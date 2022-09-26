@@ -25,7 +25,7 @@ import {
   DeathSaveSource,
   SkillSource,
 } from "./sources.js";
-import { debug, log } from "./util.js";
+import { debug, debugEnabled, log } from "./util.js";
 
 const CIRCLE_INFO = `<i class="fa-solid fa-circle-info"></i> `;
 let checkArmorStealth;
@@ -78,11 +78,8 @@ Hooks.once("DAE.setupComplete", () => {
 });
 
 Hooks.once("ready", () => {
-  // attach API to the module
-  game.modules.get("adv-reminder").api = {
-    samplePack: new SamplePackBuilder(),
-  };
-  debug('game.modules.get("adv-reminder").api.samplePack');
+  // expose SamplePackBuilder
+  if (debugEnabled) window.samplePack = new SamplePackBuilder();
 });
 
 // Attack rolls
