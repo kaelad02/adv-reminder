@@ -1,4 +1,23 @@
 {
+  "dnd5e.classfeatures": [
+    {
+      "name": "Sneak Attack",
+      "data": {
+        "changes": [
+          {
+            "key": "flags.adv-reminder.message.damage.mwak",
+            "mode": 0,
+            "value": "[[/r @scale.rogue.sneak-attack]]{Sneak Attack} once per turn"
+          },
+          {
+            "key": "flags.adv-reminder.message.damage.rwak",
+            "mode": 0,
+            "value": "[[/r @scale.rogue.sneak-attack]]{Sneak Attack} once per turn"
+          }
+        ]
+      }
+    }
+  ],
   "dnd5e.races": [
     {
       "name": "Dwarven Resilience",
