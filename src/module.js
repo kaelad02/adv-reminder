@@ -310,51 +310,36 @@ function getTarget() {
 async function makeSamplePack() {
   const samplePack = game.packs.get("adv-reminder.sample-items");
 
-  for (const sampleInput of await getPackData()) {
-    debug("sample name", sampleInput.name);
+  const packData = await getPackData();
+  for (const [sourcePackName, inputs] of Object.entries(packData)) {
+    debug("start copying items from", sourcePackName);
 
-    // get the source pack and document ID
-    const sourcePack = game.packs.get(sampleInput.sourcePackId);
-    const sourceId = (await sourcePack.getIndex()).getName(sampleInput.name)._id;
+    // get the source pack and its index
+    const sourcePack = game.packs.get(sourcePackName);
+    const index = await sourcePack.getIndex();
 
-    const item = await game.items.importFromCompendium(
-      sourcePack,
-      sourceId,
-      {},
-      { temporary: true }
-    );
+    for (const sampleInput of inputs) {
+      debug("start copying item named", sampleInput.name);
 
-    debug("imported item", item);
+      // copy the item from the source pack to the sample pack
+      const indexEntry = index.getName(sampleInput.name);
+      let item = await game.items.importFromCompendium(
+        sourcePack,
+        indexEntry._id,
+        {},
+        { temporary: true }
+      );
+      item = await samplePack.importDocument(item);
+      debug("imported item", item);
 
-    // create ActiveEffect
-    const activeEffect = {
-      changes: sampleInput.changes,
-      disabled: false,
-      duration: {
-        startTime: 0,
-        seconds: null,
-        rounds: null,
-        turns: null,
-        startRound: 1,
-        startTurn: 0,
-        type: "none",
-        duration: null,
-        remaining: null,
-        label: "None",
-      },
-      icon: item.img,
-      isSuppressed: false,
-      label: item.name,
-      //origin: item.uuid,
-      tint: null,
-      transfer: true,
-    };
-    debug("activeEffect", activeEffect);
-    const res = await item.createEmbeddedDocuments("ActiveEffect", [activeEffect], { temporary: true });
-    debug("res", res);
+      // add an active effect on the item
+      await item.createEmbeddedDocuments("ActiveEffect", [
+        buildActiveEffect(item, sampleInput.changes),
+      ]);
+      debug("created effect, done copying", item.name);
+    }
 
-    // could await this
-    samplePack.importDocument(item);
+    debug("done copying from", sourcePackName);
   }
 }
 // TODO temporary
@@ -369,4 +354,29 @@ async function getPackData() {
     console.warn(`Failed to retrieve token map data: ${err.message}`);
   }
   return data;
+}
+
+function buildActiveEffect(item, changes) {
+  return {
+    changes,
+    disabled: false,
+    duration: {
+      startTime: 0,
+      seconds: null,
+      rounds: null,
+      turns: null,
+      startRound: 1,
+      startTurn: 0,
+      type: "none",
+      duration: null,
+      remaining: null,
+      label: "None",
+    },
+    icon: item.img,
+    isSuppressed: false,
+    label: item.name,
+    origin: item.uuid,
+    tint: null,
+    transfer: true,
+  };
 }
