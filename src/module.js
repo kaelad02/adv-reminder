@@ -334,7 +334,7 @@ async function makeSamplePack() {
 
       // add an active effect on the item
       await item.createEmbeddedDocuments("ActiveEffect", [
-        buildActiveEffect(item, sampleInput.changes),
+        buildActiveEffect(item, sampleInput.data),
       ]);
       debug("created effect, done copying", item.name);
     }
@@ -356,9 +356,8 @@ async function getPackData() {
   return data;
 }
 
-function buildActiveEffect(item, changes) {
-  return {
-    changes,
+function buildActiveEffect(item, data) {
+  const template = {
     disabled: false,
     duration: {
       startTime: 0,
@@ -379,4 +378,5 @@ function buildActiveEffect(item, changes) {
     tint: null,
     transfer: true,
   };
+  return foundry.utils.mergeObject(template, data);
 }
