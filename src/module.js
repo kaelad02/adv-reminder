@@ -15,6 +15,7 @@ import {
   DeathSaveReminder,
   SkillReminder,
 } from "./reminders.js";
+import SamplePackBuilder from "./sample-pack.js";
 import { showSources } from "./settings.js";
 import {
   AbilityCheckSource,
@@ -74,6 +75,14 @@ Hooks.once("DAE.setupComplete", () => {
   );
 
   window.DAE.addAutoFields(fields);
+});
+
+Hooks.once("ready", () => {
+  // attach API to the module
+  game.modules.get("adv-reminder").api = {
+    samplePack: new SamplePackBuilder(),
+  };
+  debug('game.modules.get("adv-reminder").api.samplePack');
 });
 
 // Attack rolls
@@ -304,95 +313,4 @@ function isFastForwarding({ fastForward = false, event = {} }) {
  */
 function getTarget() {
   return [...game.user.targets][0]?.actor;
-}
-
-// create compendium content by copying from SRD, updating, then exporting to our pack
-async function makeSamplePack() {
-  const samplePack = game.packs.get("adv-reminder.sample-items");
-
-  const packData = await getPackData();
-  for (const [sourcePackName, inputs] of Object.entries(packData)) {
-    debug("start copying items from", sourcePackName);
-
-    // get the source pack and its index
-    const sourcePack = game.packs.get(sourcePackName);
-    const index = await sourcePack.getIndex();
-
-    for (const sampleInput of inputs) {
-      debug("start copying item named", sampleInput.name);
-
-      // copy the item from the source pack to the sample pack
-      const indexEntry = index.getName(sampleInput.name);
-      let item = await game.items.importFromCompendium(
-        sourcePack,
-        indexEntry._id,
-        {},
-        { temporary: true }
-      );
-      item = await samplePack.importDocument(item);
-      debug("imported item", item);
-
-      // add or update an active effect on the item
-      if (item.effects.size) {
-        // only updates changes
-        const original = item.effects.contents[0];
-        const update = {
-          _id: original.id,
-          changes: [...original.changes, ...sampleInput.data.changes],
-        };
-        debug("update active effect", update);
-        await item.updateEmbeddedDocuments("ActiveEffect", [update]);
-      } else {
-        const effect = buildActiveEffect(item, sampleInput.data);
-        debug("create active effect", effect);
-        await item.createEmbeddedDocuments("ActiveEffect", [effect]);
-      }
-      debug("created effect, done copying", item.name);
-    }
-
-    debug("done copying from", sourcePackName);
-  }
-}
-// TODO temporary
-window.makeSamplePack = makeSamplePack;
-window.clearSamplePack = () => {
-  const key = "adv-reminder.sample-items";
-  const deleteIds = game.packs.get(key).index.map((i) => i._id);
-  Item.deleteDocuments(deleteIds, { pack: key });
-};
-
-async function getPackData() {
-  let data = {};
-  try {
-    const res = await fetch("modules/adv-reminder/src/sample-pack-data.json");
-    data = await res.json();
-  } catch (err) {
-    console.warn(`Failed to retrieve token map data: ${err.message}`);
-  }
-  return data;
-}
-
-function buildActiveEffect(item, data) {
-  const template = {
-    disabled: false,
-    duration: {
-      startTime: 0,
-      seconds: null,
-      rounds: null,
-      turns: null,
-      startRound: 1,
-      startTurn: 0,
-      type: "none",
-      duration: null,
-      remaining: null,
-      label: "None",
-    },
-    icon: item.img,
-    isSuppressed: false,
-    label: item.name,
-    origin: item.uuid,
-    tint: null,
-    transfer: true,
-  };
-  return foundry.utils.mergeObject(template, data);
 }
