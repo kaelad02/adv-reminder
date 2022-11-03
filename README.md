@@ -28,7 +28,7 @@ In addition to active effects adding advantage or disadvantage, you can also add
 
 ![Saving Throw screenshot with message](docs/poison-message.png?raw=true)
 
-[Messages](docs/messages.md) has more information about the messages feature, including the active effect keys.
+[Messages](docs/messages.md) has more information about the messages feature, including the active effect keys. There is also a compendium pack, AR Message Sample Items, that contains samples.
 
 ## Other Modules
 

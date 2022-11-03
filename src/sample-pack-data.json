@@ -1,0 +1,139 @@
+{
+  "dnd5e.classfeatures": [
+    {
+      "name": "Sneak Attack",
+      "data": {
+        "changes": [
+          {
+            "key": "flags.adv-reminder.message.damage.mwak",
+            "mode": 0,
+            "value": "[[/r @scale.rogue.sneak-attack]]{Sneak Attack} once per turn"
+          },
+          {
+            "key": "flags.adv-reminder.message.damage.rwak",
+            "mode": 0,
+            "value": "[[/r @scale.rogue.sneak-attack]]{Sneak Attack} once per turn"
+          }
+        ]
+      }
+    }
+  ],
+  "dnd5e.races": [
+    {
+      "name": "Dwarven Resilience",
+      "data": {
+        "changes": [
+          {
+            "key": "flags.adv-reminder.message.ability.save.con",
+            "mode": 0,
+            "value": "Advantage against poison"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Fey Ancestry",
+      "data": {
+        "changes": [
+          {
+            "key": "flags.adv-reminder.message.ability.save.wis",
+            "mode": 0,
+            "value": "You have advantage when saving against being charmed."
+          }
+        ]
+      }
+    }
+  ],
+  "dnd5e.spells": [
+    {
+      "name": "Enhance Ability",
+      "data": {
+        "changes": [
+          {
+            "key": "flags.adv-reminder.message.ability.check.all",
+            "mode": 0,
+            "value": "Advantage on the enhanced ability"
+          }
+        ],
+        "disabled": true,
+        "duration": {
+          "startTime": null,
+          "seconds": 3600,
+          "rounds": 600,
+          "turns": null,
+          "startRound": null,
+          "startTurn": null,
+          "type": "seconds",
+          "duration": 3600,
+          "remaining": 3600,
+          "label": "3600 Seconds"
+        }
+      }
+    },
+    {
+      "name": "Enlarge/Reduce",
+      "data": {
+        "changes": [
+          {
+            "key": "flags.adv-reminder.message.ability.check.str",
+            "mode": 0,
+            "value": "Advantage if enlarged, Disadvantage if reduced"
+          },
+          {
+            "key": "flags.adv-reminder.message.ability.save.str",
+            "mode": 0,
+            "value": "Advantage if enlarged, Disadvantage if reduced"
+          },
+          {
+            "key": "flags.adv-reminder.message.damage.mwak",
+            "mode": 0,
+            "value": "[[/r +1d4]]{Enlarged} or [[/r -1d4]]{Reduced}"
+          },
+          {
+            "key": "flags.adv-reminder.message.damage.rwak",
+            "mode": 0,
+            "value": "[[/r +1d4]]{Enlarged} or [[/r -1d4]]{Reduced}"
+          }
+        ],
+        "disabled": "true",
+        "duration": {
+          "startTime": null,
+          "seconds": 60,
+          "rounds": 10,
+          "turns": null,
+          "startRound": null,
+          "startTurn": null,
+          "type": "seconds",
+          "duration": 60,
+          "remaining": 60,
+          "label": "60 Seconds"
+        }
+      }
+    },
+    {
+      "name": "Guidance",
+      "data": {
+        "changes": [
+          {
+            "key": "flags.adv-reminder.message.ability.check.all",
+            "mode": 0,
+            "value": "[[/r 1d4]]{Guidance} on one ability check, can roll before or after"
+          }
+        ],
+        "disabled": "true",
+        "duration": {
+          "startTime": null,
+          "seconds": 60,
+          "rounds": 10,
+          "turns": null,
+          "startRound": null,
+          "startTurn": null,
+          "type": "seconds",
+          "duration": 60,
+          "remaining": 60,
+          "label": "60 Seconds"
+        }
+      }
+    }
+  ]
+}

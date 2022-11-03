@@ -15,6 +15,7 @@ import {
   DeathSaveReminder,
   SkillReminder,
 } from "./reminders.js";
+import SamplePackBuilder from "./sample-pack.js";
 import { showSources } from "./settings.js";
 import {
   AbilityCheckSource,
@@ -24,7 +25,7 @@ import {
   DeathSaveSource,
   SkillSource,
 } from "./sources.js";
-import { debug, log } from "./util.js";
+import { debug, debugEnabled, log } from "./util.js";
 
 const CIRCLE_INFO = `<i class="fa-solid fa-circle-info"></i> `;
 let checkArmorStealth;
@@ -74,6 +75,11 @@ Hooks.once("DAE.setupComplete", () => {
   );
 
   window.DAE.addAutoFields(fields);
+});
+
+Hooks.once("ready", () => {
+  // expose SamplePackBuilder
+  if (debugEnabled) window.samplePack = new SamplePackBuilder();
 });
 
 // Attack rolls
