@@ -1,3 +1,6 @@
+# 3.1
+- bug fix: [#40](https://github.com/kaelad02/adv-reminder/issues/40) support Inline Roll Commands and other custom enrichers in messages
+
 # 3.0
 
 - feature: now requires v10, removes warnings about using deprecated functions
