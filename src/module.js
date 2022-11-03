@@ -271,13 +271,13 @@ async function prepareMessage(dialogOptions) {
       { messages }
     );
     // enrich message, specifically replacing rolls
-    const enriched = TextEditor.enrichHTML(message, {
+    const enriched = await TextEditor.enrichHTML(message, {
       secrets: true,
       documents: true,
       links: false,
       rolls: true,
       rollData: opt.rollData ?? {},
-      async: false,
+      async: true,
     });
     debug("messages", messages, "enriched", enriched);
     return enriched;
