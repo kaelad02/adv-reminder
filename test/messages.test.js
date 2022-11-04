@@ -243,17 +243,6 @@ describe("AttackMessage message flags", () => {
 });
 
 describe("AttackMessage from target", () => {
-  test("attack with message.all flag should add the message", () => {
-    const actor = createActorWithEffects();
-    const target = createActorWithEffects(["flags.adv-reminder.grants.message.all", "message.all message"]);
-    const item = createItem("mwak", "str");
-    const options = {};
-
-    new AttackMessage(actor, target, item).addMessage(options);
-
-    expect(options.dialogOptions["adv-reminder"].messages).toStrictEqual(["message.all message"]);
-  });
-
   test("attack with message.attack.all flag should add the message", () => {
     const actor = createActorWithEffects();
     const target = createActorWithEffects([
@@ -908,17 +897,6 @@ describe("DamageMessage message flags", () => {
 });
 
 describe("DamageMessage from target", () => {
-  test("damage with message.all flag should add the message", () => {
-    const actor = createActorWithEffects();
-    const target = createActorWithEffects(["flags.adv-reminder.grants.message.all", "message.all message"]);
-    const item = createItem("mwak", "str");
-    const options = {};
-
-    new DamageMessage(actor, target, item).addMessage(options);
-
-    expect(options.dialogOptions["adv-reminder"].messages).toStrictEqual(["message.all message"]);
-  });
-
   test("damage with message.damage.all flag should add the message", () => {
     const actor = createActorWithEffects();
     const target = createActorWithEffects([

@@ -24,7 +24,7 @@ class BaseMessage {
   }
 
   get targetKeys() {
-    return ["flags.adv-reminder.grants.message.all"];
+    return undefined;
   }
 
   addMessage(options) {
@@ -35,10 +35,12 @@ class BaseMessage {
 
     // get messages from the target and merge
     const targetKeys = this.targetKeys;
-    const targetMessages = this.targetChanges
-      .filter((change) => targetKeys.includes(change.key))
-      .map((change) => change.value);
-    messages.push(...targetMessages);
+    if (targetKeys) {
+      const targetMessages = this.targetChanges
+        .filter((change) => targetKeys.includes(change.key))
+        .map((change) => change.value);
+      messages.push(...targetMessages);
+    }
 
     if (messages.length > 0) {
       debug("messages found:", messages);
@@ -69,11 +71,11 @@ export class AttackMessage extends BaseMessage {
 
   /** @override */
   get targetKeys() {
-    return super.targetKeys.concat(
+    return [
       "flags.adv-reminder.grants.message.attack.all",
       `flags.adv-reminder.grants.message.attack.${this.actionType}`,
-      `flags.adv-reminder.grants.message.attack.${this.abilityId}`
-    );
+      `flags.adv-reminder.grants.message.attack.${this.abilityId}`,
+    ];
   }
 }
 
@@ -160,9 +162,9 @@ export class DamageMessage extends BaseMessage {
 
   /** @override */
   get targetKeys() {
-    return super.targetKeys.concat(
+    return [
       "flags.adv-reminder.grants.message.damage.all",
-      `flags.adv-reminder.grants.message.damage.${this.actionType}`
-    );
+      `flags.adv-reminder.grants.message.damage.${this.actionType}`,
+    ];
   }
 }
