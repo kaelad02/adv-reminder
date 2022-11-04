@@ -242,6 +242,109 @@ describe("AttackMessage message flags", () => {
   });
 });
 
+describe("AttackMessage from target", () => {
+  test("attack with message.all flag should add the message", () => {
+    const actor = createActorWithEffects();
+    const target = createActorWithEffects(["flags.adv-reminder.grants.message.all", "message.all message"]);
+    const item = createItem("mwak", "str");
+    const options = {};
+
+    new AttackMessage(actor, target, item).addMessage(options);
+
+    expect(options.dialogOptions["adv-reminder"].messages).toStrictEqual(["message.all message"]);
+  });
+
+  test("attack with message.attack.all flag should add the message", () => {
+    const actor = createActorWithEffects();
+    const target = createActorWithEffects([
+      "flags.adv-reminder.grants.message.attack.all",
+      "message.attack.all message",
+    ]);
+    const item = createItem("mwak", "str");
+    const options = {};
+
+    new AttackMessage(actor, target, item).addMessage(options);
+
+    expect(options.dialogOptions["adv-reminder"].messages).toStrictEqual([
+      "message.attack.all message",
+    ]);
+  });
+
+  test("attack with message.attack.mwak flag should add the message for Melee Weapon Attack", () => {
+    const actor = createActorWithEffects();
+    const target = createActorWithEffects([
+      "flags.adv-reminder.grants.message.attack.mwak",
+      "message.attack.mwak message",
+    ]);
+    const item = createItem("mwak", "str");
+    const options = {};
+
+    new AttackMessage(actor, target, item).addMessage(options);
+
+    expect(options.dialogOptions["adv-reminder"].messages).toStrictEqual([
+      "message.attack.mwak message",
+    ]);
+  });
+
+  test("attack with message.attack.mwak flag should not add the message for Ranged Weapon Attack", () => {
+    const actor = createActorWithEffects();
+    const target = createActorWithEffects([
+      "flags.adv-reminder.grants.message.attack.mwak",
+      "message.attack.mwak message",
+    ]);
+    const item = createItem("rwak", "dex");
+    const options = {};
+
+    new AttackMessage(actor, target, item).addMessage(options);
+
+    expect(options.dialogOptions).toBeUndefined();
+  });
+
+  test("attack with message.attack.cha flag should add the message for Charisma Attack", () => {
+    const actor = createActorWithEffects();
+    const target = createActorWithEffects([
+      "flags.adv-reminder.grants.message.attack.cha",
+      "message.attack.cha message",
+    ]);
+    const item = createItem("rsak", "cha");
+    const options = {};
+
+    new AttackMessage(actor, target, item).addMessage(options);
+
+    expect(options.dialogOptions["adv-reminder"].messages).toStrictEqual([
+      "message.attack.cha message",
+    ]);
+  });
+
+  test("attack with message.attack.cha flag should not add the message for Intelligence Attack", () => {
+    const actor = createActorWithEffects();
+    const target = createActorWithEffects([
+      "flags.adv-reminder.grants.message.attack.cha",
+      "message.attack.cha",
+    ]);
+    const item = createItem("rsak", "int");
+    const options = {};
+
+    new AttackMessage(actor, target, item).addMessage(options);
+
+    expect(options.dialogOptions).toBeUndefined();
+  });
+
+  test("attack with two messages should add both messages", () => {
+    const actor = createActorWithEffects(["flags.adv-reminder.message.attack.all", "first"]);
+    const target = createActorWithEffects([
+      "flags.adv-reminder.grants.message.attack.mwak",
+      "second",
+    ]);
+    const item = createItem("mwak", "str");
+    const options = {};
+
+    new AttackMessage(actor, target, item).addMessage(options);
+
+    expect(options.dialogOptions["adv-reminder"].messages).toStrictEqual(["first", "second"]);
+  });
+});
+
 describe("AbilityCheckMessage no legit active effects", () => {
   test("ability check with no active effects should not add a message", () => {
     const actor = createActorWithEffects();

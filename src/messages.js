@@ -38,7 +38,7 @@ class BaseMessage {
     const targetMessages = this.targetChanges
       .filter((change) => targetKeys.includes(change.key))
       .map((change) => change.value);
-    messages.concat(...targetMessages);
+    messages.push(...targetMessages);
 
     if (messages.length > 0) {
       debug("messages found:", messages);
@@ -64,6 +64,15 @@ export class AttackMessage extends BaseMessage {
       "flags.adv-reminder.message.attack.all",
       `flags.adv-reminder.message.attack.${this.actionType}`,
       `flags.adv-reminder.message.attack.${this.abilityId}`
+    );
+  }
+
+  /** @override */
+  get targetKeys() {
+    return super.targetKeys.concat(
+      "flags.adv-reminder.grants.message.attack.all",
+      `flags.adv-reminder.grants.message.attack.${this.actionType}`,
+      `flags.adv-reminder.grants.message.attack.${this.abilityId}`
     );
   }
 }
