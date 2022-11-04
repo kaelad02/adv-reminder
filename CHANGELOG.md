@@ -1,6 +1,7 @@
 # 3.1
 - bug fix: [#40](https://github.com/kaelad02/adv-reminder/issues/40) support Inline Roll Commands and other custom enrichers in messages
 - feature: add AR Message Sample Items compendium pack
+- feature: [#38](https://github.com/kaelad02/adv-reminder/issues/38) add a grant message flag when targeted
 
 # 3.0
 
