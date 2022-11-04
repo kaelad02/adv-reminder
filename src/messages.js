@@ -1,18 +1,30 @@
 import { debug } from "./util.js";
 
 class BaseMessage {
-  constructor(actor) {
+  constructor(actor, targetActor) {
     /** @type {Actor5e} */
     this.actor = actor;
     /** @type {EffectChangeData[]} */
-    this.changes = actor.effects
-      .filter((effect) => !effect.isSuppressed && !effect.disabled)
-      .flatMap((effect) => effect.changes)
-      .sort((a, b) => a.priority - b.priority);
+    this.changes = this._getActiveEffectKeys(actor);
+    /** @type {EffectChangeData[]} */
+    this.targetChanges = this._getActiveEffectKeys(targetActor);
+  }
+
+  _getActiveEffectKeys(actor) {
+    return actor
+      ? actor.effects
+          .filter((effect) => !effect.isSuppressed && !effect.disabled)
+          .flatMap((effect) => effect.changes)
+          .sort((a, b) => a.priority - b.priority)
+      : [];
   }
 
   get messageKeys() {
     return ["flags.adv-reminder.message.all"];
+  }
+
+  get targetKeys() {
+    return ["flags.adv-reminder.grants.message.all"];
   }
 
   addMessage(options) {
@@ -20,6 +32,13 @@ class BaseMessage {
     const messages = this.changes
       .filter((change) => keys.includes(change.key))
       .map((change) => change.value);
+
+    // get messages from the target and merge
+    const targetKeys = this.targetKeys;
+    const targetMessages = this.targetChanges
+      .filter((change) => targetKeys.includes(change.key))
+      .map((change) => change.value);
+    messages.concat(...targetMessages);
 
     if (messages.length > 0) {
       debug("messages found:", messages);
@@ -30,8 +49,8 @@ class BaseMessage {
 }
 
 export class AttackMessage extends BaseMessage {
-  constructor(actor, item) {
-    super(actor);
+  constructor(actor, targetActor, item) {
+    super(actor, targetActor);
 
     /** @type {string} */
     this.actionType = item.system.actionType;

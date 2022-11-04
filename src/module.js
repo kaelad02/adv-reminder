@@ -89,7 +89,7 @@ Hooks.on("dnd5e.preRollAttack", (item, config) => {
   if (isFastForwarding(config)) return;
 
   debug("checking for message effects on this attack roll");
-  new AttackMessage(item.actor, item).addMessage(config);
+  new AttackMessage(item.actor, getTarget(), item).addMessage(config);
   if (showSources) {
     debug("checking for adv/dis effects to display their source");
     new AttackSource(item.actor, getTarget(), item).updateOptions(config);

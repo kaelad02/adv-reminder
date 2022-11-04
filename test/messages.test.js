@@ -118,7 +118,7 @@ describe("AttackMessage no legit active effects", () => {
     const item = createItem("mwak", "str");
     const options = {};
 
-    new AttackMessage(actor, item).addMessage(options);
+    new AttackMessage(actor, undefined, item).addMessage(options);
 
     expect(options.dialogOptions).toBeUndefined();
   });
@@ -129,7 +129,7 @@ describe("AttackMessage no legit active effects", () => {
     const item = createItem("mwak", "str");
     const options = {};
 
-    new AttackMessage(actor, item).addMessage(options);
+    new AttackMessage(actor, undefined, item).addMessage(options);
 
     expect(options.dialogOptions).toBeUndefined();
   });
@@ -140,7 +140,7 @@ describe("AttackMessage no legit active effects", () => {
     const item = createItem("mwak", "str");
     const options = {};
 
-    new AttackMessage(actor, item).addMessage(options);
+    new AttackMessage(actor, undefined, item).addMessage(options);
 
     expect(options.dialogOptions).toBeUndefined();
   });
@@ -152,7 +152,7 @@ describe("AttackMessage message flags", () => {
     const item = createItem("mwak", "str");
     const options = {};
 
-    new AttackMessage(actor, item).addMessage(options);
+    new AttackMessage(actor, undefined, item).addMessage(options);
 
     expect(options.dialogOptions["adv-reminder"].messages).toStrictEqual(["message.all message"]);
   });
@@ -165,7 +165,7 @@ describe("AttackMessage message flags", () => {
     const item = createItem("mwak", "str");
     const options = {};
 
-    new AttackMessage(actor, item).addMessage(options);
+    new AttackMessage(actor, undefined, item).addMessage(options);
 
     expect(options.dialogOptions["adv-reminder"].messages).toStrictEqual([
       "message.attack.all message",
@@ -180,7 +180,7 @@ describe("AttackMessage message flags", () => {
     const item = createItem("mwak", "str");
     const options = {};
 
-    new AttackMessage(actor, item).addMessage(options);
+    new AttackMessage(actor, undefined, item).addMessage(options);
 
     expect(options.dialogOptions["adv-reminder"].messages).toStrictEqual([
       "message.attack.mwak message",
@@ -195,7 +195,7 @@ describe("AttackMessage message flags", () => {
     const item = createItem("rwak", "dex");
     const options = {};
 
-    new AttackMessage(actor, item).addMessage(options);
+    new AttackMessage(actor, undefined, item).addMessage(options);
 
     expect(options.dialogOptions).toBeUndefined();
   });
@@ -208,7 +208,7 @@ describe("AttackMessage message flags", () => {
     const item = createItem("rsak", "cha");
     const options = {};
 
-    new AttackMessage(actor, item).addMessage(options);
+    new AttackMessage(actor, undefined, item).addMessage(options);
 
     expect(options.dialogOptions["adv-reminder"].messages).toStrictEqual([
       "message.attack.cha message",
@@ -223,7 +223,7 @@ describe("AttackMessage message flags", () => {
     const item = createItem("rsak", "int");
     const options = {};
 
-    new AttackMessage(actor, item).addMessage(options);
+    new AttackMessage(actor, undefined, item).addMessage(options);
 
     expect(options.dialogOptions).toBeUndefined();
   });
@@ -236,7 +236,7 @@ describe("AttackMessage message flags", () => {
     const item = createItem("mwak", "str");
     const options = {};
 
-    new AttackMessage(actor, item).addMessage(options);
+    new AttackMessage(actor, undefined, item).addMessage(options);
 
     expect(options.dialogOptions["adv-reminder"].messages).toStrictEqual(["first", "second"]);
   });
