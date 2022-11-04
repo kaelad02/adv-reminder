@@ -87,17 +87,18 @@ Hooks.on("dnd5e.preRollAttack", (item, config) => {
   debug("preRollAttack hook called");
 
   if (isFastForwarding(config)) return;
+  const target = getTarget();
 
   debug("checking for message effects on this attack roll");
-  new AttackMessage(item.actor, getTarget(), item).addMessage(config);
+  new AttackMessage(item.actor, target, item).addMessage(config);
   if (showSources) {
     debug("checking for adv/dis effects to display their source");
-    new AttackSource(item.actor, getTarget(), item).updateOptions(config);
+    new AttackSource(item.actor, target, item).updateOptions(config);
   }
 
   if (skipReminders) return;
   debug("checking for adv/dis effects on this attack roll");
-  new AttackReminder(item.actor, getTarget(), item).updateOptions(config);
+  new AttackReminder(item.actor, target, item).updateOptions(config);
 });
 
 // Saving throws
@@ -200,17 +201,18 @@ Hooks.on("dnd5e.preRollDamage", (item, config) => {
 
   // check for critical flags unless the user pressed a fast-forward key
   if (isFastForwarding(config)) return;
+  const target = getTarget();
 
   debug("checking for message effects on this damage roll");
-  new DamageMessage(item.actor, getTarget(), item).addMessage(config);
+  new DamageMessage(item.actor, target, item).addMessage(config);
   if (showSources) {
     debug("checking for adv/dis effects to display their source");
-    new CriticalSource(item.actor, getTarget(), item).updateOptions(config);
+    new CriticalSource(item.actor, target, item).updateOptions(config);
   }
 
   if (skipReminders) return;
   debug("checking for critical/normal effects on this damage roll");
-  new CriticalReminder(item.actor, getTarget(), item).updateOptions(config);
+  new CriticalReminder(item.actor, target, item).updateOptions(config);
 });
 
 // Render dialog hook
