@@ -143,8 +143,8 @@ export class DeathSaveMessage extends AbilityBaseMessage {
 }
 
 export class DamageMessage extends BaseMessage {
-  constructor(actor, item) {
-    super(actor);
+  constructor(actor, targetActor, item) {
+    super(actor, targetActor);
 
     /** @type {string} */
     this.actionType = item.system.actionType;
@@ -155,6 +155,14 @@ export class DamageMessage extends BaseMessage {
     return super.messageKeys.concat(
       "flags.adv-reminder.message.damage.all",
       `flags.adv-reminder.message.damage.${this.actionType}`
+    );
+  }
+
+  /** @override */
+  get targetKeys() {
+    return super.targetKeys.concat(
+      "flags.adv-reminder.grants.message.damage.all",
+      `flags.adv-reminder.grants.message.damage.${this.actionType}`
     );
   }
 }

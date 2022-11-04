@@ -202,7 +202,7 @@ Hooks.on("dnd5e.preRollDamage", (item, config) => {
   if (isFastForwarding(config)) return;
 
   debug("checking for message effects on this damage roll");
-  new DamageMessage(item.actor, item).addMessage(config);
+  new DamageMessage(item.actor, getTarget(), item).addMessage(config);
   if (showSources) {
     debug("checking for adv/dis effects to display their source");
     new CriticalSource(item.actor, getTarget(), item).updateOptions(config);
