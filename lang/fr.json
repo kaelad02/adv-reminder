@@ -1,3 +1,31 @@
 {
-  "adv-reminder.AutoFail": "Échec automatique"
+  "adv-reminder.AutoFail": "Échec automatique",
+  "adv-reminder.ColorMenu": {
+    "Name": "Couleurs de la boîte de jet de dés",
+    "Hint": "Modifier les couleurs des messages et des boutons par défaut des boîtes de jet de dés",
+    "Label": "Configurer les couleurs",
+    "Test": "Montrer un exemple"
+  },
+  "adv-reminder.DefaultButtonColor": {
+    "Name": "Couleur des boutons par défaut",
+    "Hint": "Colore le texte et l'arrière-plan des boutons et des messages.",
+    "None": "Pas de changement de couleur",
+    "Player": "Couleur du joueur",
+    "Green": "Vert",
+    "Custom": "Couleur personnalisée"
+  },
+  "adv-reminder.CustomColor": {
+    "Name": "Couleur personnalisée",
+    "Hint": "Les couleurs sombres sont plus efficaces que les couleurs claires"
+  },
+  "adv-reminder.ShowSources": {
+    "Name": "Montrer la source de l'Adv / Dis/ Crit",
+    "Hint": "Si un effet actif donne un adv / dis / crit sur un jet, affichez son nom sous forme de message dans la boîte de dialogue."
+  },
+  "adv-reminder.Source": {
+    "Adv": "Source de l'avantage : {sources}",
+    "Dis": "Source du désavantage : {sources}",
+    "Crit": "Source du coup critique : {sources}",
+    "Norm": "Source du jet normal : {sources}"
+  }
 }
