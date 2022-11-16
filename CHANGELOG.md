@@ -1,3 +1,7 @@
+# 3.1.1
+
+- feature: [#44](https://github.com/kaelad02/adv-reminder/pull/44) update French language file
+
 # 3.1
 - bug fix: [#40](https://github.com/kaelad02/adv-reminder/issues/40) support Inline Roll Commands and other custom enrichers in messages
 - feature: add AR Message Sample Items compendium pack
