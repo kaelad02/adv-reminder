@@ -1,3 +1,7 @@
+# 3.1.2
+
+- bug fix: [#45](https://github.com/kaelad02/adv-reminder/issues/45) Disable auto-fail saving throws if Midi is active
+
 # 3.1.1
 
 - feature: [#44](https://github.com/kaelad02/adv-reminder/pull/44) update French language file
