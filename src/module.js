@@ -106,8 +106,10 @@ Hooks.on("dnd5e.preRollAbilitySave", (actor, config, abilityId) => {
   debug("preRollAbilitySave hook called");
 
   // check if an effect says to fail this roll
-  const failChecker = new AbilitySaveFail(actor, abilityId);
-  if (failChecker.fails(config)) return false;
+  if (!skipReminders) {
+    const failChecker = new AbilitySaveFail(actor, abilityId);
+    if (failChecker.fails(config)) return false;
+  }
 
   if (isFastForwarding(config)) return;
 
