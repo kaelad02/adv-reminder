@@ -82,6 +82,25 @@ Hooks.once("ready", () => {
   if (debugEnabled) window.samplePack = new SamplePackBuilder();
 });
 
+// Apply Midi-QOL's custom active effects
+Hooks.on("applyActiveEffect", (actor, change, current, delta, changes) => {
+  const supportedKeys = [
+    "flags.midi-qol.advantage.",
+    "flags.midi-qol.disadvantage.",
+    "flags.midi-qol.grants.",
+    "flags.midi-qol.critical.",
+    "flags.midi-qol.noCritical.",
+    "flags.midi-qol.fail.",
+  ];
+  if (supportedKeys.some((k) => change.key.startsWith(k))) {
+    // update the actor
+    if (typeof change.value !== "string") setProperty(actor, change.key, change.value);
+    else if (["true", "1"].includes(change.value.trim())) setProperty(actor, change.key, true);
+    else if (["false", "0"].includes(change.value.trim())) setProperty(actor, change.key, false);
+    else setProperty(actor, change.key, change.value);
+  }
+});
+
 // Attack rolls
 Hooks.on("dnd5e.preRollAttack", (item, config) => {
   debug("preRollAttack hook called");
