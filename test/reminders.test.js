@@ -9,8 +9,7 @@ import {
 } from "../src/reminders";
 
 function createActorWithEffects(...keys) {
-  const effects = keys.map(createEffect);
-  return {
+  const actor = {
     system: {
       skills: {
         acr: {
@@ -69,24 +68,92 @@ function createActorWithEffects(...keys) {
         },
       },
     },
-    effects,
+    flags: {},
   };
+  keys.forEach(k => setProperty(actor, k, "1"));
+  return actor;
 }
 
-function createEffect(key) {
-  return {
-    isSuppressed: false,
-    changes: [
-      {
-        key,
-        value: "1",
-        mode: 0,
-        priority: "0",
-      },
-    ],
-    disabled: false,
-  };
+function setProperty(object, key, value) {
+  // split the key into parts, removing the last one
+  const parts = key.split(".");
+  const lastProp = parts.pop();
+  // recursively create objects out the key parts
+  const lastObj = parts.reduce((obj, prop) => {
+    if (!obj.hasOwnProperty(prop)) obj[prop] = {};
+    return obj[prop];
+  }, object);
+  // set the value using the last key part
+  lastObj[lastProp] = value;
 }
+
+// fake
+globalThis.flattenObject = (obj, _d=0) => {
+  const flat = {};
+  if ( _d > 100 ) {
+    throw new Error("Maximum depth exceeded");
+  }
+  for ( let [k, v] of Object.entries(obj) ) {
+    let t = getType(v);
+    if ( t === "Object" ) {
+      if ( isEmpty(v) ) flat[k] = v;
+      let inner = flattenObject(v, _d+1);
+      for ( let [ik, iv] of Object.entries(inner) ) {
+        flat[`${k}.${ik}`] = iv;
+      }
+    }
+    else flat[k] = v;
+  }
+  return flat;
+};
+
+// fake
+globalThis.getType = (variable) => {
+
+  // Primitive types, handled with simple typeof check
+  const typeOf = typeof variable;
+  if ( typeOf !== "object" ) return typeOf;
+
+  // Special cases of object
+  if ( variable === null ) return "null";
+  if ( !variable.constructor ) return "Object"; // Object with the null prototype.
+  if ( variable.constructor.name === "Object" ) return "Object";  // simple objects
+
+  // Match prototype instances
+  const prototypes = [
+    [Array, "Array"],
+    [Set, "Set"],
+    [Map, "Map"],
+    [Promise, "Promise"],
+    [Error, "Error"],
+    [Color, "number"]
+  ];
+  if ( "HTMLElement" in globalThis ) prototypes.push([globalThis.HTMLElement, "HTMLElement"]);
+  for ( const [cls, type] of prototypes ) {
+    if ( variable instanceof cls ) return type;
+  }
+
+  // Unknown Object type
+  return "Object";
+};
+
+// fake
+globalThis.isEmpty = (value) => {
+  const t = getType(value);
+  switch ( t ) {
+    case "undefined":
+      return true;
+    case "Array":
+      return !value.length;
+    case "Object":
+      return (getType(value) === "Object") && !Object.keys(value).length;
+    case "Set":
+    case "Map":
+      return !value.size;
+    default:
+      return false;
+  }
+};
 
 function createItem(actionType, abilityMod) {
   return {
@@ -105,32 +172,6 @@ describe("AttackReminder no legit active effects", () => {
     const options = {};
 
     const reminder = new AttackReminder(actor, target, item);
-    reminder.updateOptions(options);
-
-    expect(options.advantage).toBeUndefined();
-    expect(options.disadvantage).toBeUndefined();
-  });
-
-  test("attack with a suppressed active effect should be normal", () => {
-    const actor = createActorWithEffects("flags.midi-qol.advantage.all");
-    actor.effects[0].isSuppressed = true;
-    const item = createItem("mwak", "str");
-    const options = {};
-
-    const reminder = new AttackReminder(actor, null, item);
-    reminder.updateOptions(options);
-
-    expect(options.advantage).toBeUndefined();
-    expect(options.disadvantage).toBeUndefined();
-  });
-
-  test("attack with a disabled active effect should be normal", () => {
-    const actor = createActorWithEffects("flags.midi-qol.advantage.all");
-    actor.effects[0].disabled = true;
-    const item = createItem("mwak", "str");
-    const options = {};
-
-    const reminder = new AttackReminder(actor, null, item);
     reminder.updateOptions(options);
 
     expect(options.advantage).toBeUndefined();
@@ -419,30 +460,6 @@ describe("AbilityCheckReminder no legit active effects", () => {
     expect(options.advantage).toBeUndefined();
     expect(options.disadvantage).toBeUndefined();
   });
-
-  test("ability check with a suppressed active effect should be normal", () => {
-    const actor = createActorWithEffects("flags.midi-qol.advantage.all");
-    actor.effects[0].isSuppressed = true;
-    const options = {};
-
-    const reminder = new AbilityCheckReminder(actor, "str");
-    reminder.updateOptions(options);
-
-    expect(options.advantage).toBeUndefined();
-    expect(options.disadvantage).toBeUndefined();
-  });
-
-  test("ability check with a disabled active effect should be normal", () => {
-    const actor = createActorWithEffects("flags.midi-qol.advantage.all");
-    actor.effects[0].disabled = true;
-    const options = {};
-
-    const reminder = new AbilityCheckReminder(actor, "str");
-    reminder.updateOptions(options);
-
-    expect(options.advantage).toBeUndefined();
-    expect(options.disadvantage).toBeUndefined();
-  });
 });
 
 describe("AbilityCheckReminder advantage flags", () => {
@@ -614,30 +631,6 @@ describe("AbilitySaveReminder no legit active effects", () => {
     expect(options.advantage).toBeUndefined();
     expect(options.disadvantage).toBeUndefined();
   });
-
-  test("saving throw with a suppressed active effect should be normal", () => {
-    const actor = createActorWithEffects("flags.midi-qol.advantage.all");
-    actor.effects[0].isSuppressed = true;
-    const options = {};
-
-    const reminder = new AbilitySaveReminder(actor, "wis");
-    reminder.updateOptions(options);
-
-    expect(options.advantage).toBeUndefined();
-    expect(options.disadvantage).toBeUndefined();
-  });
-
-  test("saving throw with a disabled active effect should be normal", () => {
-    const actor = createActorWithEffects("flags.midi-qol.advantage.all");
-    actor.effects[0].disabled = true;
-    const options = {};
-
-    const reminder = new AbilitySaveReminder(actor, "wis");
-    reminder.updateOptions(options);
-
-    expect(options.advantage).toBeUndefined();
-    expect(options.disadvantage).toBeUndefined();
-  });
 });
 
 describe("AbilitySaveReminder advantage flags", () => {
@@ -801,30 +794,6 @@ describe("AbilitySaveReminder both advantage and disadvantage flags", () => {
 describe("SkillReminder no legit active effects", () => {
   test("skill check with no active effects should be normal", () => {
     const actor = createActorWithEffects();
-    const options = {};
-
-    const reminder = new SkillReminder(actor, "prc");
-    reminder.updateOptions(options);
-
-    expect(options.advantage).toBeUndefined();
-    expect(options.disadvantage).toBeUndefined();
-  });
-
-  test("skill check with a suppressed active effect should be normal", () => {
-    const actor = createActorWithEffects("flags.midi-qol.advantage.all");
-    actor.effects[0].isSuppressed = true;
-    const options = {};
-
-    const reminder = new SkillReminder(actor, "prc");
-    reminder.updateOptions(options);
-
-    expect(options.advantage).toBeUndefined();
-    expect(options.disadvantage).toBeUndefined();
-  });
-
-  test("skill check with a disabled active effect should be normal", () => {
-    const actor = createActorWithEffects("flags.midi-qol.advantage.all");
-    actor.effects[0].disabled = true;
     const options = {};
 
     const reminder = new SkillReminder(actor, "prc");
@@ -1154,30 +1123,6 @@ describe("DeathSaveReminder no legit active effects", () => {
     expect(options.advantage).toBeUndefined();
     expect(options.disadvantage).toBeUndefined();
   });
-
-  test("death save with a suppressed active effect should be normal", () => {
-    const actor = createActorWithEffects("flags.midi-qol.advantage.all");
-    actor.effects[0].isSuppressed = true;
-    const options = {};
-
-    const reminder = new DeathSaveReminder(actor);
-    reminder.updateOptions(options);
-
-    expect(options.advantage).toBeUndefined();
-    expect(options.disadvantage).toBeUndefined();
-  });
-
-  test("death save with a disabled active effect should be normal", () => {
-    const actor = createActorWithEffects("flags.midi-qol.advantage.all");
-    actor.effects[0].disabled = true;
-    const options = {};
-
-    const reminder = new DeathSaveReminder(actor);
-    reminder.updateOptions(options);
-
-    expect(options.advantage).toBeUndefined();
-    expect(options.disadvantage).toBeUndefined();
-  });
 });
 
 describe("DeathSaveReminder advantage flags", () => {
@@ -1292,32 +1237,6 @@ describe("CriticalReminder no legit active effects", () => {
   test("damage roll with no active effects should be normal", () => {
     const actor = createActorWithEffects();
     const item = createItem("mwak", "str");
-    const options = {};
-
-    const reminder = new CriticalReminder(actor, null, item);
-    reminder.updateOptions(options);
-
-    expect(options.advantage).toBeUndefined();
-    expect(options.disadvantage).toBeUndefined();
-  });
-
-  test("damage roll with a suppressed active effect should be normal", () => {
-    const actor = createActorWithEffects("flags.midi-qol.critical.all");
-    const item = createItem("mwak", "str");
-    actor.effects[0].isSuppressed = true;
-    const options = {};
-
-    const reminder = new CriticalReminder(actor, null, item);
-    reminder.updateOptions(options);
-
-    expect(options.advantage).toBeUndefined();
-    expect(options.disadvantage).toBeUndefined();
-  });
-
-  test("damage roll with a disabled active effect should be normal", () => {
-    const actor = createActorWithEffects("flags.midi-qol.critical.all");
-    const item = createItem("mwak", "str");
-    actor.effects[0].disabled = true;
     const options = {};
 
     const reminder = new CriticalReminder(actor, null, item);
