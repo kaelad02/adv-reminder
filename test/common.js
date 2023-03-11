@@ -63,7 +63,7 @@ export default function commonTestInit() {
       },
       flags: {},
     };
-    keys.forEach((k) => setProperty(actor, k, "1"));
+    keys.forEach((k) => setProperty(actor, k, true));
     return actor;
   };
 
