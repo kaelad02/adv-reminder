@@ -172,7 +172,7 @@ Hooks.on("dnd5e.preRollSkill", (actor, config, skillId) => {
   new SkillMessage(actor, skillId).addMessage(config);
   if (showSources) {
     debug("checking for adv/dis effects to display their source");
-    new SkillSource(actor, skillId, checkArmorStealth).updateOptions(config);
+    new SkillSource(actor, skillId, true).updateOptions(config);
   }
 
   if (skipReminders) return;
