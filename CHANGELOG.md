@@ -1,3 +1,8 @@
+# 3.2.0
+
+- feature: apply Midi's flags to the actor instead of reading the active effects directly
+- bug fix: disadvantage on stealth from armor not working consistently
+
 # 3.1.2
 
 - bug fix: [#45](https://github.com/kaelad02/adv-reminder/issues/45) Disable auto-fail saving throws if Midi is active
