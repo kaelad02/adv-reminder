@@ -83,7 +83,7 @@ Hooks.once("ready", () => {
 });
 
 // Apply Midi-QOL's custom active effects
-Hooks.on("applyActiveEffect", (actor, change, current, delta, changes) => {
+Hooks.on("applyActiveEffect", (actor, change) => {
   const supportedKeys = [
     "flags.midi-qol.advantage.",
     "flags.midi-qol.disadvantage.",
