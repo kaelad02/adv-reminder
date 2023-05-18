@@ -15,7 +15,6 @@ import {
   DeathSaveReminder,
   SkillReminder,
 } from "../reminders.js";
-import { showSources } from "../settings.js";
 import {
   AbilityCheckSource,
   AbilitySaveSource,
@@ -24,12 +23,13 @@ import {
   DeathSaveSource,
   SkillSource,
 } from "../sources.js";
+import { showSources } from "../settings.js";
 import { debug, getTarget } from "../util.js";
 
 // the core behavior, no other roller modules
 // meant for setting up and defining the "dnd5e.pre???" hooks
 
-export default class CoreRollHooks {
+export default class CoreRollerHooks {
   /**
    * If true, check armor for stealth checks.
    * @type {boolean}

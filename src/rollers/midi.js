@@ -16,9 +16,9 @@ import {
 } from "../sources.js";
 import { showSources } from "../settings.js";
 import { debug, getTarget } from "../util.js";
-import CoreRollHooks from "./core.js";
+import CoreRollerHooks from "./core.js";
 
-export default class MidiRollerHooks extends CoreRollHooks {
+export default class MidiRollerHooks extends CoreRollerHooks {
   shouldApplyMidiActiveEffect() {
     return false;
   }
