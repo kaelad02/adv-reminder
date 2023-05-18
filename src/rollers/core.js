@@ -30,9 +30,17 @@ import { debug, getTarget } from "../util.js";
 // meant for setting up and defining the "dnd5e.pre???" hooks
 
 export default class CoreRollHooks {
+  /**
+   * If true, check armor for stealth checks.
+   * @type {boolean}
+   */
+  checkArmorStealth;
+
   // setup everything specific to the roller
   init() {
-    // TODO should we get checkArmorStealth here or pass in via constructor?
+    // DAE version 0.8.81 added support for "impose stealth disadvantage"
+    this.checkArmorStealth = !game.modules.get("dae")?.active;
+    debug("checkArmorStealth", this.checkArmorStealth);
 
     // register all the dnd5e.pre hooks
     Hooks.on("dnd5e.preRollAttack", this.preRollAttack);
@@ -116,7 +124,7 @@ export default class CoreRollHooks {
     }
 
     debug("checking for adv/dis effects on this skill check");
-    new SkillReminder(actor, skillId, checkArmorStealth).updateOptions(config);
+    new SkillReminder(actor, skillId, this.checkArmorStealth).updateOptions(config);
   }
 
   preRollToolCheck(item, config) {
