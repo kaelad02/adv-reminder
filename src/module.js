@@ -39,9 +39,31 @@ Hooks.once("init", () => {
   debug("checkArmorStealth", checkArmorStealth);
 
   // skip all reminder checks if Midi is active since it will do it anyways
-  skipReminders = game.modules.get("midi-qol")?.active;
+  const midiActive = game.modules.get("midi-qol")?.active;
+  skipReminders = midiActive;
   debug("skipReminders", skipReminders);
+
+  if (!midiActive) Hooks.on("applyActiveEffect", applyMidiCustom);
 });
+
+// Apply Midi-QOL's custom active effects
+function applyMidiCustom(actor, change) {
+  const supportedKeys = [
+    "flags.midi-qol.advantage.",
+    "flags.midi-qol.disadvantage.",
+    "flags.midi-qol.grants.",
+    "flags.midi-qol.critical.",
+    "flags.midi-qol.noCritical.",
+    "flags.midi-qol.fail.",
+  ];
+  if (supportedKeys.some((k) => change.key.startsWith(k))) {
+    // update the actor
+    if (typeof change.value !== "string") setProperty(actor, change.key, change.value);
+    else if (["true", "1"].includes(change.value.trim())) setProperty(actor, change.key, true);
+    else if (["false", "0"].includes(change.value.trim())) setProperty(actor, change.key, false);
+    else setProperty(actor, change.key, change.value);
+  }
+}
 
 // Add message flags to DAE so it shows them in the AE editor
 Hooks.once("DAE.setupComplete", () => {
@@ -153,7 +175,7 @@ Hooks.on("dnd5e.preRollSkill", (actor, config, skillId) => {
   new SkillMessage(actor, skillId).addMessage(config);
   if (showSources) {
     debug("checking for adv/dis effects to display their source");
-    new SkillSource(actor, skillId, checkArmorStealth).updateOptions(config);
+    new SkillSource(actor, skillId, true).updateOptions(config);
   }
 
   if (skipReminders) return;

@@ -2,23 +2,18 @@ import { debug } from "./util.js";
 
 class BaseReminder {
   constructor(actor) {
-    /** @type {string[]} */
-    this.actorKeys = this._getActiveEffectKeys(actor);
+    /** @type {object} */
+    this.actorFlags = this._getFlags(actor);
   }
 
   /**
-   * Get Midi QOL's active effect keys from an actor.
-   * @param {Actor5e} actor the actor
-   * @returns {string[]} an array of Midi QOL's active effects keys
+   * Get the midi-qol flags on the actor, flattened.
+   * @param {Actor5e*} actor 
+   * @returns {object} the midi-qol flags on the actor, flattened
    */
-  _getActiveEffectKeys(actor) {
-    return actor
-      ? actor.effects
-          .filter((effect) => !effect.isSuppressed && !effect.disabled)
-          .flatMap((effect) => effect.changes)
-          .map((change) => change.key)
-          .filter((key) => key.startsWith("flags.midi-qol."))
-      : [];
+  _getFlags(actor) {
+    const midiFlags = actor?.flags["midi-qol"] || {};
+    return flattenObject(midiFlags);
   }
 
   /**
@@ -29,11 +24,9 @@ class BaseReminder {
     let disadvantage;
 
     return {
-      add: (actorKeys, advKeys, disKeys) => {
-        actorKeys.forEach((key) => {
-          if (advKeys.includes(key)) advantage = true;
-          if (disKeys.includes(key)) disadvantage = true;
-        });
+      add: (actorFlags, advKeys, disKeys) => {
+        advantage = advKeys.reduce((accum, curr) => accum || actorFlags[curr], advantage);
+        disadvantage = disKeys.reduce((accum, curr) => accum || actorFlags[curr], disadvantage);
       },
       disadvantage: (label) => {
         if (label) disadvantage = true;
@@ -54,8 +47,8 @@ export class AttackReminder extends BaseReminder {
   constructor(actor, targetActor, item) {
     super(actor);
 
-    /** @type {string[]} */
-    this.targetKeys = this._getActiveEffectKeys(targetActor);
+    /** @type {object} */
+    this.targetFlags = this._getFlags(targetActor);
     /** @type {string} */
     this.actionType = item.system.actionType;
     /** @type {string} */
@@ -63,35 +56,35 @@ export class AttackReminder extends BaseReminder {
   }
 
   updateOptions(options) {
-    // quick return if there are no active effects
-    if (this.actorKeys.length == 0 && this.targetKeys.length == 0) return;
+    // quick return if there are no flags
+    if (this.actorFlags === {} && this.targetFlags === {}) return;
 
     // build the active effect keys applicable for this roll
     const advKeys = [
-      "flags.midi-qol.advantage.all",
-      "flags.midi-qol.advantage.attack.all",
-      `flags.midi-qol.advantage.attack.${this.actionType}`,
-      `flags.midi-qol.advantage.attack.${this.abilityId}`,
+      "advantage.all",
+      "advantage.attack.all",
+      `advantage.attack.${this.actionType}`,
+      `advantage.attack.${this.abilityId}`,
     ];
     const disKeys = [
-      "flags.midi-qol.disadvantage.all",
-      "flags.midi-qol.disadvantage.attack.all",
-      `flags.midi-qol.disadvantage.attack.${this.actionType}`,
-      `flags.midi-qol.disadvantage.attack.${this.abilityId}`,
+      "disadvantage.all",
+      "disadvantage.attack.all",
+      `disadvantage.attack.${this.actionType}`,
+      `disadvantage.attack.${this.abilityId}`,
     ];
     const grantsAdvKeys = [
-      "flags.midi-qol.grants.advantage.attack.all",
-      `flags.midi-qol.grants.advantage.attack.${this.actionType}`,
+      "grants.advantage.attack.all",
+      `grants.advantage.attack.${this.actionType}`,
     ];
     const grantsDisKeys = [
-      "flags.midi-qol.grants.disadvantage.attack.all",
-      `flags.midi-qol.grants.disadvantage.attack.${this.actionType}`,
+      "grants.disadvantage.attack.all",
+      `grants.disadvantage.attack.${this.actionType}`,
     ];
 
     // find matching keys and update options
     const accumulator = this._accumulator();
-    accumulator.add(this.actorKeys, advKeys, disKeys);
-    accumulator.add(this.targetKeys, grantsAdvKeys, grantsDisKeys);
+    accumulator.add(this.actorFlags, advKeys, disKeys);
+    accumulator.add(this.targetFlags, grantsAdvKeys, grantsDisKeys);
     accumulator.update(options);
   }
 }
@@ -105,22 +98,16 @@ class AbilityBaseReminder extends BaseReminder {
   }
 
   get advantageKeys() {
-    return [
-      "flags.midi-qol.advantage.all",
-      "flags.midi-qol.advantage.ability.all",
-    ];
+    return ["advantage.all", "advantage.ability.all"];
   }
 
   get disadvantageKeys() {
-    return [
-      "flags.midi-qol.disadvantage.all",
-      "flags.midi-qol.disadvantage.ability.all",
-    ];
+    return ["disadvantage.all", "disadvantage.ability.all"];
   }
 
   updateOptions(options) {
-    // quick return if there are no active effects
-    if (this.actorKeys.length == 0) return;
+    // quick return if there are no flags
+    if (this.actorFlags === {}) return;
 
     // get the active effect keys applicable for this roll
     const advKeys = this.advantageKeys;
@@ -129,7 +116,7 @@ class AbilityBaseReminder extends BaseReminder {
 
     // find matching keys and update options
     const accumulator = this._accumulator();
-    accumulator.add(this.actorKeys, advKeys, disKeys);
+    accumulator.add(this.actorFlags, advKeys, disKeys);
     accumulator.update(options);
   }
 }
@@ -138,16 +125,16 @@ export class AbilityCheckReminder extends AbilityBaseReminder {
   /** @override */
   get advantageKeys() {
     return super.advantageKeys.concat([
-      "flags.midi-qol.advantage.ability.check.all",
-      `flags.midi-qol.advantage.ability.check.${this.abilityId}`,
+      "advantage.ability.check.all",
+      `advantage.ability.check.${this.abilityId}`,
     ]);
   }
 
   /** @override */
   get disadvantageKeys() {
     return super.disadvantageKeys.concat([
-      "flags.midi-qol.disadvantage.ability.check.all",
-      `flags.midi-qol.disadvantage.ability.check.${this.abilityId}`,
+      "disadvantage.ability.check.all",
+      `disadvantage.ability.check.${this.abilityId}`,
     ]);
   }
 }
@@ -156,16 +143,16 @@ export class AbilitySaveReminder extends AbilityBaseReminder {
   /** @override */
   get advantageKeys() {
     return super.advantageKeys.concat([
-      "flags.midi-qol.advantage.ability.save.all",
-      `flags.midi-qol.advantage.ability.save.${this.abilityId}`,
+      "advantage.ability.save.all",
+      `advantage.ability.save.${this.abilityId}`,
     ]);
   }
 
   /** @override */
   get disadvantageKeys() {
     return super.disadvantageKeys.concat([
-      "flags.midi-qol.disadvantage.ability.save.all",
-      `flags.midi-qol.disadvantage.ability.save.${this.abilityId}`,
+      "disadvantage.ability.save.all",
+      `disadvantage.ability.save.${this.abilityId}`,
     ]);
   }
 }
@@ -185,16 +172,16 @@ export class SkillReminder extends AbilityCheckReminder {
   /** @override */
   get advantageKeys() {
     return super.advantageKeys.concat([
-      "flags.midi-qol.advantage.skill.all",
-      `flags.midi-qol.advantage.skill.${this.skillId}`,
+      "advantage.skill.all",
+      `advantage.skill.${this.skillId}`,
     ]);
   }
 
   /** @override */
   get disadvantageKeys() {
     return super.disadvantageKeys.concat([
-      "flags.midi-qol.disadvantage.skill.all",
-      `flags.midi-qol.disadvantage.skill.${this.skillId}`,
+      "disadvantage.skill.all",
+      `disadvantage.skill.${this.skillId}`,
     ]);
   }
 
@@ -210,7 +197,7 @@ export class SkillReminder extends AbilityCheckReminder {
     if (this.checkArmorStealth) {
       accumulator.disadvantage(this._armorStealthDisadvantage());
     }
-    accumulator.add(this.actorKeys, advKeys, disKeys);
+    accumulator.add(this.actorFlags, advKeys, disKeys);
     accumulator.update(options);
   }
 
@@ -240,16 +227,16 @@ export class DeathSaveReminder extends AbilityBaseReminder {
   /** @override */
   get advantageKeys() {
     return super.advantageKeys.concat([
-      "flags.midi-qol.advantage.ability.save.all",
-      "flags.midi-qol.advantage.deathSave",
+      "advantage.ability.save.all",
+      "advantage.deathSave",
     ]);
   }
 
   /** @override */
   get disadvantageKeys() {
     return super.disadvantageKeys.concat([
-      "flags.midi-qol.disadvantage.ability.save.all",
-      "flags.midi-qol.disadvantage.deathSave",
+      "disadvantage.ability.save.all",
+      "disadvantage.deathSave",
     ]);
   }
 }
@@ -258,38 +245,38 @@ export class CriticalReminder extends BaseReminder {
   constructor(actor, targetActor, item) {
     super(actor);
 
-    /** @type {string[]} */
-    this.targetKeys = this._getActiveEffectKeys(targetActor);
+    /** @type {object} */
+    this.targetFlags = this._getFlags(targetActor);
     /** @type {string} */
     this.actionType = item.system.actionType;
   }
 
   updateOptions(options) {
-    // quick return if there are no active effects
-    if (this.actorKeys.length == 0 && this.targetKeys.length == 0) return;
+    // quick return if there are no flags
+    if (this.actorFlags === {} && this.targetFlags === {}) return;
 
     // build the active effect keys applicable for this roll
     const critKeys = [
-      "flags.midi-qol.critical.all",
-      `flags.midi-qol.critical.${this.actionType}`,
+      "critical.all",
+      `critical.${this.actionType}`,
     ];
     const normalKeys = [
-      "flags.midi-qol.noCritical.all",
-      `flags.midi-qol.noCritical.${this.actionType}`,
+      "noCritical.all",
+      `noCritical.${this.actionType}`,
     ];
     const grantsCritKeys = [
-      "flags.midi-qol.grants.critical.all",
-      `flags.midi-qol.grants.critical.${this.actionType}`,
+      "grants.critical.all",
+      `grants.critical.${this.actionType}`,
     ];
     const grantsNormalKeys = [
-      "flags.midi-qol.fail.critical.all",
-      `flags.midi-qol.fail.critical.${this.actionType}`,
+      "fail.critical.all",
+      `fail.critical.${this.actionType}`,
     ];
 
     // find matching keys and update options
     const accumulator = this._accumulator();
-    accumulator.add(this.actorKeys, critKeys, normalKeys);
-    accumulator.add(this.targetKeys, grantsCritKeys, grantsNormalKeys);
+    accumulator.add(this.actorFlags, critKeys, normalKeys);
+    accumulator.add(this.targetFlags, grantsCritKeys, grantsNormalKeys);
     accumulator.update(options);
   }
 
@@ -299,11 +286,9 @@ export class CriticalReminder extends BaseReminder {
     let normal;
 
     return {
-      add: (actorKeys, critKeys, normalKeys) => {
-        actorKeys.forEach((key) => {
-          if (critKeys.includes(key)) crit = true;
-          if (normalKeys.includes(key)) normal = true;
-        });
+      add: (actorFlags, critKeys, normalKeys) => {
+        crit = critKeys.reduce((accum, curr) => accum || actorFlags[curr], crit);
+        normal = normalKeys.reduce((accum, curr) => accum || actorFlags[curr], normal);
       },
       update: (options) => {
         // a normal hit overrides a crit

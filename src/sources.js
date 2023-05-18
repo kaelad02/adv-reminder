@@ -10,19 +10,25 @@ import { debug } from "./util.js";
 
 const SourceMixin = (superclass) =>
   class extends superclass {
-    _getActiveEffectKeys(actor) {
-      return actor
-        ? actor.effects
-            .filter((effect) => !effect.isSuppressed && !effect.disabled)
-            .flatMap((effect) =>
-              // make an object with the effect's label and change's key
-              effect.changes.map((change) => ({
-                label: effect.label,
-                key: change.key,
-              }))
-            )
-            .filter((change) => change.key.startsWith("flags.midi-qol."))
-        : [];
+    _getFlags(actor) {
+      if (!actor) return {};
+
+      const asArray = actor.effects
+        .filter((effect) => !effect.isSuppressed && !effect.disabled)
+        .flatMap((effect) =>
+          // make an object with the effect's label and change's key
+          effect.changes.map((change) => ({
+            label: effect.label,
+            key: change.key,
+          }))
+        )
+        .filter((change) => change.key.startsWith("flags.midi-qol."));
+      asArray.forEach((change) => (change.key = change.key.substring(15)));
+      return asArray.reduce((accum, curr) => {
+        if (!accum[curr.key]) accum[curr.key] = [];
+        accum[curr.key].push(curr.label);
+        return accum;
+      }, {});
     }
 
     _accumulator() {
@@ -31,9 +37,11 @@ const SourceMixin = (superclass) =>
 
       return {
         add: (changes, advKeys, disKeys) => {
-          changes.forEach((change) => {
-            if (advKeys.includes(change.key)) advantageLabels.push(change.label);
-            if (disKeys.includes(change.key)) disadvantageLabels.push(change.label);
+          advKeys.forEach((key) => {
+            if (changes[key]) advantageLabels.push(...changes[key]);
+          });
+          disKeys.forEach((key) => {
+            if (changes[key]) disadvantageLabels.push(...changes[key]);
           });
         },
         disadvantage: (label) => {
@@ -72,9 +80,11 @@ export class CriticalSource extends SourceMixin(CriticalReminder) {
 
     return {
       add: (changes, critKeys, normalKeys) => {
-        changes.forEach((change) => {
-          if (critKeys.includes(change.key)) criticalLabels.push(change.label);
-          if (normalKeys.includes(change.key)) normalLabels.push(change.label);
+        critKeys.forEach(key => {
+          if (changes[key]) criticalLabels.push(...changes[key]);
+        });
+        normalKeys.forEach(key => {
+          if(changes[key]) normalLabels.push(...changes[key]);
         });
       },
       update: (options) => {
