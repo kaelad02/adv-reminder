@@ -1,5 +1,6 @@
 import CoreRollerHooks from "./rollers/core.js";
 import MidiRollerHooks from "./rollers/midi.js";
+import ReadySetRollHooks from "./rollers/rsr.js";
 import SamplePackBuilder from "./sample-pack.js";
 import { debug, debugEnabled, log } from "./util.js";
 
@@ -11,6 +12,7 @@ Hooks.once("init", () => {
   // initialize the roller hooks helper class
   let rollerHooks;
   if (game.modules.get("midi-qol")?.active) rollerHooks = new MidiRollerHooks();
+  else if (game.modules.get("ready-set-roll-5e")?.active) rollerHooks = new ReadySetRollHooks();
   else rollerHooks = new CoreRollerHooks();
   rollerHooks.init();
 
