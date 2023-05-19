@@ -28,6 +28,8 @@ class BaseMessage {
   }
 
   addMessage(options) {
+    debug("checking for message effects");
+
     const keys = this.messageKeys;
     const messages = this.changes
       .filter((change) => keys.includes(change.key))

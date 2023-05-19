@@ -8,12 +8,16 @@ class BaseReminder {
 
   /**
    * Get the midi-qol flags on the actor, flattened.
-   * @param {Actor5e*} actor 
+   * @param {Actor5e*} actor
    * @returns {object} the midi-qol flags on the actor, flattened
    */
   _getFlags(actor) {
     const midiFlags = actor?.flags["midi-qol"] || {};
     return flattenObject(midiFlags);
+  }
+
+  _message() {
+    debug("checking for adv/dis effects for the roll");
   }
 
   /**
@@ -32,9 +36,7 @@ class BaseReminder {
         if (label) disadvantage = true;
       },
       update: (options) => {
-        debug(
-          `updating options with {advantage: ${advantage}, disadvantage: ${disadvantage}}`
-        );
+        debug(`updating options with {advantage: ${advantage}, disadvantage: ${disadvantage}}`);
         // only set if adv or dis, the die roller doesn't handle when both are true correctly
         if (advantage && !disadvantage) options.advantage = true;
         else if (!advantage && disadvantage) options.disadvantage = true;
@@ -56,6 +58,8 @@ export class AttackReminder extends BaseReminder {
   }
 
   updateOptions(options) {
+    this._message();
+
     // quick return if there are no flags
     if (this.actorFlags === {} && this.targetFlags === {}) return;
 
@@ -106,6 +110,8 @@ class AbilityBaseReminder extends BaseReminder {
   }
 
   updateOptions(options) {
+    this._message();
+
     // quick return if there are no flags
     if (this.actorFlags === {}) return;
 
@@ -171,10 +177,7 @@ export class SkillReminder extends AbilityCheckReminder {
 
   /** @override */
   get advantageKeys() {
-    return super.advantageKeys.concat([
-      "advantage.skill.all",
-      `advantage.skill.${this.skillId}`,
-    ]);
+    return super.advantageKeys.concat(["advantage.skill.all", `advantage.skill.${this.skillId}`]);
   }
 
   /** @override */
@@ -187,6 +190,8 @@ export class SkillReminder extends AbilityCheckReminder {
 
   /** @override */
   updateOptions(options) {
+    this._message();
+
     // get the active effect keys applicable for this roll
     const advKeys = this.advantageKeys;
     const disKeys = this.disadvantageKeys;
@@ -208,10 +213,7 @@ export class SkillReminder extends AbilityCheckReminder {
   _armorStealthDisadvantage() {
     if (this.skillId === "ste") {
       const item = this.items.find(
-        (item) =>
-          item.type === "equipment" &&
-          item.system?.equipped &&
-          item.system?.stealth
+        (item) => item.type === "equipment" && item.system?.equipped && item.system?.stealth
       );
       debug("equiped item that imposes stealth disadvantage", item?.name);
       return item?.name;
@@ -226,10 +228,7 @@ export class DeathSaveReminder extends AbilityBaseReminder {
 
   /** @override */
   get advantageKeys() {
-    return super.advantageKeys.concat([
-      "advantage.ability.save.all",
-      "advantage.deathSave",
-    ]);
+    return super.advantageKeys.concat(["advantage.ability.save.all", "advantage.deathSave"]);
   }
 
   /** @override */
@@ -252,26 +251,16 @@ export class CriticalReminder extends BaseReminder {
   }
 
   updateOptions(options) {
+    this._message();
+
     // quick return if there are no flags
     if (this.actorFlags === {} && this.targetFlags === {}) return;
 
     // build the active effect keys applicable for this roll
-    const critKeys = [
-      "critical.all",
-      `critical.${this.actionType}`,
-    ];
-    const normalKeys = [
-      "noCritical.all",
-      `noCritical.${this.actionType}`,
-    ];
-    const grantsCritKeys = [
-      "grants.critical.all",
-      `grants.critical.${this.actionType}`,
-    ];
-    const grantsNormalKeys = [
-      "fail.critical.all",
-      `fail.critical.${this.actionType}`,
-    ];
+    const critKeys = ["critical.all", `critical.${this.actionType}`];
+    const normalKeys = ["noCritical.all", `noCritical.${this.actionType}`];
+    const grantsCritKeys = ["grants.critical.all", `grants.critical.${this.actionType}`];
+    const grantsNormalKeys = ["fail.critical.all", `fail.critical.${this.actionType}`];
 
     // find matching keys and update options
     const accumulator = this._accumulator();
