@@ -22,9 +22,9 @@ export function isMinVersion(name, version) {
 }
 
 /**
-   * Get the first targeted actor, if there are any targets at all.
-   * @returns {Actor5e} the first target, if there are any
-   */
+ * Get the first targeted actor, if there are any targets at all.
+ * @returns {Actor5e} the first target, if there are any
+ */
 export function getTarget() {
   return [...game.user.targets][0]?.actor;
 }
