@@ -31,6 +31,10 @@ const SourceMixin = (superclass) =>
       }, {});
     }
 
+    _message() {
+      debug("checking for adv/dis effects to display their source");
+    }
+
     _accumulator() {
       const advantageLabels = [];
       const disadvantageLabels = [];

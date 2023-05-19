@@ -8,7 +8,7 @@ class BaseFail {
 
   /**
    * Get the midi-qol flags on the actor, flattened.
-   * @param {Actor5e} actor 
+   * @param {Actor5e} actor
    * @returns {object} the midi-qol flags on the actor, flattened
    */
   _getFlags(actor) {
@@ -26,6 +26,8 @@ class BaseFail {
    * @returns true if the roll should fail, false if it may continue
    */
   fails(options) {
+    debug("checking for fail flags for the roll");
+
     // get the active effect keys that will fail
     const failKeys = this.failKeys;
     debug("failKeys", failKeys);
@@ -41,9 +43,7 @@ class BaseFail {
 
   async toMessage(messageData) {
     // content that immatates a die roll
-    const content = await renderTemplate(
-      "modules/adv-reminder/templates/fail-dice-roll.hbs"
-    );
+    const content = await renderTemplate("modules/adv-reminder/templates/fail-dice-roll.hbs");
     // merge basic data with child's data
     const chatData = foundry.utils.mergeObject(
       {

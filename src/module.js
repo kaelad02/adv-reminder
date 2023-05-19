@@ -1,49 +1,23 @@
-import { AbilitySaveFail } from "./fails.js";
-import {
-  AbilityCheckMessage,
-  AbilitySaveMessage,
-  AttackMessage,
-  DamageMessage,
-  DeathSaveMessage,
-  SkillMessage,
-} from "./messages.js";
-import {
-  AttackReminder,
-  AbilityCheckReminder,
-  AbilitySaveReminder,
-  CriticalReminder,
-  DeathSaveReminder,
-  SkillReminder,
-} from "./reminders.js";
+import CoreRollerHooks from "./rollers/core.js";
+import MidiRollerHooks from "./rollers/midi.js";
+import ReadySetRollHooks from "./rollers/rsr.js";
 import SamplePackBuilder from "./sample-pack.js";
-import { showSources } from "./settings.js";
-import {
-  AbilityCheckSource,
-  AbilitySaveSource,
-  AttackSource,
-  CriticalSource,
-  DeathSaveSource,
-  SkillSource,
-} from "./sources.js";
 import { debug, debugEnabled, log } from "./util.js";
 
 const CIRCLE_INFO = `<i class="fa-solid fa-circle-info"></i> `;
-let checkArmorStealth;
-let skipReminders;
 
 Hooks.once("init", () => {
   log("initializing Advantage Reminder");
 
-  // DAE version 0.8.81 added support for "impose stealth disadvantage"
-  checkArmorStealth = !game.modules.get("dae")?.active;
-  debug("checkArmorStealth", checkArmorStealth);
+  // initialize the roller hooks helper class
+  let rollerHooks;
+  if (game.modules.get("midi-qol")?.active) rollerHooks = new MidiRollerHooks();
+  else if (game.modules.get("ready-set-roll-5e")?.active) rollerHooks = new ReadySetRollHooks();
+  else rollerHooks = new CoreRollerHooks();
+  rollerHooks.init();
 
-  // skip all reminder checks if Midi is active since it will do it anyways
-  const midiActive = game.modules.get("midi-qol")?.active;
-  skipReminders = midiActive;
-  debug("skipReminders", skipReminders);
-
-  if (!midiActive) Hooks.on("applyActiveEffect", applyMidiCustom);
+  // register hook to apply Midi's flags
+  if (rollerHooks.shouldApplyMidiActiveEffect()) Hooks.on("applyActiveEffect", applyMidiCustom);
 });
 
 // Apply Midi-QOL's custom active effects
@@ -102,141 +76,6 @@ Hooks.once("DAE.setupComplete", () => {
 Hooks.once("ready", () => {
   // expose SamplePackBuilder
   if (debugEnabled) window.samplePack = new SamplePackBuilder();
-});
-
-// Attack rolls
-Hooks.on("dnd5e.preRollAttack", (item, config) => {
-  debug("preRollAttack hook called");
-
-  if (isFastForwarding(config)) return;
-  const target = getTarget();
-
-  debug("checking for message effects on this attack roll");
-  new AttackMessage(item.actor, target, item).addMessage(config);
-  if (showSources) {
-    debug("checking for adv/dis effects to display their source");
-    new AttackSource(item.actor, target, item).updateOptions(config);
-  }
-
-  if (skipReminders) return;
-  debug("checking for adv/dis effects on this attack roll");
-  new AttackReminder(item.actor, target, item).updateOptions(config);
-});
-
-// Saving throws
-Hooks.on("dnd5e.preRollAbilitySave", (actor, config, abilityId) => {
-  debug("preRollAbilitySave hook called");
-
-  // check if an effect says to fail this roll
-  if (!skipReminders) {
-    const failChecker = new AbilitySaveFail(actor, abilityId);
-    if (failChecker.fails(config)) return false;
-  }
-
-  if (isFastForwarding(config)) return;
-
-  debug("checking for message effects on this saving throw");
-  new AbilitySaveMessage(actor, abilityId).addMessage(config);
-  if (showSources) {
-    debug("checking for adv/dis effects to display their source");
-    new AbilitySaveSource(actor, abilityId).updateOptions(config);
-  }
-
-  if (skipReminders) return;
-  debug("checking for adv/dis effects on this saving throw");
-  new AbilitySaveReminder(actor, abilityId).updateOptions(config);
-});
-
-// Ability checks
-Hooks.on("dnd5e.preRollAbilityTest", (actor, config, abilityId) => {
-  debug("preRollAbilityTest hook called");
-
-  if (isFastForwarding(config)) return;
-
-  debug("checking for message effects on this ability check");
-  new AbilityCheckMessage(actor, abilityId).addMessage(config);
-  if (showSources) {
-    debug("checking for adv/dis effects to display their source");
-    new AbilityCheckSource(actor, abilityId).updateOptions(config);
-  }
-
-  if (skipReminders) return;
-  debug("checking for adv/dis effects on this ability check");
-  new AbilityCheckReminder(actor, abilityId).updateOptions(config);
-});
-
-// Skill checks
-Hooks.on("dnd5e.preRollSkill", (actor, config, skillId) => {
-  debug("preRollSkill hook called");
-
-  if (isFastForwarding(config)) return;
-
-  debug("checking for message effects on this skill check");
-  new SkillMessage(actor, skillId).addMessage(config);
-  if (showSources) {
-    debug("checking for adv/dis effects to display their source");
-    new SkillSource(actor, skillId, true).updateOptions(config);
-  }
-
-  if (skipReminders) return;
-  debug("checking for adv/dis effects on this skill check");
-  new SkillReminder(actor, skillId, checkArmorStealth).updateOptions(config);
-});
-
-// Tool checks
-Hooks.on("dnd5e.preRollToolCheck", (item, config) => {
-  debug("preRollToolCheck hook called");
-
-  if (isFastForwarding(config)) return;
-
-  debug("checking for message effects on this tool check");
-  new AbilityCheckMessage(item.actor, item.system.ability).addMessage(config);
-  if (showSources) {
-    debug("checking for adv/dis effects to display their source");
-    new AbilityCheckSource(item.actor, item.system.ability).updateOptions(config);
-  }
-
-  if (skipReminders) return;
-  debug("checking for adv/dis effects on this tool check");
-  new AbilityCheckReminder(item.actor, item.system.ability).updateOptions(config);
-});
-
-// Death saves
-Hooks.on("dnd5e.preRollDeathSave", (actor, config) => {
-  debug("preRollDeathSave hook called");
-
-  if (isFastForwarding(config)) return;
-
-  debug("checking for message effects on this death save");
-  new DeathSaveMessage(actor).addMessage(config);
-  if (showSources) {
-    debug("checking for adv/dis effects to display their source");
-    new DeathSaveSource(actor).updateOptions(config);
-  }
-
-  if (skipReminders) return;
-  debug("checking for adv/dis effects on this death save");
-  new DeathSaveReminder(actor).updateOptions(config);
-});
-
-// Damage rolls
-Hooks.on("dnd5e.preRollDamage", (item, config) => {
-  debug("preRollDamage hook called");
-
-  // check for critical flags unless the user pressed a fast-forward key
-  if (isFastForwarding(config)) return;
-  const target = getTarget();
-
-  debug("checking for message effects on this damage roll");
-  new DamageMessage(item.actor, target, item).addMessage(config);
-  if (showSources) {
-    debug("checking for adv/dis effects to display their source");
-    new CriticalSource(item.actor, target, item).updateOptions(config);
-  }
-
-  if (skipReminders) return;
-  debug("checking for critical/normal effects on this damage roll");
-  new CriticalReminder(item.actor, target, item).updateOptions(config);
 });
 
 // Render dialog hook
@@ -308,32 +147,4 @@ async function prepareMessage(dialogOptions) {
     debug("messages", messages, "enriched", enriched);
     return enriched;
   }
-}
-
-/**
- * Check if we should fast-forward the roll by checking the fastForward flag
- * and if one of the modifier keys was pressed.
- * @param {object} options
- * @param {boolean} [options.fastForward] a specific fastForward flag
- * @param {Event} [options.event] the triggering event
- * @returns {boolean} true if they are fast-forwarding, false otherwise
- */
-function isFastForwarding({ fastForward = false, event = {} }) {
-  const isFF = !!(
-    fastForward ||
-    event?.shiftKey ||
-    event?.altKey ||
-    event?.ctrlKey ||
-    event?.metaKey
-  );
-  if (isFF) debug("fast-forwarding the roll, stop processing");
-  return isFF;
-}
-
-/**
- * Get the first targeted actor, if there are any targets at all.
- * @returns {Actor5e} the first target, if there are any
- */
-function getTarget() {
-  return [...game.user.targets][0]?.actor;
 }
