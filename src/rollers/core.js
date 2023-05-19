@@ -43,13 +43,13 @@ export default class CoreRollerHooks {
     debug("checkArmorStealth", this.checkArmorStealth);
 
     // register all the dnd5e.pre hooks
-    Hooks.on("dnd5e.preRollAttack", this.preRollAttack);
-    Hooks.on("dnd5e.preRollAbilitySave", this.preRollAbilitySave);
-    Hooks.on("dnd5e.preRollAbilityTest", this.preRollAbilityTest);
-    Hooks.on("dnd5e.preRollSkill", this.preRollSkill);
-    Hooks.on("dnd5e.preRollToolCheck", this.preRollToolCheck);
-    Hooks.on("dnd5e.preRollDeathSave", this.preRollDeathSave);
-    Hooks.on("dnd5e.preRollDamage", this.preRollDamage);
+    Hooks.on("dnd5e.preRollAttack", this.preRollAttack.bind(this));
+    Hooks.on("dnd5e.preRollAbilitySave", this.preRollAbilitySave.bind(this));
+    Hooks.on("dnd5e.preRollAbilityTest", this.preRollAbilityTest.bind(this));
+    Hooks.on("dnd5e.preRollSkill", this.preRollSkill.bind(this));
+    Hooks.on("dnd5e.preRollToolCheck", this.preRollToolCheck.bind(this));
+    Hooks.on("dnd5e.preRollDeathSave", this.preRollDeathSave.bind(this));
+    Hooks.on("dnd5e.preRollDamage", this.preRollDamage.bind(this));
   }
 
   // applying Midi flags should be done outside this class,
