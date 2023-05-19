@@ -167,9 +167,10 @@ export default class ReadySetRollHooks extends CoreRollerHooks {
     return !fastForward;
   }
 
-  _doReminder({ advantage = false, disadvantage = false }) {
+  _doReminder({ advantage = false, disadvantage = false, critical = false }) {
     if (advantage) debug("advantage already set, skip reminder checks");
     if (disadvantage) debug("disadvantage already set, skip reminder checks");
-    return !(advantage || disadvantage);
+    if (critical) debug("critical already set, skip reminder checks");
+    return !(advantage || disadvantage || critical);
   }
 }
