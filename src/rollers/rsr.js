@@ -156,10 +156,8 @@ export default class ReadySetRollHooks extends CoreRollerHooks {
       }
     }
 
-    if (this._doReminder(config)) {
-      debug("checking for critical/normal effects on this damage roll");
-      new CriticalReminder(item.actor, target, item).updateOptions(config);
-    }
+    // don't use CriticalReminder because it causes problems with the damage roll
+    // TODO https://github.com/MangoFVTT/fvtt-ready-set-roll-5e/issues/184
   }
 
   _doMessages({ fastForward = false }) {
@@ -167,10 +165,9 @@ export default class ReadySetRollHooks extends CoreRollerHooks {
     return !fastForward;
   }
 
-  _doReminder({ advantage = false, disadvantage = false, critical = false }) {
+  _doReminder({ advantage = false, disadvantage = false }) {
     if (advantage) debug("advantage already set, skip reminder checks");
     if (disadvantage) debug("disadvantage already set, skip reminder checks");
-    if (critical) debug("critical already set, skip reminder checks");
-    return !(advantage || disadvantage || critical);
+    return !(advantage || disadvantage);
   }
 }
