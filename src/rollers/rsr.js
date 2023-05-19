@@ -27,6 +27,9 @@ import { showSources } from "../settings.js";
 import { debug, getTarget } from "../util.js";
 import CoreRollerHooks from "./core.js";
 
+/**
+ * Setup the dnd5e.preRoll hooks for use with Ready Set Roll.
+ */
 export default class ReadySetRollHooks extends CoreRollerHooks {
   preRollAttack(item, config) {
     debug("preRollAttack hook called");

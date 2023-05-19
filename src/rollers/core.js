@@ -26,9 +26,9 @@ import {
 import { showSources } from "../settings.js";
 import { debug, getTarget } from "../util.js";
 
-// the core behavior, no other roller modules
-// meant for setting up and defining the "dnd5e.pre???" hooks
-
+/**
+ * Setup the dnd5e.preRoll hooks for use with the core roller.
+ */
 export default class CoreRollerHooks {
   /**
    * If true, check armor for stealth checks.
@@ -36,7 +36,9 @@ export default class CoreRollerHooks {
    */
   checkArmorStealth;
 
-  // setup everything specific to the roller
+  /**
+   * Initialize the hooks.
+   */
   init() {
     // DAE version 0.8.81 added support for "impose stealth disadvantage"
     this.checkArmorStealth = !game.modules.get("dae")?.active;
@@ -52,8 +54,10 @@ export default class CoreRollerHooks {
     Hooks.on("dnd5e.preRollDamage", this.preRollDamage.bind(this));
   }
 
-  // applying Midi flags should be done outside this class,
-  // but we'll ask whether to do it or not here
+  /**
+   * Returns a boolean to tell whether or not to handle Midi's flags
+   * @returns true to register a hook to handle Midi's flags, false otherwise
+   */
   shouldApplyMidiActiveEffect() {
     return true;
   }

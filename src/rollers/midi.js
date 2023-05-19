@@ -18,6 +18,9 @@ import { showSources } from "../settings.js";
 import { debug, getTarget } from "../util.js";
 import CoreRollerHooks from "./core.js";
 
+/**
+ * Setup the dnd5e.preRoll hooks for use with Midi-QOL.
+ */
 export default class MidiRollerHooks extends CoreRollerHooks {
   shouldApplyMidiActiveEffect() {
     return false;
