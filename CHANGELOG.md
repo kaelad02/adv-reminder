@@ -1,5 +1,6 @@
 # 3.2.0
 
+- feature: add better support for Ready Set Roll with adv/dis checks
 - feature: apply Midi's flags to the actor instead of reading the active effects directly
 - bug fix: disadvantage on stealth from armor not working consistently
 
