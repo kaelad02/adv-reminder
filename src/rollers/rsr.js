@@ -31,6 +31,13 @@ import CoreRollerHooks from "./core.js";
  * Setup the dnd5e.preRoll hooks for use with Ready Set Roll.
  */
 export default class ReadySetRollHooks extends CoreRollerHooks {
+  init() {
+    super.init();
+
+    // register another hook for CriticalReminder
+    Hooks.on("dnd5e.useItem", this.useItem.bind(this));
+  }
+
   preRollAttack(item, config) {
     debug("preRollAttack hook called");
 
@@ -115,9 +122,15 @@ export default class ReadySetRollHooks extends CoreRollerHooks {
       new DamageMessage(item.actor, target, item).addMessage(config);
       if (showSources) new CriticalSource(item.actor, target, item).updateOptions(config);
     }
+    // don't use CriticalReminder here, it's done in another hook
+  }
 
-    // don't use CriticalReminder because it causes problems with the damage roll
-    // TODO https://github.com/MangoFVTT/fvtt-ready-set-roll-5e/issues/184
+  useItem(item, config, options) {
+    debug("useItem hook called");
+
+    // check for critical hits but set the "isCrit" property instead of the default "critical"
+    const target = getTarget();
+    new CriticalReminder(item.actor, target, item).updateOptions(config, "isCrit");
   }
 
   _doMessages({ fastForward = false }) {

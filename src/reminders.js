@@ -250,7 +250,7 @@ export class CriticalReminder extends BaseReminder {
     this.actionType = item.system.actionType;
   }
 
-  updateOptions(options) {
+  updateOptions(options, critProp = "critical") {
     this._message();
 
     // quick return if there are no flags
@@ -266,7 +266,7 @@ export class CriticalReminder extends BaseReminder {
     const accumulator = this._accumulator();
     accumulator.add(this.actorFlags, critKeys, normalKeys);
     accumulator.add(this.targetFlags, grantsCritKeys, grantsNormalKeys);
-    accumulator.update(options);
+    accumulator.update(options, critProp);
   }
 
   /** @override */
@@ -279,11 +279,11 @@ export class CriticalReminder extends BaseReminder {
         crit = critKeys.reduce((accum, curr) => accum || actorFlags[curr], crit);
         normal = normalKeys.reduce((accum, curr) => accum || actorFlags[curr], normal);
       },
-      update: (options) => {
+      update: (options, critProp) => {
         // a normal hit overrides a crit
         const critical = normal ? false : !!crit;
-        debug(`updating critical: ${critical}`);
-        options.critical = critical;
+        debug(`updating ${critProp}: ${critical}`);
+        options[critProp] = critical;
       },
     };
   }
