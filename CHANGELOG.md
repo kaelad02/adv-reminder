@@ -1,6 +1,7 @@
 # 3.2.1
 
 - bug fix: tweak how messages are added to the dialog to remove a conflict with another module that also changes that dialog
+- feature: update verified version to Foundry v11
 
 # 3.2.0
 
