@@ -85,7 +85,7 @@ Hooks.on("renderDialog", async (dialog, html, data) => {
   const message = await prepareMessage(dialog.options);
   if (message) {
     // add message at the end
-    const formGroups = html.find(".form-group:last");
+    const formGroups = html.find("form:first .form-group:last");
     formGroups.after(message);
     // swap "inline-roll" class for "dialog-roll"
     const inlineRolls = html.find("a.inline-roll");

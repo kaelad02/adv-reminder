@@ -1,3 +1,7 @@
+# 3.2.1
+
+- bug fix: tweak how messages are added to the dialog to remove a conflict with another module that also changes that dialog
+
 # 3.2.0
 
 - feature: add better support for Ready Set Roll with adv/dis/crit checks
