@@ -12,8 +12,7 @@ class BaseMessage {
 
   _getActiveEffectKeys(actor) {
     return actor
-      ? actor.effects
-          .filter((effect) => !effect.isSuppressed && !effect.disabled)
+      ? actor.appliedEffects
           .flatMap((effect) => effect.changes)
           .sort((a, b) => a.priority - b.priority)
       : [];
