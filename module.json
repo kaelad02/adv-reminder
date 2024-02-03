@@ -5,11 +5,22 @@
   "authors": [{ "name": "kaelad", "discord": "kaelad#1693" }],
   "version": "0.1",
   "compatibility": {
-    "minimum": "10",
+    "minimum": "11",
     "verified": "11"
   },
   "relationships": {
-    "systems": [{ "id": "dnd5e" }, { "id": "sw5e" }]
+    "systems": [
+      {
+        "id": "dnd5e",
+        "compatibility": {
+          "minimum": "3.0.0",
+          "verified": "3.0.0"
+        }
+      },
+      {
+        "id": "sw5e"
+      }
+    ]
   },
   "esmodules": ["src/module.js", "src/settings.js"],
   "styles": ["css/adv-reminder.css"],
