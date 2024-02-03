@@ -1,3 +1,8 @@
+# 3.3.0
+
+- bug fix: 3.0.0 compatibility for Messages and Souces from effects on items
+- feature: now requires dnd5e 3.0.0 and thus, Foundry 11
+
 # 3.2.1
 
 - bug fix: tweak how messages are added to the dialog to remove a conflict with another module that also changes that dialog
