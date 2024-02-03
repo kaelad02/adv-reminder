@@ -2,6 +2,7 @@
 
 - bug fix: 3.0.0 compatibility for Messages and Souces from effects on items
 - bug fix: 3.0.0 compatibility with new stealthDisadvantage property
+- bug fix: use `name` instead of `label` on effect to remove deprecation warning
 - feature: now requires dnd5e 3.0.0 and thus, Foundry 11
 
 # 3.2.1
