@@ -669,7 +669,7 @@ describe("SkillReminder no legit active effects", () => {
         type: "spell",
         system: {
           equipped: true,
-          stealth: true,
+          properties: new Set(["stealthDisadvantage"]),
         },
       },
     ];
@@ -690,7 +690,7 @@ describe("SkillReminder no legit active effects", () => {
         type: "equipment",
         system: {
           equipped: false,
-          stealth: true,
+          properties: new Set(["stealthDisadvantage"]),
         },
       },
     ];
@@ -891,7 +891,7 @@ describe("SkillReminder disadvantage flags", () => {
         type: "equipment",
         system: {
           equipped: true,
-          stealth: true,
+          properties: new Set(["stealthDisadvantage"]),
         },
       },
     ];
@@ -912,7 +912,7 @@ describe("SkillReminder disadvantage flags", () => {
         type: "equipment",
         system: {
           equipped: true,
-          stealth: true,
+          properties: new Set(["stealthDisadvantage"]),
         },
       },
     ];
