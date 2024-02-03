@@ -213,7 +213,7 @@ export class SkillReminder extends AbilityCheckReminder {
   _armorStealthDisadvantage() {
     if (this.skillId === "ste") {
       const item = this.items.find(
-        (item) => item.type === "equipment" && item.system?.equipped && item.system?.stealth
+        (item) => item.type === "equipment" && item.system.equipped && item.system.properties.has("stealthDisadvantage")
       );
       debug("equiped item that imposes stealth disadvantage", item?.name);
       return item?.name;
