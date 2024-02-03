@@ -13,8 +13,7 @@ const SourceMixin = (superclass) =>
     _getFlags(actor) {
       if (!actor) return {};
 
-      const asArray = actor.effects
-        .filter((effect) => !effect.isSuppressed && !effect.disabled)
+      const asArray = actor.appliedEffects
         .flatMap((effect) =>
           // make an object with the effect's label and change's key
           effect.changes.map((change) => ({
