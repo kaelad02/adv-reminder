@@ -13,12 +13,11 @@ const SourceMixin = (superclass) =>
     _getFlags(actor) {
       if (!actor) return {};
 
-      const asArray = actor.effects
-        .filter((effect) => !effect.isSuppressed && !effect.disabled)
+      const asArray = actor.appliedEffects
         .flatMap((effect) =>
           // make an object with the effect's label and change's key
           effect.changes.map((change) => ({
-            label: effect.label,
+            name: effect.name,
             key: change.key,
           }))
         )
@@ -26,7 +25,7 @@ const SourceMixin = (superclass) =>
       asArray.forEach((change) => (change.key = change.key.substring(15)));
       return asArray.reduce((accum, curr) => {
         if (!accum[curr.key]) accum[curr.key] = [];
-        accum[curr.key].push(curr.label);
+        accum[curr.key].push(curr.name);
         return accum;
       }, {});
     }

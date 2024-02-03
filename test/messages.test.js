@@ -23,7 +23,7 @@ globalThis.setProperty = (object, key, value) => {
 };
 
 function createActorWithEffects(...keyValuePairs) {
-  const effects = keyValuePairs.map(createEffect);
+  const appliedEffects = keyValuePairs.map(createEffect);
   return {
     system: {
       skills: {
@@ -83,14 +83,13 @@ function createActorWithEffects(...keyValuePairs) {
         },
       },
     },
-    effects,
+    appliedEffects,
     getRollData: () => ({}),
   };
 }
 
 function createEffect([key, value]) {
   return {
-    isSuppressed: false,
     changes: [
       {
         key,
@@ -98,8 +97,7 @@ function createEffect([key, value]) {
         mode: 0,
         priority: "0",
       },
-    ],
-    disabled: false,
+    ]
   };
 }
 
@@ -115,28 +113,6 @@ function createItem(actionType, abilityMod) {
 describe("AttackMessage no legit active effects", () => {
   test("attack with no active effects should not add a message", () => {
     const actor = createActorWithEffects();
-    const item = createItem("mwak", "str");
-    const options = {};
-
-    new AttackMessage(actor, undefined, item).addMessage(options);
-
-    expect(options.dialogOptions).toBeUndefined();
-  });
-
-  test("attack with a suppressed active effect should not add a message", () => {
-    const actor = createActorWithEffects(["flags.adv-reminder.message.all", "some message"]);
-    actor.effects[0].isSuppressed = true;
-    const item = createItem("mwak", "str");
-    const options = {};
-
-    new AttackMessage(actor, undefined, item).addMessage(options);
-
-    expect(options.dialogOptions).toBeUndefined();
-  });
-
-  test("attack with a disabled active effect should not add a message", () => {
-    const actor = createActorWithEffects(["flags.adv-reminder.message.all", "some message"]);
-    actor.effects[0].disabled = true;
     const item = createItem("mwak", "str");
     const options = {};
 
@@ -343,26 +319,6 @@ describe("AbilityCheckMessage no legit active effects", () => {
 
     expect(options.dialogOptions).toBeUndefined();
   });
-
-  test("ability check with a suppressed active effect should not add a message", () => {
-    const actor = createActorWithEffects(["flags.adv-reminder.message.all", "some message"]);
-    actor.effects[0].isSuppressed = true;
-    const options = {};
-
-    new AbilityCheckMessage(actor, "int").addMessage(options);
-
-    expect(options.dialogOptions).toBeUndefined();
-  });
-
-  test("ability check with a disabled active effect should not add a message", () => {
-    const actor = createActorWithEffects(["flags.adv-reminder.message.all", "some message"]);
-    actor.effects[0].disabled = true;
-    const options = {};
-
-    new AbilityCheckMessage(actor, "int").addMessage(options);
-
-    expect(options.dialogOptions).toBeUndefined();
-  });
 });
 
 describe("AbilityCheckMessage message flags", () => {
@@ -451,26 +407,6 @@ describe("AbilitySaveMessage no legit active effects", () => {
 
     expect(options.dialogOptions).toBeUndefined();
   });
-
-  test("saving throw with a suppressed active effect should not add a message", () => {
-    const actor = createActorWithEffects(["flags.adv-reminder.message.all", "some message"]);
-    actor.effects[0].isSuppressed = true;
-    const options = {};
-
-    new AbilitySaveMessage(actor, "int").addMessage(options);
-
-    expect(options.dialogOptions).toBeUndefined();
-  });
-
-  test("saving throw with a disabled active effect should not add a message", () => {
-    const actor = createActorWithEffects(["flags.adv-reminder.message.all", "some message"]);
-    actor.effects[0].disabled = true;
-    const options = {};
-
-    new AbilitySaveMessage(actor, "int").addMessage(options);
-
-    expect(options.dialogOptions).toBeUndefined();
-  });
 });
 
 describe("AbilitySaveMessage message flags", () => {
@@ -553,26 +489,6 @@ describe("AbilitySaveMessage message flags", () => {
 describe("SkillMessage no legit active effects", () => {
   test("skill check with no active effects should not add a message", () => {
     const actor = createActorWithEffects();
-    const options = {};
-
-    new SkillMessage(actor, "ath").addMessage(options);
-
-    expect(options.dialogOptions).toBeUndefined();
-  });
-
-  test("skill check with a suppressed active effect should not add a message", () => {
-    const actor = createActorWithEffects(["flags.adv-reminder.message.all", "some message"]);
-    actor.effects[0].isSuppressed = true;
-    const options = {};
-
-    new SkillMessage(actor, "ath").addMessage(options);
-
-    expect(options.dialogOptions).toBeUndefined();
-  });
-
-  test("skill check with a disabled active effect should not add a message", () => {
-    const actor = createActorWithEffects(["flags.adv-reminder.message.all", "some message"]);
-    actor.effects[0].disabled = true;
     const options = {};
 
     new SkillMessage(actor, "ath").addMessage(options);
@@ -707,26 +623,6 @@ describe("DeathSaveMessage no legit active effects", () => {
 
     expect(options.dialogOptions).toBeUndefined();
   });
-
-  test("death save with a suppressed active effect should not add a message", () => {
-    const actor = createActorWithEffects(["flags.adv-reminder.message.all", "some message"]);
-    actor.effects[0].isSuppressed = true;
-    const options = {};
-
-    new DeathSaveMessage(actor).addMessage(options);
-
-    expect(options.dialogOptions).toBeUndefined();
-  });
-
-  test("death save with a disabled active effect should not add a message", () => {
-    const actor = createActorWithEffects(["flags.adv-reminder.message.all", "some message"]);
-    actor.effects[0].disabled = true;
-    const options = {};
-
-    new DeathSaveMessage(actor).addMessage(options);
-
-    expect(options.dialogOptions).toBeUndefined();
-  });
 });
 
 describe("DeathSaveMessage message flags", () => {
@@ -797,28 +693,6 @@ describe("DeathSaveMessage message flags", () => {
 describe("DamageMessage no legit active effects", () => {
   test("damage with no active effects should not add a message", () => {
     const actor = createActorWithEffects();
-    const item = createItem("mwak", "str");
-    const options = {};
-
-    new DamageMessage(actor, undefined, item).addMessage(options);
-
-    expect(options.dialogOptions).toBeUndefined();
-  });
-
-  test("damage with a suppressed active effect should not add a message", () => {
-    const actor = createActorWithEffects(["flags.adv-reminder.message.all", "some message"]);
-    actor.effects[0].isSuppressed = true;
-    const item = createItem("mwak", "str");
-    const options = {};
-
-    new DamageMessage(actor, undefined, item).addMessage(options);
-
-    expect(options.dialogOptions).toBeUndefined();
-  });
-
-  test("damage with a disabled active effect should not add a message", () => {
-    const actor = createActorWithEffects(["flags.adv-reminder.message.all", "some message"]);
-    actor.effects[0].disabled = true;
     const item = createItem("mwak", "str");
     const options = {};
 
