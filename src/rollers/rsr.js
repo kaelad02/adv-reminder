@@ -32,10 +32,13 @@ import CoreRollerHooks from "./core.js";
  */
 export default class ReadySetRollHooks extends CoreRollerHooks {
   init() {
-    super.init();
+    // delay registering these dnd5e hooks so they run after RSR's hooks
+    Hooks.once("setup", () => {
+      super.init();
 
-    // register another hook for CriticalReminder
-    Hooks.on("dnd5e.useItem", this.useItem.bind(this));
+      // register another hook for CriticalReminder
+      Hooks.on("dnd5e.useItem", this.useItem.bind(this));  
+    });
   }
 
   preRollAttack(item, config) {
