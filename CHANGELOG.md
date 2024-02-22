@@ -1,3 +1,8 @@
+# 3.3.1
+
+- bug fix: [#56](https://github.com/kaelad02/adv-reminder/issues/56) Fully support messages on damage rolls other than attacks
+- bug fix: [#58](https://github.com/kaelad02/adv-reminder/issues/58) Fixed integration with Ready Set Roll after the 3.0-compatibility release
+
 # 3.3.0
 
 - bug fix: 3.0.0 compatibility for Messages and Souces from effects on items

@@ -55,10 +55,11 @@ Hooks.once("DAE.setupComplete", () => {
 
   const actionTypes =
     game.system.id === "sw5e" ? ["mwak", "rwak", "mpak", "rpak"] : ["mwak", "rwak", "msak", "rsak"];
-  actionTypes.forEach((actionType) => {
-    fields.push(`flags.adv-reminder.message.attack.${actionType}`);
-    fields.push(`flags.adv-reminder.message.damage.${actionType}`);
-  });
+  actionTypes.forEach((actionType) => fields.push(`flags.adv-reminder.message.attack.${actionType}`));
+
+  Object.keys(CONFIG.DND5E.itemActionTypes).forEach((actionType) =>
+    fields.push(`flags.adv-reminder.message.damage.${actionType}`)
+  );
 
   Object.keys(CONFIG.DND5E.abilities).forEach((abilityId) => {
     fields.push(`flags.adv-reminder.message.attack.${abilityId}`);
