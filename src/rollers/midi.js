@@ -63,13 +63,14 @@ export default class MidiRollerHooks extends CoreRollerHooks {
     if (showSources) new SkillSource(actor, skillId, true).updateOptions(config);
   }
 
-  preRollToolCheck(item, config) {
+  preRollToolCheck(actor, config, toolId) {
     debug("preRollToolCheck hook called");
 
     if (this.isFastForwarding(config)) return;
 
-    new AbilityCheckMessage(item.actor, item.system.ability).addMessage(config);
-    if (showSources) new AbilityCheckSource(item.actor, item.system.ability).updateOptions(config);
+    const ability = config.data.defaultAbility;
+    new AbilityCheckMessage(actor, ability).addMessage(config);
+    if (showSources) new AbilityCheckSource(actor, ability).updateOptions(config);
   }
 
   preRollDeathSave(actor, config) {

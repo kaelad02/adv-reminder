@@ -1,3 +1,7 @@
+# 3.3.2
+
+- bug fix: [#60](https://github.com/kaelad02/adv-reminder/issues/60) Fix tool checks to show advantage and messages again after the check was moved from the item to the actor
+
 # 3.3.1
 
 - bug fix: [#56](https://github.com/kaelad02/adv-reminder/issues/56) Fully support messages on damage rolls other than attacks
