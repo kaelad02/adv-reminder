@@ -83,13 +83,14 @@ export default class ReadySetRollHooks extends CoreRollerHooks {
   preRollSkill(actor, config, skillId) {
     debug("preRollSkill hook called");
 
+    const ability = config.data.defaultAbility;
     if (this._doMessages(config)) {
-      new SkillMessage(actor, skillId).addMessage(config);
-      if (showSources) new SkillSource(actor, skillId, true).updateOptions(config);
+      new SkillMessage(actor, ability, skillId).addMessage(config);
+      if (showSources) new SkillSource(actor, ability, skillId, true).updateOptions(config);
     }
 
     if (this._doReminder(config))
-      new SkillReminder(actor, skillId, this.checkArmorStealth).updateOptions(config);
+      new SkillReminder(actor, ability, skillId, this.checkArmorStealth).updateOptions(config);
   }
 
   preRollToolCheck(actor, config, toolId) {

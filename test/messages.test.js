@@ -25,64 +25,6 @@ globalThis.setProperty = (object, key, value) => {
 function createActorWithEffects(...keyValuePairs) {
   const appliedEffects = keyValuePairs.map(createEffect);
   return {
-    system: {
-      skills: {
-        acr: {
-          ability: "dex",
-        },
-        ani: {
-          ability: "wis",
-        },
-        arc: {
-          ability: "int",
-        },
-        ath: {
-          ability: "str",
-        },
-        dec: {
-          ability: "cha",
-        },
-        his: {
-          ability: "int",
-        },
-        ins: {
-          ability: "wis",
-        },
-        itm: {
-          ability: "cha",
-        },
-        inv: {
-          ability: "int",
-        },
-        med: {
-          ability: "wis",
-        },
-        nat: {
-          ability: "int",
-        },
-        prc: {
-          ability: "wis",
-        },
-        prf: {
-          ability: "cha",
-        },
-        per: {
-          ability: "cha",
-        },
-        rel: {
-          ability: "int",
-        },
-        slt: {
-          ability: "dex",
-        },
-        ste: {
-          ability: "dex",
-        },
-        sur: {
-          ability: "wis",
-        },
-      },
-    },
     appliedEffects,
     getRollData: () => ({}),
   };
@@ -491,7 +433,7 @@ describe("SkillMessage no legit active effects", () => {
     const actor = createActorWithEffects();
     const options = {};
 
-    new SkillMessage(actor, "ath").addMessage(options);
+    new SkillMessage(actor, "str", "ath").addMessage(options);
 
     expect(options.dialogOptions).toBeUndefined();
   });
@@ -502,7 +444,7 @@ describe("SkillMessage message flags", () => {
     const actor = createActorWithEffects(["flags.adv-reminder.message.all", "message.all message"]);
     const options = {};
 
-    new SkillMessage(actor, "prc").addMessage(options);
+    new SkillMessage(actor, "wis", "prc").addMessage(options);
 
     expect(options.dialogOptions["adv-reminder"].messages).toStrictEqual(["message.all message"]);
   });
@@ -514,7 +456,7 @@ describe("SkillMessage message flags", () => {
     ]);
     const options = {};
 
-    new SkillMessage(actor, "prc").addMessage(options);
+    new SkillMessage(actor, "wis", "prc").addMessage(options);
 
     expect(options.dialogOptions["adv-reminder"].messages).toStrictEqual([
       "message.ability.all message",
@@ -528,7 +470,7 @@ describe("SkillMessage message flags", () => {
     ]);
     const options = {};
 
-    new SkillMessage(actor, "prc").addMessage(options);
+    new SkillMessage(actor, "wis", "prc").addMessage(options);
 
     expect(options.dialogOptions["adv-reminder"].messages).toStrictEqual([
       "message.ability.check.all message",
@@ -542,7 +484,7 @@ describe("SkillMessage message flags", () => {
     ]);
     const options = {};
 
-    new SkillMessage(actor, "prc").addMessage(options);
+    new SkillMessage(actor, "wis", "prc").addMessage(options);
 
     expect(options.dialogOptions["adv-reminder"].messages).toStrictEqual([
       "message.ability.check.int message",
@@ -556,7 +498,7 @@ describe("SkillMessage message flags", () => {
     ]);
     const options = {};
 
-    new SkillMessage(actor, "acr").addMessage(options);
+    new SkillMessage(actor, "dex", "acr").addMessage(options);
 
     expect(options.dialogOptions).toBeUndefined();
   });
@@ -568,7 +510,7 @@ describe("SkillMessage message flags", () => {
     ]);
     const options = {};
 
-    new SkillMessage(actor, "prc").addMessage(options);
+    new SkillMessage(actor, "wis", "prc").addMessage(options);
 
     expect(options.dialogOptions["adv-reminder"].messages).toStrictEqual([
       "message.skill.all message",
@@ -582,7 +524,7 @@ describe("SkillMessage message flags", () => {
     ]);
     const options = {};
 
-    new SkillMessage(actor, "prc").addMessage(options);
+    new SkillMessage(actor, "wis", "prc").addMessage(options);
 
     expect(options.dialogOptions["adv-reminder"].messages).toStrictEqual([
       "message.skill.prc message",
@@ -596,7 +538,7 @@ describe("SkillMessage message flags", () => {
     ]);
     const options = {};
 
-    new SkillMessage(actor, "nat").addMessage(options);
+    new SkillMessage(actor, "int", "nat").addMessage(options);
 
     expect(options.dialogOptions).toBeUndefined();
   });
@@ -608,7 +550,7 @@ describe("SkillMessage message flags", () => {
     );
     const options = {};
 
-    new SkillMessage(actor, "ste").addMessage(options);
+    new SkillMessage(actor, "dex", "ste").addMessage(options);
 
     expect(options.dialogOptions["adv-reminder"].messages).toStrictEqual(["first", "second"]);
   });

@@ -59,8 +59,9 @@ export default class MidiRollerHooks extends CoreRollerHooks {
 
     if (this.isFastForwarding(config)) return;
 
-    new SkillMessage(actor, skillId).addMessage(config);
-    if (showSources) new SkillSource(actor, skillId, true).updateOptions(config);
+    const ability = config.data.defaultAbility;
+    new SkillMessage(actor, ability, skillId).addMessage(config);
+    if (showSources) new SkillSource(actor, ability, skillId, true).updateOptions(config);
   }
 
   preRollToolCheck(actor, config, toolId) {

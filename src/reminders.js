@@ -164,8 +164,8 @@ export class AbilitySaveReminder extends AbilityBaseReminder {
 }
 
 export class SkillReminder extends AbilityCheckReminder {
-  constructor(actor, skillId, checkArmorStealth = true) {
-    super(actor, actor.system.skills[skillId].ability);
+  constructor(actor, abilityId, skillId, checkArmorStealth = true) {
+    super(actor, abilityId);
 
     /** @type {string} */
     this.skillId = skillId;

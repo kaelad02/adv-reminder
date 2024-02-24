@@ -115,8 +115,8 @@ export class AbilitySaveMessage extends AbilityBaseMessage {
 }
 
 export class SkillMessage extends AbilityCheckMessage {
-  constructor(actor, skillId) {
-    super(actor, actor.system.skills[skillId].ability);
+  constructor(actor, abilityId, skillId) {
+    super(actor, abilityId);
 
     /** @type {string} */
     this.skillId = skillId;

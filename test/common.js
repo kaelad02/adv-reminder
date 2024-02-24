@@ -3,64 +3,6 @@ export default function commonTestInit() {
 
   globalThis.createActorWithFlags = (...keys) => {
     const actor = {
-      system: {
-        skills: {
-          acr: {
-            ability: "dex",
-          },
-          ani: {
-            ability: "wis",
-          },
-          arc: {
-            ability: "int",
-          },
-          ath: {
-            ability: "str",
-          },
-          dec: {
-            ability: "cha",
-          },
-          his: {
-            ability: "int",
-          },
-          ins: {
-            ability: "wis",
-          },
-          itm: {
-            ability: "cha",
-          },
-          inv: {
-            ability: "int",
-          },
-          med: {
-            ability: "wis",
-          },
-          nat: {
-            ability: "int",
-          },
-          prc: {
-            ability: "wis",
-          },
-          prf: {
-            ability: "cha",
-          },
-          per: {
-            ability: "cha",
-          },
-          rel: {
-            ability: "int",
-          },
-          slt: {
-            ability: "dex",
-          },
-          ste: {
-            ability: "dex",
-          },
-          sur: {
-            ability: "wis",
-          },
-        },
-      },
       flags: {},
     };
     keys.forEach((k) => setProperty(actor, k, true));
