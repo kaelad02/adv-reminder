@@ -1,6 +1,7 @@
 # 3.3.2
 
 - bug fix: [#60](https://github.com/kaelad02/adv-reminder/issues/60) Fix tool checks to show advantage and messages again after the check was moved from the item to the actor
+- bug fix: Honor the ability you can pass into the `rollSkill` function, overriding the normal ability used for a skill. Examples would be a macro or using the new enricher to make a Strength (Intimidation) check.
 
 # 3.3.1
 
