@@ -654,7 +654,7 @@ describe("SkillReminder no legit active effects", () => {
     const actor = createActorWithFlags();
     const options = {};
 
-    const reminder = new SkillReminder(actor, "prc");
+    const reminder = new SkillReminder(actor, "wis", "prc");
     reminder.updateOptions(options);
 
     expect(options.advantage).toBeUndefined();
@@ -675,7 +675,7 @@ describe("SkillReminder no legit active effects", () => {
     ];
     const options = {};
 
-    const reminder = new SkillReminder(actor, "ste");
+    const reminder = new SkillReminder(actor, "dex", "ste");
     reminder.updateOptions(options);
 
     expect(options.advantage).toBeUndefined();
@@ -696,7 +696,7 @@ describe("SkillReminder no legit active effects", () => {
     ];
     const options = {};
 
-    const reminder = new SkillReminder(actor, "ste");
+    const reminder = new SkillReminder(actor, "dex", "ste");
     reminder.updateOptions(options);
 
     expect(options.advantage).toBeUndefined();
@@ -709,7 +709,7 @@ describe("SkillReminder advantage flags", () => {
     const actor = createActorWithFlags("flags.midi-qol.advantage.all");
     const options = {};
 
-    const reminder = new SkillReminder(actor, "prc");
+    const reminder = new SkillReminder(actor, "wis", "prc");
     reminder.updateOptions(options);
 
     expect(options.advantage).toBe(true);
@@ -720,7 +720,7 @@ describe("SkillReminder advantage flags", () => {
     const actor = createActorWithFlags("flags.midi-qol.advantage.ability.all");
     const options = {};
 
-    const reminder = new SkillReminder(actor, "prc");
+    const reminder = new SkillReminder(actor, "wis", "prc");
     reminder.updateOptions(options);
 
     expect(options.advantage).toBe(true);
@@ -731,7 +731,7 @@ describe("SkillReminder advantage flags", () => {
     const actor = createActorWithFlags("flags.midi-qol.advantage.ability.check.all");
     const options = {};
 
-    const reminder = new SkillReminder(actor, "prc");
+    const reminder = new SkillReminder(actor, "wis", "prc");
     reminder.updateOptions(options);
 
     expect(options.advantage).toBe(true);
@@ -742,7 +742,7 @@ describe("SkillReminder advantage flags", () => {
     const actor = createActorWithFlags("flags.midi-qol.advantage.ability.check.wis");
     const options = {};
 
-    const reminder = new SkillReminder(actor, "prc");
+    const reminder = new SkillReminder(actor, "wis", "prc");
     reminder.updateOptions(options);
 
     expect(options.advantage).toBe(true);
@@ -753,7 +753,7 @@ describe("SkillReminder advantage flags", () => {
     const actor = createActorWithFlags("flags.midi-qol.advantage.ability.check.wis");
     const options = {};
 
-    const reminder = new SkillReminder(actor, "arc");
+    const reminder = new SkillReminder(actor, "int", "arc");
     reminder.updateOptions(options);
 
     expect(options.advantage).toBeUndefined();
@@ -764,7 +764,7 @@ describe("SkillReminder advantage flags", () => {
     const actor = createActorWithFlags("flags.midi-qol.advantage.skill.all");
     const options = {};
 
-    const reminder = new SkillReminder(actor, "prc");
+    const reminder = new SkillReminder(actor, "wis", "prc");
     reminder.updateOptions(options);
 
     expect(options.advantage).toBe(true);
@@ -775,7 +775,7 @@ describe("SkillReminder advantage flags", () => {
     const actor = createActorWithFlags("flags.midi-qol.advantage.skill.prc");
     const options = {};
 
-    const reminder = new SkillReminder(actor, "prc");
+    const reminder = new SkillReminder(actor, "wis", "prc");
     reminder.updateOptions(options);
 
     expect(options.advantage).toBe(true);
@@ -786,7 +786,7 @@ describe("SkillReminder advantage flags", () => {
     const actor = createActorWithFlags("flags.midi-qol.advantage.skill.prc");
     const options = {};
 
-    const reminder = new SkillReminder(actor, "arc");
+    const reminder = new SkillReminder(actor, "int", "arc");
     reminder.updateOptions(options);
 
     expect(options.advantage).toBeUndefined();
@@ -799,7 +799,7 @@ describe("SkillReminder disadvantage flags", () => {
     const actor = createActorWithFlags("flags.midi-qol.disadvantage.all");
     const options = {};
 
-    const reminder = new SkillReminder(actor, "prc");
+    const reminder = new SkillReminder(actor, "wis", "prc");
     reminder.updateOptions(options);
 
     expect(options.advantage).toBeUndefined();
@@ -810,7 +810,7 @@ describe("SkillReminder disadvantage flags", () => {
     const actor = createActorWithFlags("flags.midi-qol.disadvantage.ability.all");
     const options = {};
 
-    const reminder = new SkillReminder(actor, "prc");
+    const reminder = new SkillReminder(actor, "wis", "prc");
     reminder.updateOptions(options);
 
     expect(options.advantage).toBeUndefined();
@@ -821,7 +821,7 @@ describe("SkillReminder disadvantage flags", () => {
     const actor = createActorWithFlags("flags.midi-qol.disadvantage.ability.check.all");
     const options = {};
 
-    const reminder = new SkillReminder(actor, "prc");
+    const reminder = new SkillReminder(actor, "wis", "prc");
     reminder.updateOptions(options);
 
     expect(options.advantage).toBeUndefined();
@@ -832,7 +832,7 @@ describe("SkillReminder disadvantage flags", () => {
     const actor = createActorWithFlags("flags.midi-qol.disadvantage.ability.check.wis");
     const options = {};
 
-    const reminder = new SkillReminder(actor, "prc");
+    const reminder = new SkillReminder(actor, "wis", "prc");
     reminder.updateOptions(options);
 
     expect(options.advantage).toBeUndefined();
@@ -843,7 +843,7 @@ describe("SkillReminder disadvantage flags", () => {
     const actor = createActorWithFlags("flags.midi-qol.disadvantage.ability.check.wis");
     const options = {};
 
-    const reminder = new SkillReminder(actor, "arc");
+    const reminder = new SkillReminder(actor, "int", "arc");
     reminder.updateOptions(options);
 
     expect(options.advantage).toBeUndefined();
@@ -854,7 +854,7 @@ describe("SkillReminder disadvantage flags", () => {
     const actor = createActorWithFlags("flags.midi-qol.disadvantage.skill.all");
     const options = {};
 
-    const reminder = new SkillReminder(actor, "prc");
+    const reminder = new SkillReminder(actor, "wis", "prc");
     reminder.updateOptions(options);
 
     expect(options.advantage).toBeUndefined();
@@ -865,7 +865,7 @@ describe("SkillReminder disadvantage flags", () => {
     const actor = createActorWithFlags("flags.midi-qol.disadvantage.skill.prc");
     const options = {};
 
-    const reminder = new SkillReminder(actor, "prc");
+    const reminder = new SkillReminder(actor, "wis", "prc");
     reminder.updateOptions(options);
 
     expect(options.advantage).toBeUndefined();
@@ -876,7 +876,7 @@ describe("SkillReminder disadvantage flags", () => {
     const actor = createActorWithFlags("flags.midi-qol.disadvantage.skill.prc");
     const options = {};
 
-    const reminder = new SkillReminder(actor, "arc");
+    const reminder = new SkillReminder(actor, "int", "arc");
     reminder.updateOptions(options);
 
     expect(options.advantage).toBeUndefined();
@@ -897,7 +897,7 @@ describe("SkillReminder disadvantage flags", () => {
     ];
     const options = {};
 
-    const reminder = new SkillReminder(actor, "ste");
+    const reminder = new SkillReminder(actor, "dex", "ste");
     reminder.updateOptions(options);
 
     expect(options.advantage).toBeUndefined();
@@ -918,7 +918,7 @@ describe("SkillReminder disadvantage flags", () => {
     ];
     const options = {};
 
-    const reminder = new SkillReminder(actor, "ste", false);
+    const reminder = new SkillReminder(actor, "dex", "ste", false);
     reminder.updateOptions(options);
 
     expect(options.advantage).toBeUndefined();
@@ -934,7 +934,7 @@ describe("SkillReminder both advantage and disadvantage flags", () => {
     );
     const options = {};
 
-    const reminder = new SkillReminder(actor, "prc");
+    const reminder = new SkillReminder(actor, "wis", "prc");
     reminder.updateOptions(options);
 
     expect(options.advantage).toBeUndefined();
@@ -948,7 +948,7 @@ describe("SkillReminder both advantage and disadvantage flags", () => {
     );
     const options = {};
 
-    const reminder = new SkillReminder(actor, "prc");
+    const reminder = new SkillReminder(actor, "wis", "prc");
     reminder.updateOptions(options);
 
     expect(options.advantage).toBeUndefined();
@@ -962,7 +962,7 @@ describe("SkillReminder both advantage and disadvantage flags", () => {
     );
     const options = {};
 
-    const reminder = new SkillReminder(actor, "prc");
+    const reminder = new SkillReminder(actor, "wis", "prc");
     reminder.updateOptions(options);
 
     expect(options.advantage).toBe(true);

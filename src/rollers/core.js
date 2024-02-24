@@ -101,19 +101,21 @@ export default class CoreRollerHooks {
 
     if (this.isFastForwarding(config)) return;
 
-    new SkillMessage(actor, skillId).addMessage(config);
-    if (showSources) new SkillSource(actor, skillId, true).updateOptions(config);
-    new SkillReminder(actor, skillId, this.checkArmorStealth).updateOptions(config);
+    const ability = config.data.defaultAbility;
+    new SkillMessage(actor, ability, skillId).addMessage(config);
+    if (showSources) new SkillSource(actor, ability, skillId, true).updateOptions(config);
+    new SkillReminder(actor, ability, skillId, this.checkArmorStealth).updateOptions(config);
   }
 
-  preRollToolCheck(item, config) {
+  preRollToolCheck(actor, config, toolId) {
     debug("preRollToolCheck hook called");
 
     if (this.isFastForwarding(config)) return;
 
-    new AbilityCheckMessage(item.actor, item.system.ability).addMessage(config);
-    if (showSources) new AbilityCheckSource(item.actor, item.system.ability).updateOptions(config);
-    new AbilityCheckReminder(item.actor, item.system.ability).updateOptions(config);
+    const ability = config.data.defaultAbility;
+    new AbilityCheckMessage(actor, ability).addMessage(config);
+    if (showSources) new AbilityCheckSource(actor, ability).updateOptions(config);
+    new AbilityCheckReminder(actor, ability).updateOptions(config);
   }
 
   preRollDeathSave(actor, config) {
