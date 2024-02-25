@@ -40,10 +40,11 @@ function applyMidiCustom(actor, change) {
 }
 
 Hooks.once("setup", () => {
-  // TODO guard with a setting
-  updateStatusEffects();
-  Hooks.on("preCreateActiveEffect", addExhaustionEffects);
-  Hooks.on("preUpdateActiveEffect", addExhaustionEffects);
+  if (game.settings.get("adv-reminder", "updateStatusEffects")) {
+    updateStatusEffects();
+    Hooks.on("preCreateActiveEffect", addExhaustionEffects);
+    Hooks.on("preUpdateActiveEffect", addExhaustionEffects);
+  }
 });
 
 function updateStatusEffects() {
@@ -353,8 +354,7 @@ Hooks.once("DAE.setupComplete", () => {
   fields.push("flags.adv-reminder.message.deathSave");
   fields.push("flags.adv-reminder.message.damage.all");
 
-  const actionTypes =
-    game.system.id === "sw5e" ? ["mwak", "rwak", "mpak", "rpak"] : ["mwak", "rwak", "msak", "rsak"];
+  const actionTypes = game.system.id === "sw5e" ? ["mwak", "rwak", "mpak", "rpak"] : ["mwak", "rwak", "msak", "rsak"];
   actionTypes.forEach((actionType) => fields.push(`flags.adv-reminder.message.attack.${actionType}`));
 
   Object.keys(CONFIG.DND5E.itemActionTypes).forEach((actionType) =>
@@ -367,9 +367,7 @@ Hooks.once("DAE.setupComplete", () => {
     fields.push(`flags.adv-reminder.message.ability.save.${abilityId}`);
   });
 
-  Object.keys(CONFIG.DND5E.skills).forEach((skillId) =>
-    fields.push(`flags.adv-reminder.message.skill.${skillId}`)
-  );
+  Object.keys(CONFIG.DND5E.skills).forEach((skillId) => fields.push(`flags.adv-reminder.message.skill.${skillId}`));
 
   window.DAE.addAutoFields(fields);
 });
@@ -432,10 +430,7 @@ async function prepareMessage(dialogOptions) {
 
   if (messages.length) {
     // build message
-    const message = await renderTemplate(
-      "modules/adv-reminder/templates/roll-dialog-messages.hbs",
-      { messages }
-    );
+    const message = await renderTemplate("modules/adv-reminder/templates/roll-dialog-messages.hbs", { messages });
     // enrich message, specifically replacing rolls
     const enriched = await TextEditor.enrichHTML(message, {
       secrets: true,

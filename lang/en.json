@@ -27,5 +27,9 @@
     "Dis": "Disadvantage from {sources}",
     "Crit": "Critical Hit from {sources}",
     "Norm": "Normal from {sources}"
+  },
+  "adv-reminder.UpdateStatusEffects": {
+    "Name": "Update Status Effects",
+    "Hint": "Update the status effects that the system adds to include the appropriate advantage/disadvantage flags. Not recommended if you are using another module to modify or replace them."
   }
 }
