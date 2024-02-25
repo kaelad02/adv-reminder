@@ -1,3 +1,7 @@
+# 3.4.0
+
+- feature: Update the system-defined status effects to include advantage/disadvantage flags. Controlled by a setting.
+
 # 3.3.2
 
 - bug fix: [#60](https://github.com/kaelad02/adv-reminder/issues/60) Fix tool checks to show advantage and messages again after the check was moved from the item to the actor
