@@ -42,6 +42,8 @@ function applyMidiCustom(actor, change) {
 Hooks.once("setup", () => {
   // TODO guard with a setting
   updateStatusEffects();
+  Hooks.on("preCreateActiveEffect", addExhaustionEffects);
+  Hooks.on("preUpdateActiveEffect", addExhaustionEffects);
 });
 
 function updateStatusEffects() {
@@ -300,6 +302,41 @@ function updateStatusEffects() {
     const effect = CONFIG.statusEffects.find((e) => e.id === id);
     if (effect) foundry.utils.mergeObject(effect, data);
   });
+}
+
+function addExhaustionEffects(effect, updates) {
+  debug("addExhaustionEffects", effect, updates);
+  if (effect.id !== dnd5e.documents.ActiveEffect5e.ID.EXHAUSTION) return;
+  const level = foundry.utils.getProperty(updates, "flags.dnd5e.exhaustionLevel");
+  if (!level) return;
+  // build the changes based on exhaustion level
+  const changes = [
+    {
+      key: "flags.midi-qol.disadvantage.ability.check.all",
+      mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+      value: "1",
+    },
+    {
+      key: "flags.dnd5e.initiativeDisadv",
+      mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+      value: "1",
+    },
+  ];
+  if (level >= 3)
+    changes.push(
+      {
+        key: "flags.midi-qol.disadvantage.attack.all",
+        mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+        value: "1",
+      },
+      {
+        key: "flags.midi-qol.disadvantage.ability.save.all",
+        mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+        value: "1",
+      }
+    );
+  // add changes to the active effect
+  effect.updateSource({ changes });
 }
 
 // Add message flags to DAE so it shows them in the AE editor
