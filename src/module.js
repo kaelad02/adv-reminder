@@ -39,6 +39,269 @@ function applyMidiCustom(actor, change) {
   }
 }
 
+Hooks.once("setup", () => {
+  // TODO guard with a setting
+  updateStatusEffects();
+});
+
+function updateStatusEffects() {
+  debug("updateStatusEffects");
+  const effectChanges = {
+    blinded: {
+      changes: [
+        {
+          key: "flags.midi-qol.disadvantage.attack.all",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "1",
+        },
+        {
+          key: "flags.midi-qol.grants.advantage.attack.all",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "1",
+        },
+      ],
+    },
+    dodging: {
+      flags: {
+        dae: {
+          specialDuration: ["turnStart"],
+        },
+      },
+      changes: [
+        {
+          key: "flags.midi-qol.grants.disadvantage.attack.all",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "1",
+        },
+        {
+          key: "flags.midi-qol.advantage.ability.save.dex",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "1",
+        },
+      ],
+    },
+    // TODO exhaustion
+    frightened: {
+      changes: [
+        {
+          key: "flags.midi-qol.disadvantage.attack.all",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "1",
+        },
+        {
+          key: "flags.midi-qol.disadvantage.ability.check.all",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "1",
+        },
+      ],
+    },
+    hidden: {
+      changes: [
+        {
+          key: "flags.midi-qol.advantage.attack.all",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "1",
+        },
+        {
+          key: "flags.midi-qol.grants.disadvantage.attack.all",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "1",
+        },
+      ],
+    },
+    invisible: {
+      changes: [
+        {
+          key: "flags.midi-qol.advantage.attack.all",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "1",
+        },
+        {
+          key: "flags.midi-qol.grants.disadvantage.attack.all",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "1",
+        },
+      ],
+    },
+    paralyzed: {
+      changes: [
+        {
+          key: "flags.midi-qol.fail.ability.save.dex",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "1",
+        },
+        {
+          key: "flags.midi-qol.fail.ability.save.str",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "1",
+        },
+        {
+          key: "flags.midi-qol.grants.advantage.attack.all",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "1",
+        },
+        {
+          key: "flags.midi-qol.grants.critical.range",
+          mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE,
+          value: "5",
+        },
+      ],
+    },
+    petrified: {
+      changes: [
+        {
+          key: "flags.midi-qol.grants.advantage.attack.all",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "1",
+        },
+        {
+          key: "flags.midi-qol.fail.ability.save.dex",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "1",
+        },
+        {
+          key: "flags.midi-qol.fail.ability.save.str",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "1",
+        },
+        /* {
+          key: "system.traits.di.value",
+          mode: CONST.ACTIVE_EFFECT_MODES.ADD,
+          value: "poison",
+        },
+        {
+          key: "system.traits.dr.all",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "physical",
+        },
+        {
+          key: "system.traits.dr.all",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "magical",
+        },
+        {
+          key: "system.attributes.movement.all",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "0",
+          priority: 25,
+        }, */
+      ],
+    },
+    poisoned: {
+      changes: [
+        {
+          key: "flags.midi-qol.disadvantage.attack.all",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "1",
+        },
+        {
+          key: "flags.midi-qol.disadvantage.ability.check.all",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "1",
+        },
+      ],
+    },
+    prone: {
+      changes: [
+        {
+          key: "flags.midi-qol.grants.advantage.attack.mwak",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "1",
+        },
+        {
+          key: "flags.midi-qol.grants.advantage.attack.msak",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "1",
+        },
+        {
+          key: "flags.midi-qol.grants.disadvantage.attack.rwak",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "1",
+        },
+        {
+          key: "flags.midi-qol.grants.disadvantage.attack.rsak",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "1",
+        },
+        {
+          key: "flags.midi-qol.disadvantage.attack.all",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "1",
+        },
+      ],
+    },
+    restrained: {
+      changes: [
+        {
+          key: "flags.midi-qol.disadvantage.ability.save.dex",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "1",
+        },
+        {
+          key: "flags.midi-qol.disadvantage.attack.all",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "1",
+        },
+        {
+          key: "flags.midi-qol.grants.advantage.attack.all",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "1",
+        },
+      ],
+    },
+    stunned: {
+      changes: [
+        {
+          key: "flags.midi-qol.fail.ability.save.dex",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "1",
+        },
+        {
+          key: "flags.midi-qol.fail.ability.save.str",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "1",
+        },
+        {
+          key: "flags.midi-qol.grants.advantage.attack.all",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "1",
+        },
+      ],
+    },
+    unconscious: {
+      changes: [
+        {
+          key: "flags.midi-qol.fail.ability.save.dex",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "1",
+        },
+        {
+          key: "flags.midi-qol.fail.ability.save.str",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "1",
+        },
+        {
+          key: "flags.midi-qol.grants.advantage.attack.all",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "1",
+        },
+        {
+          key: "flags.midi-qol.grants.critical.range",
+          mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE,
+          value: "5",
+        },
+        // TODO does prone already get applied?
+        //...this._prone.changes,
+      ],
+    },
+  };
+
+  Object.entries(effectChanges).forEach(([id, data]) => {
+    const effect = CONFIG.statusEffects.find((e) => e.id === id);
+    if (effect) foundry.utils.mergeObject(effect, data);
+  });
+}
+
 // Add message flags to DAE so it shows them in the AE editor
 Hooks.once("DAE.setupComplete", () => {
   debug("adding Advantage Reminder flags to DAE");
