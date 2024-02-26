@@ -49,6 +49,7 @@ Hooks.once("setup", () => {
 
 function updateStatusEffects() {
   debug("updateStatusEffects");
+
   const effectChanges = {
     blinded: {
       changes: [
@@ -83,7 +84,6 @@ function updateStatusEffects() {
         },
       ],
     },
-    // TODO exhaustion
     frightened: {
       changes: [
         {
@@ -167,27 +167,6 @@ function updateStatusEffects() {
           mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
           value: "1",
         },
-        /* {
-          key: "system.traits.di.value",
-          mode: CONST.ACTIVE_EFFECT_MODES.ADD,
-          value: "poison",
-        },
-        {
-          key: "system.traits.dr.all",
-          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
-          value: "physical",
-        },
-        {
-          key: "system.traits.dr.all",
-          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
-          value: "magical",
-        },
-        {
-          key: "system.attributes.movement.all",
-          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
-          value: "0",
-          priority: 25,
-        }, */
       ],
     },
     poisoned: {
@@ -293,8 +272,6 @@ function updateStatusEffects() {
           mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE,
           value: "5",
         },
-        // TODO does prone already get applied?
-        //...this._prone.changes,
       ],
     },
   };
@@ -306,7 +283,8 @@ function updateStatusEffects() {
 }
 
 function addExhaustionEffects(effect, updates) {
-  debug("addExhaustionEffects", effect, updates);
+  debug("addExhaustionEffects");
+
   if (effect.id !== dnd5e.documents.ActiveEffect5e.ID.EXHAUSTION) return;
   const level = foundry.utils.getProperty(updates, "flags.dnd5e.exhaustionLevel");
   if (!level) return;
