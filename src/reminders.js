@@ -1,4 +1,4 @@
-import { debug } from "./util.js";
+import { debug, isEmpty } from "./util.js";
 
 class BaseReminder {
   constructor(actor) {
@@ -61,7 +61,7 @@ export class AttackReminder extends BaseReminder {
     this._message();
 
     // quick return if there are no flags
-    if (this.actorFlags === {} && this.targetFlags === {}) return;
+    if (isEmpty(this.actorFlags) && isEmpty(this.targetFlags)) return;
 
     // build the active effect keys applicable for this roll
     const advKeys = [
@@ -113,7 +113,7 @@ class AbilityBaseReminder extends BaseReminder {
     this._message();
 
     // quick return if there are no flags
-    if (this.actorFlags === {}) return;
+    if (isEmpty(this.actorFlags)) return;
 
     // get the active effect keys applicable for this roll
     const advKeys = this.advantageKeys;
@@ -254,7 +254,7 @@ export class CriticalReminder extends BaseReminder {
     this._message();
 
     // quick return if there are no flags
-    if (this.actorFlags === {} && this.targetFlags === {}) return;
+    if (isEmpty(this.actorFlags) && isEmpty(this.targetFlags)) return;
 
     // build the active effect keys applicable for this roll
     const critKeys = ["critical.all", `critical.${this.actionType}`];

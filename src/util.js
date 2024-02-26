@@ -28,3 +28,12 @@ export function isMinVersion(name, version) {
 export function getTarget() {
   return [...game.user.targets][0]?.actor;
 }
+
+/**
+ * Test if an object is empty.
+ * @param {object} obj object to test
+ * @returns true if an object is empty, false otherwise
+ */
+export function isEmpty(obj) {
+  return !Object.keys(obj).length;
+}

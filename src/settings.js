@@ -54,6 +54,16 @@ Hooks.once("init", () => {
     default: true,
     onChange: (value) => (showSources = value),
   });
+
+  game.settings.register("adv-reminder", "updateStatusEffects", {
+    name: "adv-reminder.UpdateStatusEffects.Name",
+    hint: "adv-reminder.UpdateStatusEffects.Hint",
+    scope: "world",
+    config: true,
+    requiresReload: true,
+    type: Boolean,
+    default: false,
+  });
 });
 
 Hooks.once("ready", () => {
