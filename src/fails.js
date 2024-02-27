@@ -35,17 +35,19 @@ class BaseFail {
     const actorFlags = this._getFlags(this.actor);
     const shouldFail = failKeys.reduce((accum, curr) => actorFlags[curr] || accum, false);
     if (shouldFail) {
-      const messageData = this.createMessageData(options);
-      this.toMessage(messageData);
+      const messageData = foundry.utils.expandObject(options.messageData);
+      messageData.flavor = messageData.flavor || options.flavor;
+      const rollMode = options.rollMode || game.settings.get("core", "rollMode");
+      this.toMessage(messageData, rollMode);
     }
     return shouldFail;
   }
 
-  async toMessage(messageData) {
+  async toMessage(messageData, rollMode) {
     // content that immatates a die roll
     const content = await renderTemplate("modules/adv-reminder/templates/fail-dice-roll.hbs");
     // merge basic data with child's data
-    const chatData = foundry.utils.mergeObject(
+    messageData = foundry.utils.mergeObject(
       {
         user: game.user.id,
         type: CONST.CHAT_MESSAGE_TYPES.OTHER,
@@ -53,11 +55,11 @@ class BaseFail {
       },
       messageData
     );
-    // apply the roll mode to adjust message visibility
-    ChatMessage.applyRollMode(chatData, game.settings.get("core", "rollMode"));
-
-    // create the chat message
-    return ChatMessage.create(chatData);
+    // Create the message
+    const cls = getDocumentClass("ChatMessage");
+    const msg = new cls(messageData);
+    msg.applyRollMode(rollMode);
+    return cls.create(msg.toObject());
   }
 }
 
@@ -76,24 +78,5 @@ export class AbilitySaveFail extends BaseFail {
       `fail.ability.save.all`,
       `fail.ability.save.${this.abilityId}`,
     ]);
-  }
-
-  createMessageData(options = {}) {
-    // build title, probably used as chat message flavor
-    const label = CONFIG.DND5E.abilities[this.abilityId];
-    const title = `${game.i18n.format("DND5E.SavePromptTitle", {
-      ability: label,
-    })}: ${this.actor.name}`;
-
-    // build chat message data
-    const messageData = foundry.utils.mergeObject(options.messageData || {}, {
-      speaker: options.speaker || ChatMessage.getSpeaker({ actor: this.actor }),
-      "flags.dnd5e.roll": { type: "save", abilityId: this.abilityId },
-    });
-
-    // pull flavor from a few places before falling back to title
-    messageData.flavor = messageData.flavor || options.flavor || title;
-
-    return messageData;
   }
 }
