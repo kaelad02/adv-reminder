@@ -1,4 +1,5 @@
 import CoreRollerHooks from "./rollers/core.js";
+import FasterHooks from "./rollers/faster.js";
 import MidiRollerHooks from "./rollers/midi.js";
 import ReadySetRollHooks from "./rollers/rsr.js";
 import SamplePackBuilder from "./sample-pack.js";
@@ -13,6 +14,7 @@ Hooks.once("init", () => {
   let rollerHooks;
   if (game.modules.get("midi-qol")?.active) rollerHooks = new MidiRollerHooks();
   else if (game.modules.get("ready-set-roll-5e")?.active) rollerHooks = new ReadySetRollHooks();
+  else if (game.modules.get("faster-rolling-by-default-5e")?.active) rollerHooks = new FasterHooks();
   else rollerHooks = new CoreRollerHooks();
   rollerHooks.init();
 
