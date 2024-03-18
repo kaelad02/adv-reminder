@@ -1,0 +1,35 @@
+{
+  "adv-reminder.AutoFail": "Falha Automática",
+  "adv-reminder.ColorMenu": {
+    "Name": "Cores do Diálogo de Rolagem",
+    "Hint": "Mude as cores das menssagens e botões padrão nos diálogos de rolagem.",
+    "Label": "Configurar Cores",
+    "Test": "Mostrar Amostra de Rolagem"
+  },
+  "adv-reminder.DefaultButtonColor": {
+    "Name": "Cor Padrão do Botão",
+    "Hint": "Colore o texto e tinge o fundo dos botões e mensagens.",
+    "None": "Sem mudança de cor",
+    "Player": "Cor do jogador",
+    "Green": "Verde",
+    "Custom": "Cor personalizada"
+  },
+  "adv-reminder.CustomColor": {
+    "Name": "Cor Personalizada",
+    "Hint": "Cores escuras funcionam melhor do que cores claras."
+  },
+  "adv-reminder.ShowSources": {
+    "Name": "Mostrar fonte de Vant/Desv/Crít",
+    "Hint": "Se um efeito ativo determinar vant/desv/crít em uma rolagem, mostre seu nome como uma mensagem no diálogo."
+  },
+  "adv-reminder.Source": {
+    "Adv": "Vantagem de {sources}",
+    "Dis": "Desvantagem de {sources}",
+    "Crit": "Acerto Crítico de from {sources}",
+    "Norm": "Normal de {sources}"
+  },
+  "adv-reminder.UpdateStatusEffects": {
+    "Name": "Atualizar Condições",
+    "Hint": "Atualiza as condições que o sistema adiciona para incluir as flags de vantagem/desvantagem apropriadas. Não recomendado se você usa outro módulo para modificar e substituir elas."
+  }
+}
