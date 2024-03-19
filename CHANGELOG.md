@@ -1,3 +1,7 @@
+# 3.4.1
+
+- feature: [#64](https://github.com/kaelad02/adv-reminder/pull/64) Add pt-BR translation, thanks @Kharmans
+
 # 3.4.0
 
 - feature: Update the system-defined status effects to include advantage/disadvantage flags. Controlled by a setting.
