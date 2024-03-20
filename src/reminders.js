@@ -241,13 +241,25 @@ export class DeathSaveReminder extends AbilityBaseReminder {
 }
 
 export class CriticalReminder extends BaseReminder {
-  constructor(actor, targetActor, item) {
+  constructor(actor, targetActor, item, distanceFn) {
     super(actor);
 
     /** @type {object} */
     this.targetFlags = this._getFlags(targetActor);
     /** @type {string} */
     this.actionType = item.system.actionType;
+
+    // get the Range directly from the actor's flags
+    this.grantsCriticalRange = targetActor?.flags["midi-qol"].grants.critical.range || -Infinity;
+    this._adjustRange(distanceFn);
+  }
+
+  _adjustRange(distanceFn) {
+    // adjust the Range flag to look like a boolean like the rest
+    if ("grants.critical.range" in this.targetFlags) {
+      const distance = distanceFn();
+      this.targetFlags["grants.critical.range"] = distance <= this.grantsCriticalRange;
+    }
   }
 
   updateOptions(options, critProp = "critical") {
@@ -259,7 +271,11 @@ export class CriticalReminder extends BaseReminder {
     // build the active effect keys applicable for this roll
     const critKeys = ["critical.all", `critical.${this.actionType}`];
     const normalKeys = ["noCritical.all", `noCritical.${this.actionType}`];
-    const grantsCritKeys = ["grants.critical.all", `grants.critical.${this.actionType}`];
+    const grantsCritKeys = [
+      "grants.critical.all",
+      `grants.critical.${this.actionType}`,
+      "grants.critical.range",
+    ];
     const grantsNormalKeys = ["fail.critical.all", `fail.critical.${this.actionType}`];
 
     // find matching keys and update options

@@ -24,7 +24,7 @@ import {
   SkillSource,
 } from "../sources.js";
 import { showSources } from "../settings.js";
-import { debug, getTarget } from "../util.js";
+import { debug, getDistanceToTargetFn, getTarget } from "../util.js";
 
 /**
  * Setup the dnd5e.preRoll hooks for use with the core roller.
@@ -133,10 +133,11 @@ export default class CoreRollerHooks {
 
     if (this.isFastForwarding(config)) return;
     const target = getTarget();
+    const distanceFn = getDistanceToTargetFn(config.messageData.speaker);
 
     new DamageMessage(item.actor, target, item).addMessage(config);
-    if (showSources) new CriticalSource(item.actor, target, item).updateOptions(config);
-    new CriticalReminder(item.actor, target, item).updateOptions(config);
+    if (showSources) new CriticalSource(item.actor, target, item, distanceFn).updateOptions(config);
+    new CriticalReminder(item.actor, target, item, distanceFn).updateOptions(config);
   }
 
   /**
