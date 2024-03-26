@@ -19,6 +19,7 @@ import {
   AbilityCheckSource,
   AbilitySaveSource,
   AttackSource,
+  ConcentrationSource,
   CriticalSource,
   DeathSaveSource,
   SkillSource,
@@ -47,6 +48,7 @@ export default class CoreRollerHooks {
     // register all the dnd5e.pre hooks
     Hooks.on("dnd5e.preRollAttack", this.preRollAttack.bind(this));
     Hooks.on("dnd5e.preRollAbilitySave", this.preRollAbilitySave.bind(this));
+    Hooks.on("dnd5e.preRollConcentration", this.preRollConcentration.bind(this));
     Hooks.on("dnd5e.preRollAbilityTest", this.preRollAbilityTest.bind(this));
     Hooks.on("dnd5e.preRollSkill", this.preRollSkill.bind(this));
     Hooks.on("dnd5e.preRollToolCheck", this.preRollToolCheck.bind(this));
@@ -84,6 +86,15 @@ export default class CoreRollerHooks {
     new AbilitySaveMessage(actor, abilityId).addMessage(config);
     if (showSources) new AbilitySaveSource(actor, abilityId).updateOptions(config);
     new AbilitySaveReminder(actor, abilityId).updateOptions(config);
+  }
+
+  preRollConcentration(actor, options) {
+    debug("preRollConcentration hook called");
+
+    if (this.isFastForwarding(options)) return;
+
+    // TODO add a message handler
+    if (showSources) new ConcentrationSource(actor, options.ability).updateOptions(options);
   }
 
   preRollAbilityTest(actor, config, abilityId) {
