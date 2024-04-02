@@ -3,6 +3,7 @@ import {
   AbilityCheckMessage,
   AbilitySaveMessage,
   AttackMessage,
+  ConcentrationMessage,
   DamageMessage,
   DeathSaveMessage,
   SkillMessage,
@@ -93,8 +94,9 @@ export default class CoreRollerHooks {
 
     if (this.isFastForwarding(options)) return;
 
-    // TODO add a message handler
+    new ConcentrationMessage(actor, options.ability).addMessage(options);
     if (showSources) new ConcentrationSource(actor, options.ability).updateOptions(options);
+    // don't need a reminder, the system will set advantage/disadvantage
   }
 
   preRollAbilityTest(actor, config, abilityId) {
