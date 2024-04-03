@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, jest, test } from "@jest/globals";
+import { beforeAll, describe, expect, jest, test } from "@jest/globals";
 import {
   AbilityCheckMessage,
   AbilitySaveMessage,
@@ -7,20 +7,11 @@ import {
   DeathSaveMessage,
   SkillMessage,
 } from "../src/messages";
+import commonTestInit from "./common.js";
 
-// fakes
-globalThis.setProperty = (object, key, value) => {
-  // split the key into parts, removing the last one
-  const parts = key.split(".");
-  const lastProp = parts.pop();
-  // recursively create objects out the key parts
-  const lastObj = parts.reduce((obj, prop) => {
-    if (!obj.hasOwnProperty(prop)) obj[prop] = {};
-    return obj[prop];
-  }, object);
-  // set the value using the last key part
-  lastObj[lastProp] = value;
-};
+beforeAll(() => {
+  commonTestInit();
+});
 
 function createActorWithEffects(...keyValuePairs) {
   const appliedEffects = keyValuePairs.map(createEffect);

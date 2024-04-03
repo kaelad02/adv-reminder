@@ -42,13 +42,13 @@ class BaseReminder {
         // only set if adv or dis, the die roller doesn't handle when both are true correctly
         if (advantage && !disadvantage) {
           options.advantage = true;
-          options.disadvantage = false;
+          if (options.disadvantage) options.disadvantage = false;
         } else if (!advantage && disadvantage) {
-          options.advantage = false;
+          if (options.advantage) options.advantage = false;
           options.disadvantage = true;
         } else {
-          options.advantage = false;
-          options.disadvantage = false;
+          if (options.advantage) options.advantage = false;
+          if (options.disadvantage) options.disadvantage = false;
         }
       },
     };
