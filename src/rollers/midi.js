@@ -2,6 +2,7 @@ import {
   AbilityCheckMessage,
   AbilitySaveMessage,
   AttackMessage,
+  ConcentrationMessage,
   DamageMessage,
   DeathSaveMessage,
   SkillMessage,
@@ -10,6 +11,7 @@ import {
   AbilityCheckSource,
   AbilitySaveSource,
   AttackSource,
+  ConcentrationSource,
   CriticalSource,
   DeathSaveSource,
   SkillSource,
@@ -43,6 +45,15 @@ export default class MidiRollerHooks extends CoreRollerHooks {
 
     new AbilitySaveMessage(actor, abilityId).addMessage(config);
     if (showSources) new AbilitySaveSource(actor, abilityId).updateOptions(config);
+  }
+
+  preRollConcentration(actor, options) {
+    debug("preRollConcentration hook called");
+
+    if (this.isFastForwarding(options)) return;
+
+    new ConcentrationMessage(actor, options.ability).addMessage(options);
+    if (showSources) new ConcentrationSource(actor, options.ability).updateOptions(options);
   }
 
   preRollAbilityTest(actor, config, abilityId) {
