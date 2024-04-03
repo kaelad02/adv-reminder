@@ -26,7 +26,7 @@ class BaseReminder {
    * @param {boolean} options.advantage initial value for advantage
    * @param {boolean} options.disadvantage initial value for disadvantage
    */
-  _accumulator({advantage, disadvantage}) {
+  _accumulator({advantage, disadvantage} = {}) {
     return {
       advantage,
       disadvantage,
