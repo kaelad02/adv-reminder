@@ -1,3 +1,7 @@
+# upcoming
+
+- feature: Support the system's new concentration rolls with sources and messages (system already handles advantage/disadvantage)
+
 # 3.4.1
 
 - feature: [#64](https://github.com/kaelad02/adv-reminder/pull/64) Add pt-BR translation, thanks @Kharmans
