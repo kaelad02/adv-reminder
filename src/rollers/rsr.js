@@ -27,6 +27,10 @@ import { showSources } from "../settings.js";
 import { debug, getTarget } from "../util.js";
 import CoreRollerHooks from "./core.js";
 
+// disable the grants.critical.range flag since RSR can't have it's critical flag changed anyways,
+// only set by the attack roll
+const distanceFn = () => Infinity;
+
 /**
  * Setup the dnd5e.preRoll hooks for use with Ready Set Roll.
  */
@@ -125,7 +129,7 @@ export default class ReadySetRollHooks extends CoreRollerHooks {
 
     if (this._doMessages(config)) {
       new DamageMessage(item.actor, target, item).addMessage(config);
-      if (showSources) new CriticalSource(item.actor, target, item).updateOptions(config);
+      if (showSources) new CriticalSource(item.actor, target, item, distanceFn).updateOptions(config);
     }
     // don't use CriticalReminder here, it's done in another hook
   }
@@ -135,7 +139,7 @@ export default class ReadySetRollHooks extends CoreRollerHooks {
 
     // check for critical hits but set the "isCrit" property instead of the default "critical"
     const target = getTarget();
-    new CriticalReminder(item.actor, target, item).updateOptions(config, "isCrit");
+    new CriticalReminder(item.actor, target, item, distanceFn).updateOptions(config, "isCrit");
   }
 
   _doMessages({ fastForward = false }) {
