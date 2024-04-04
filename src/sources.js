@@ -77,11 +77,11 @@ export class SkillSource extends SourceMixin(SkillReminder) {}
 export class DeathSaveSource extends SourceMixin(DeathSaveReminder) {}
 
 export class CriticalSource extends SourceMixin(CriticalReminder) {
-  _adjustRange(distanceFn) {
+  _adjustRange(distanceFn, grantsCriticalRange) {
     // check if the range applies, remove flag if not
     if ("grants.critical.range" in this.targetFlags) {
       const distance = distanceFn();
-      if (distance > this.grantsCriticalRange) delete this.targetFlags["grants.critical.range"];
+      if (distance > grantsCriticalRange) delete this.targetFlags["grants.critical.range"];
     }
   }
 

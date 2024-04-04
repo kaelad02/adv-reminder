@@ -250,15 +250,15 @@ export class CriticalReminder extends BaseReminder {
     this.actionType = item.system.actionType;
 
     // get the Range directly from the actor's flags
-    this.grantsCriticalRange = targetActor?.flags["midi-qol"].grants.critical.range || -Infinity;
-    this._adjustRange(distanceFn);
+    const grantsCriticalRange = getProperty(targetActor, "flags.midi-qol.grants.critical.range") || -Infinity;
+    this._adjustRange(distanceFn, grantsCriticalRange);
   }
 
-  _adjustRange(distanceFn) {
+  _adjustRange(distanceFn, grantsCriticalRange) {
     // adjust the Range flag to look like a boolean like the rest
     if ("grants.critical.range" in this.targetFlags) {
       const distance = distanceFn();
-      this.targetFlags["grants.critical.range"] = distance <= this.grantsCriticalRange;
+      this.targetFlags["grants.critical.range"] = distance <= grantsCriticalRange;
     }
   }
 
