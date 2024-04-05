@@ -9,10 +9,6 @@ import {
 } from "../src/messages";
 import commonTestInit from "./common.js";
 
-beforeAll(() => {
-  commonTestInit();
-});
-
 function createActorWithEffects(...keyValuePairs) {
   const appliedEffects = keyValuePairs.map(createEffect);
   return {
@@ -42,6 +38,10 @@ function createItem(actionType, abilityMod) {
     },
   };
 }
+
+beforeAll(() => {
+  commonTestInit();
+});
 
 describe("AttackMessage no legit active effects", () => {
   test("attack with no active effects should not add a message", () => {
