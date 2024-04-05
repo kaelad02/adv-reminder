@@ -22,12 +22,14 @@ class BaseReminder {
 
   /**
    * An accumulator that looks for matching keys and tracks advantage/disadvantage.
+   * @param {Object} options
+   * @param {boolean} options.advantage initial value for advantage
+   * @param {boolean} options.disadvantage initial value for disadvantage
    */
-  _accumulator() {
-    let advantage;
-    let disadvantage;
-
+  _accumulator({advantage, disadvantage} = {}) {
     return {
+      advantage,
+      disadvantage,
       add: (actorFlags, advKeys, disKeys) => {
         advantage = advKeys.reduce((accum, curr) => accum || actorFlags[curr], advantage);
         disadvantage = disKeys.reduce((accum, curr) => accum || actorFlags[curr], disadvantage);
@@ -38,8 +40,16 @@ class BaseReminder {
       update: (options) => {
         debug(`updating options with {advantage: ${advantage}, disadvantage: ${disadvantage}}`);
         // only set if adv or dis, the die roller doesn't handle when both are true correctly
-        if (advantage && !disadvantage) options.advantage = true;
-        else if (!advantage && disadvantage) options.disadvantage = true;
+        if (advantage && !disadvantage) {
+          options.advantage = true;
+          if (options.disadvantage) options.disadvantage = false;
+        } else if (!advantage && disadvantage) {
+          if (options.advantage) options.advantage = false;
+          options.disadvantage = true;
+        } else {
+          if (options.advantage) options.advantage = false;
+          if (options.disadvantage) options.disadvantage = false;
+        }
       },
     };
   }
@@ -121,7 +131,7 @@ class AbilityBaseReminder extends BaseReminder {
     debug("advKeys", advKeys, "disKeys", disKeys);
 
     // find matching keys and update options
-    const accumulator = this._accumulator();
+    const accumulator = options.isConcentration ? this._accumulator(options) : this._accumulator();
     accumulator.add(this.actorFlags, advKeys, disKeys);
     accumulator.update(options);
   }

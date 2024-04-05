@@ -29,10 +29,15 @@ class BaseMessage {
   addMessage(options) {
     debug("checking for message effects");
 
+    // get any existing messages
+    const messages = getProperty(options, "dialogOptions.adv-reminder.messages") ?? [];
+
+    // get messages from the actor and merge
     const keys = this.messageKeys;
-    const messages = this.changes
+    const actorMessages = this.changes
       .filter((change) => keys.includes(change.key))
       .map((change) => change.value);
+    messages.push(...actorMessages);
 
     // get messages from the target and merge
     const targetKeys = this.targetKeys;
@@ -111,6 +116,14 @@ export class AbilitySaveMessage extends AbilityBaseMessage {
       "flags.adv-reminder.message.ability.save.all",
       `flags.adv-reminder.message.ability.save.${this.abilityId}`
     );
+  }
+}
+
+export class ConcentrationMessage extends AbilityBaseMessage {
+  /** @override */
+  get messageKeys() {
+    // don't call super since the system will trigger a saving throw
+    return ["flags.adv-reminder.message.ability.concentration"];
   }
 }
 
