@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, jest, test } from "@jest/globals";
+import { beforeAll, describe, expect, jest, test } from "@jest/globals";
 import {
   AbilityCheckMessage,
   AbilitySaveMessage,
@@ -7,20 +7,7 @@ import {
   DeathSaveMessage,
   SkillMessage,
 } from "../src/messages";
-
-// fakes
-globalThis.setProperty = (object, key, value) => {
-  // split the key into parts, removing the last one
-  const parts = key.split(".");
-  const lastProp = parts.pop();
-  // recursively create objects out the key parts
-  const lastObj = parts.reduce((obj, prop) => {
-    if (!obj.hasOwnProperty(prop)) obj[prop] = {};
-    return obj[prop];
-  }, object);
-  // set the value using the last key part
-  lastObj[lastProp] = value;
-};
+import commonTestInit from "./common.js";
 
 function createActorWithEffects(...keyValuePairs) {
   const appliedEffects = keyValuePairs.map(createEffect);
@@ -51,6 +38,10 @@ function createItem(actionType, abilityMod) {
     },
   };
 }
+
+beforeAll(() => {
+  commonTestInit();
+});
 
 describe("AttackMessage no legit active effects", () => {
   test("attack with no active effects should not add a message", () => {

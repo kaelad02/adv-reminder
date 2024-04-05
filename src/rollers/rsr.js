@@ -3,6 +3,7 @@ import {
   AbilityCheckMessage,
   AbilitySaveMessage,
   AttackMessage,
+  ConcentrationMessage,
   DamageMessage,
   DeathSaveMessage,
   SkillMessage,
@@ -19,6 +20,7 @@ import {
   AbilityCheckSource,
   AbilitySaveSource,
   AttackSource,
+  ConcentrationSource,
   CriticalSource,
   DeathSaveSource,
   SkillSource,
@@ -67,6 +69,16 @@ export default class ReadySetRollHooks extends CoreRollerHooks {
     }
 
     if (this._doReminder(config)) new AbilitySaveReminder(actor, abilityId).updateOptions(config);
+  }
+
+  preRollConcentration(actor, options) {
+    debug("preRollConcentration hook called");
+
+    if (this._doMessages(options)) {
+      new ConcentrationMessage(actor, options.ability).addMessage(options);
+      if (showSources) new ConcentrationSource(actor, options.ability).updateOptions(options);
+    }
+    // don't need a reminder, the system will set advantage/disadvantage
   }
 
   preRollAbilityTest(actor, config, abilityId) {
