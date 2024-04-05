@@ -22,6 +22,16 @@ Hooks.once("init", () => {
 
 // Apply Midi-QOL's custom active effects
 function applyMidiCustom(actor, change) {
+  // check if the actor is immune to this condition
+  if (change.effect?.statuses?.size) {
+    const status = change.effect.statuses.first();
+    const imms = actor.system.traits?.ci?.value ?? new Set();
+    if (imms.has(status)) {
+      debug(`actor is immune to ${status}, ignore the active effect's change`);
+      return;
+    }
+  }
+
   const supportedKeys = [
     "flags.midi-qol.advantage.",
     "flags.midi-qol.disadvantage.",
