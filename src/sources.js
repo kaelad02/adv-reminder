@@ -47,6 +47,9 @@ const SourceMixin = (superclass) =>
             if (changes[key]) disadvantageLabels.push(...changes[key]);
           });
         },
+        advantage: (label) => {
+          if (label) advantageLabels.push(label);
+        },
         disadvantage: (label) => {
           if (label) disadvantageLabels.push(label);
         },
@@ -70,6 +73,31 @@ export class AttackSource extends SourceMixin(AttackReminder) {}
 
 export class AbilitySaveSource extends SourceMixin(AbilitySaveReminder) {}
 
+export class ConcentrationSource extends SourceMixin(Object) {
+  constructor(actor, abilityId) {
+    super();
+    
+    /** @type {object} */
+    this.conc = actor.system.attributes?.concentration;
+    /** @type {string} */
+    this.abilityId = abilityId;
+  }
+
+  updateOptions(options) {
+    this._message();
+
+    const modes = CONFIG.Dice.D20Roll.ADV_MODE;
+    const source = () =>
+      game.i18n.localize("DND5E.Concentration") + " " + game.i18n.localize("DND5E.AdvantageMode");
+
+    // check Concentration's roll mode to look for advantage/disadvantage
+    const accumulator = this._accumulator();
+    if (this.conc.roll.mode === modes.ADVANTAGE) accumulator.advantage(source());
+    else if (this.conc.roll.mode === modes.DISADVANTAGE) accumulator.disadvantage(source());
+    accumulator.update(options);
+  }
+}
+
 export class AbilityCheckSource extends SourceMixin(AbilityCheckReminder) {}
 
 export class SkillSource extends SourceMixin(SkillReminder) {}
@@ -77,6 +105,14 @@ export class SkillSource extends SourceMixin(SkillReminder) {}
 export class DeathSaveSource extends SourceMixin(DeathSaveReminder) {}
 
 export class CriticalSource extends SourceMixin(CriticalReminder) {
+  _adjustRange(distanceFn, grantsCriticalRange) {
+    // check if the range applies, remove flag if not
+    if ("grants.critical.range" in this.targetFlags) {
+      const distance = distanceFn();
+      if (distance > grantsCriticalRange) delete this.targetFlags["grants.critical.range"];
+    }
+  }
+
   _accumulator() {
     const criticalLabels = [];
     const normalLabels = [];

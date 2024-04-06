@@ -1,3 +1,8 @@
+# upcoming
+
+- feature: Support the system's new concentration rolls with sources and messages with `flags.adv-reminder.message.ability.concentration` (system already handles advantage/disadvantage)
+- feature: Support `flags.midi-qol.grants.critical.range` for conditions like Paralyzed that turn hits into crits if the attacker is adjacent. Does not currently work with Ready Set Roll, will just be ignored.
+
 # 3.4.1
 
 - feature: [#64](https://github.com/kaelad02/adv-reminder/pull/64) Add pt-BR translation, thanks @Kharmans

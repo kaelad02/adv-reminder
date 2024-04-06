@@ -22,12 +22,14 @@ class BaseReminder {
 
   /**
    * An accumulator that looks for matching keys and tracks advantage/disadvantage.
+   * @param {Object} options
+   * @param {boolean} options.advantage initial value for advantage
+   * @param {boolean} options.disadvantage initial value for disadvantage
    */
-  _accumulator() {
-    let advantage;
-    let disadvantage;
-
+  _accumulator({advantage, disadvantage} = {}) {
     return {
+      advantage,
+      disadvantage,
       add: (actorFlags, advKeys, disKeys) => {
         advantage = advKeys.reduce((accum, curr) => accum || actorFlags[curr], advantage);
         disadvantage = disKeys.reduce((accum, curr) => accum || actorFlags[curr], disadvantage);
@@ -38,8 +40,16 @@ class BaseReminder {
       update: (options) => {
         debug(`updating options with {advantage: ${advantage}, disadvantage: ${disadvantage}}`);
         // only set if adv or dis, the die roller doesn't handle when both are true correctly
-        if (advantage && !disadvantage) options.advantage = true;
-        else if (!advantage && disadvantage) options.disadvantage = true;
+        if (advantage && !disadvantage) {
+          options.advantage = true;
+          if (options.disadvantage) options.disadvantage = false;
+        } else if (!advantage && disadvantage) {
+          if (options.advantage) options.advantage = false;
+          options.disadvantage = true;
+        } else {
+          if (options.advantage) options.advantage = false;
+          if (options.disadvantage) options.disadvantage = false;
+        }
       },
     };
   }
@@ -121,7 +131,7 @@ class AbilityBaseReminder extends BaseReminder {
     debug("advKeys", advKeys, "disKeys", disKeys);
 
     // find matching keys and update options
-    const accumulator = this._accumulator();
+    const accumulator = options.isConcentration ? this._accumulator(options) : this._accumulator();
     accumulator.add(this.actorFlags, advKeys, disKeys);
     accumulator.update(options);
   }
@@ -241,13 +251,28 @@ export class DeathSaveReminder extends AbilityBaseReminder {
 }
 
 export class CriticalReminder extends BaseReminder {
-  constructor(actor, targetActor, item) {
+  constructor(actor, targetActor, item, distanceFn) {
     super(actor);
 
     /** @type {object} */
     this.targetFlags = this._getFlags(targetActor);
     /** @type {string} */
     this.actionType = item.system.actionType;
+
+    // get the Range directly from the actor's flags
+    if (targetActor) {
+      const grantsCriticalRange =
+        getProperty(targetActor, "flags.midi-qol.grants.critical.range") || -Infinity;
+      this._adjustRange(distanceFn, grantsCriticalRange);
+    }
+  }
+
+  _adjustRange(distanceFn, grantsCriticalRange) {
+    // adjust the Range flag to look like a boolean like the rest
+    if ("grants.critical.range" in this.targetFlags) {
+      const distance = distanceFn();
+      this.targetFlags["grants.critical.range"] = distance <= grantsCriticalRange;
+    }
   }
 
   updateOptions(options, critProp = "critical") {
@@ -259,7 +284,11 @@ export class CriticalReminder extends BaseReminder {
     // build the active effect keys applicable for this roll
     const critKeys = ["critical.all", `critical.${this.actionType}`];
     const normalKeys = ["noCritical.all", `noCritical.${this.actionType}`];
-    const grantsCritKeys = ["grants.critical.all", `grants.critical.${this.actionType}`];
+    const grantsCritKeys = [
+      "grants.critical.all",
+      `grants.critical.${this.actionType}`,
+      "grants.critical.range",
+    ];
     const grantsNormalKeys = ["fail.critical.all", `fail.critical.${this.actionType}`];
 
     // find matching keys and update options

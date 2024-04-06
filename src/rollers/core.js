@@ -3,6 +3,7 @@ import {
   AbilityCheckMessage,
   AbilitySaveMessage,
   AttackMessage,
+  ConcentrationMessage,
   DamageMessage,
   DeathSaveMessage,
   SkillMessage,
@@ -19,12 +20,13 @@ import {
   AbilityCheckSource,
   AbilitySaveSource,
   AttackSource,
+  ConcentrationSource,
   CriticalSource,
   DeathSaveSource,
   SkillSource,
 } from "../sources.js";
 import { showSources } from "../settings.js";
-import { debug, getTarget } from "../util.js";
+import { debug, getDistanceToTargetFn, getTarget } from "../util.js";
 
 /**
  * Setup the dnd5e.preRoll hooks for use with the core roller.
@@ -47,6 +49,7 @@ export default class CoreRollerHooks {
     // register all the dnd5e.pre hooks
     Hooks.on("dnd5e.preRollAttack", this.preRollAttack.bind(this));
     Hooks.on("dnd5e.preRollAbilitySave", this.preRollAbilitySave.bind(this));
+    Hooks.on("dnd5e.preRollConcentration", this.preRollConcentration.bind(this));
     Hooks.on("dnd5e.preRollAbilityTest", this.preRollAbilityTest.bind(this));
     Hooks.on("dnd5e.preRollSkill", this.preRollSkill.bind(this));
     Hooks.on("dnd5e.preRollToolCheck", this.preRollToolCheck.bind(this));
@@ -84,6 +87,16 @@ export default class CoreRollerHooks {
     new AbilitySaveMessage(actor, abilityId).addMessage(config);
     if (showSources) new AbilitySaveSource(actor, abilityId).updateOptions(config);
     new AbilitySaveReminder(actor, abilityId).updateOptions(config);
+  }
+
+  preRollConcentration(actor, options) {
+    debug("preRollConcentration hook called");
+
+    if (this.isFastForwarding(options)) return;
+
+    new ConcentrationMessage(actor, options.ability).addMessage(options);
+    if (showSources) new ConcentrationSource(actor, options.ability).updateOptions(options);
+    // don't need a reminder, the system will set advantage/disadvantage
   }
 
   preRollAbilityTest(actor, config, abilityId) {
@@ -133,10 +146,11 @@ export default class CoreRollerHooks {
 
     if (this.isFastForwarding(config)) return;
     const target = getTarget();
+    const distanceFn = getDistanceToTargetFn(config.messageData.speaker);
 
     new DamageMessage(item.actor, target, item).addMessage(config);
-    if (showSources) new CriticalSource(item.actor, target, item).updateOptions(config);
-    new CriticalReminder(item.actor, target, item).updateOptions(config);
+    if (showSources) new CriticalSource(item.actor, target, item, distanceFn).updateOptions(config);
+    new CriticalReminder(item.actor, target, item, distanceFn).updateOptions(config);
   }
 
   /**

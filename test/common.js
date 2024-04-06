@@ -24,6 +24,19 @@ export default function commonTestInit() {
     lastObj[lastProp] = value;
   };
 
+  globalThis.getProperty = (object, key) => {
+    if (!key) return undefined;
+    if (key in object) return object[key];
+    let target = object;
+    for (let p of key.split(".")) {
+      getType(target);
+      if (!(typeof target === "object")) return undefined;
+      if (p in target) target = target[p];
+      else return undefined;
+    }
+    return target;
+  };
+
   globalThis.flattenObject = (obj, _d = 0) => {
     const flat = {};
     if (_d > 100) {
