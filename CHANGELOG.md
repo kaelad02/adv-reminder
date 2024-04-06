@@ -1,6 +1,7 @@
 # upcoming
 
-- feature: Support the system's new concentration rolls with sources and messages (system already handles advantage/disadvantage)
+- feature: Support the system's new concentration rolls with sources and messages with `flags.adv-reminder.message.ability.concentration` (system already handles advantage/disadvantage)
+- feature: Support `flags.midi-qol.grants.critical.range` for conditions like Paralyzed that turn hits into crits if the attacker is adjacent. Does not currently work with Ready Set Roll, will just be ignored.
 
 # 3.4.1
 
