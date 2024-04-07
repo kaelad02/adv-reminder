@@ -2,3 +2,8 @@ adv-reminder.lock
 
 # Dependency directory
 node_modules/
+
+# databases
+packs/*
+!packs/_source/
+!packs/*.db

@@ -6,8 +6,18 @@ class BaseFail {
     this.actor = actor;
   }
 
+  /**
+   * Get the midi-qol flags on the actor, flattened.
+   * @param {Actor5e} actor
+   * @returns {object} the midi-qol flags on the actor, flattened
+   */
+  _getFlags(actor) {
+    const midiFlags = actor?.flags["midi-qol"] || {};
+    return flattenObject(midiFlags);
+  }
+
   get failKeys() {
-    return ["flags.midi-qol.fail.all"];
+    return ["fail.all"];
   }
 
   /**
@@ -15,27 +25,25 @@ class BaseFail {
    * @param {object} options the roll options
    * @returns true if the roll should fail, false if it may continue
    */
-  async fails(options) {
+  fails(options) {
+    debug("checking for fail flags for the roll");
+
     // get the active effect keys that will fail
     const failKeys = this.failKeys;
     debug("failKeys", failKeys);
 
-    const shouldFail = this.actor.effects
-      .filter((effect) => !effect.isSuppressed && !effect.data.disabled)
-      .flatMap((effect) => effect.data.changes)
-      .some((change) => failKeys.includes(change.key));
+    const actorFlags = this._getFlags(this.actor);
+    const shouldFail = failKeys.reduce((accum, curr) => actorFlags[curr] || accum, false);
     if (shouldFail) {
       const messageData = this.createMessageData(options);
-      await this.toMessage(messageData);
+      this.toMessage(messageData);
     }
     return shouldFail;
   }
 
   async toMessage(messageData) {
     // content that immatates a die roll
-    const content = await renderTemplate(
-      "modules/adv-reminder/templates/fail-dice-roll.hbs"
-    );
+    const content = await renderTemplate("modules/adv-reminder/templates/fail-dice-roll.hbs");
     // merge basic data with child's data
     const chatData = foundry.utils.mergeObject(
       {
@@ -64,9 +72,9 @@ export class AbilitySaveFail extends BaseFail {
   /** @override */
   get failKeys() {
     return super.failKeys.concat([
-      "flags.midi-qol.fail.ability.all",
-      `flags.midi-qol.fail.ability.save.all`,
-      `flags.midi-qol.fail.ability.save.${this.abilityId}`,
+      "fail.ability.all",
+      `fail.ability.save.all`,
+      `fail.ability.save.${this.abilityId}`,
     ]);
   }
 

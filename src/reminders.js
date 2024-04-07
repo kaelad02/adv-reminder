@@ -1,50 +1,55 @@
-import { debug } from "./util.js";
+import { debug, isEmpty } from "./util.js";
 
 class BaseReminder {
   constructor(actor) {
-    /** @type {string[]} */
-    this.actorKeys = this._getActiveEffectKeys(actor);
+    /** @type {object} */
+    this.actorFlags = this._getFlags(actor);
   }
 
   /**
-   * Get Midi QOL's active effect keys from an actor.
-   * @param {Actor5e} actor the actor
-   * @returns {string[]} an array of Midi QOL's active effects keys
+   * Get the midi-qol flags on the actor, flattened.
+   * @param {Actor5e*} actor
+   * @returns {object} the midi-qol flags on the actor, flattened
    */
-  _getActiveEffectKeys(actor) {
-    return actor
-      ? actor.effects
-          .filter((effect) => !effect.isSuppressed && !effect.data.disabled)
-          .flatMap((effect) => effect.data.changes)
-          .map((change) => change.key)
-          .filter((key) => key.startsWith("flags.midi-qol."))
-      : [];
+  _getFlags(actor) {
+    const midiFlags = actor?.flags["midi-qol"] || {};
+    return flattenObject(midiFlags);
+  }
+
+  _message() {
+    debug("checking for adv/dis effects for the roll");
   }
 
   /**
    * An accumulator that looks for matching keys and tracks advantage/disadvantage.
+   * @param {Object} options
+   * @param {boolean} options.advantage initial value for advantage
+   * @param {boolean} options.disadvantage initial value for disadvantage
    */
-  _accumulator() {
-    let advantage;
-    let disadvantage;
-
+  _accumulator({advantage, disadvantage} = {}) {
     return {
-      add: (actorKeys, advKeys, disKeys) => {
-        actorKeys.forEach((key) => {
-          if (advKeys.includes(key)) advantage = true;
-          if (disKeys.includes(key)) disadvantage = true;
-        });
+      advantage,
+      disadvantage,
+      add: (actorFlags, advKeys, disKeys) => {
+        advantage = advKeys.reduce((accum, curr) => accum || actorFlags[curr], advantage);
+        disadvantage = disKeys.reduce((accum, curr) => accum || actorFlags[curr], disadvantage);
       },
-      disadvantage: (value) => {
-        if (value) disadvantage = true;
+      disadvantage: (label) => {
+        if (label) disadvantage = true;
       },
       update: (options) => {
-        debug(
-          `updating options with {advantage: ${advantage}, disadvantage: ${disadvantage}}`
-        );
+        debug(`updating options with {advantage: ${advantage}, disadvantage: ${disadvantage}}`);
         // only set if adv or dis, the die roller doesn't handle when both are true correctly
-        if (advantage && !disadvantage) options.advantage = true;
-        else if (!advantage && disadvantage) options.disadvantage = true;
+        if (advantage && !disadvantage) {
+          options.advantage = true;
+          if (options.disadvantage) options.disadvantage = false;
+        } else if (!advantage && disadvantage) {
+          if (options.advantage) options.advantage = false;
+          options.disadvantage = true;
+        } else {
+          if (options.advantage) options.advantage = false;
+          if (options.disadvantage) options.disadvantage = false;
+        }
       },
     };
   }
@@ -54,44 +59,46 @@ export class AttackReminder extends BaseReminder {
   constructor(actor, targetActor, item) {
     super(actor);
 
-    /** @type {string[]} */
-    this.targetKeys = this._getActiveEffectKeys(targetActor);
+    /** @type {object} */
+    this.targetFlags = this._getFlags(targetActor);
     /** @type {string} */
-    this.actionType = item.data.data.actionType;
+    this.actionType = item.system.actionType;
     /** @type {string} */
     this.abilityId = item.abilityMod;
   }
 
   updateOptions(options) {
-    // quick return if there are no active effects
-    if (this.actorKeys.length == 0 && this.targetKeys.length == 0) return;
+    this._message();
+
+    // quick return if there are no flags
+    if (isEmpty(this.actorFlags) && isEmpty(this.targetFlags)) return;
 
     // build the active effect keys applicable for this roll
     const advKeys = [
-      "flags.midi-qol.advantage.all",
-      "flags.midi-qol.advantage.attack.all",
-      `flags.midi-qol.advantage.attack.${this.actionType}`,
-      `flags.midi-qol.advantage.attack.${this.abilityId}`,
+      "advantage.all",
+      "advantage.attack.all",
+      `advantage.attack.${this.actionType}`,
+      `advantage.attack.${this.abilityId}`,
     ];
     const disKeys = [
-      "flags.midi-qol.disadvantage.all",
-      "flags.midi-qol.disadvantage.attack.all",
-      `flags.midi-qol.disadvantage.attack.${this.actionType}`,
-      `flags.midi-qol.disadvantage.attack.${this.abilityId}`,
+      "disadvantage.all",
+      "disadvantage.attack.all",
+      `disadvantage.attack.${this.actionType}`,
+      `disadvantage.attack.${this.abilityId}`,
     ];
     const grantsAdvKeys = [
-      "flags.midi-qol.grants.advantage.attack.all",
-      `flags.midi-qol.grants.advantage.attack.${this.actionType}`,
+      "grants.advantage.attack.all",
+      `grants.advantage.attack.${this.actionType}`,
     ];
     const grantsDisKeys = [
-      "flags.midi-qol.grants.disadvantage.attack.all",
-      `flags.midi-qol.grants.disadvantage.attack.${this.actionType}`,
+      "grants.disadvantage.attack.all",
+      `grants.disadvantage.attack.${this.actionType}`,
     ];
 
     // find matching keys and update options
     const accumulator = this._accumulator();
-    accumulator.add(this.actorKeys, advKeys, disKeys);
-    accumulator.add(this.targetKeys, grantsAdvKeys, grantsDisKeys);
+    accumulator.add(this.actorFlags, advKeys, disKeys);
+    accumulator.add(this.targetFlags, grantsAdvKeys, grantsDisKeys);
     accumulator.update(options);
   }
 }
@@ -105,22 +112,18 @@ class AbilityBaseReminder extends BaseReminder {
   }
 
   get advantageKeys() {
-    return [
-      "flags.midi-qol.advantage.all",
-      "flags.midi-qol.advantage.ability.all",
-    ];
+    return ["advantage.all", "advantage.ability.all"];
   }
 
   get disadvantageKeys() {
-    return [
-      "flags.midi-qol.disadvantage.all",
-      "flags.midi-qol.disadvantage.ability.all",
-    ];
+    return ["disadvantage.all", "disadvantage.ability.all"];
   }
 
   updateOptions(options) {
-    // quick return if there are no active effects
-    if (this.actorKeys.length == 0) return;
+    this._message();
+
+    // quick return if there are no flags
+    if (isEmpty(this.actorFlags)) return;
 
     // get the active effect keys applicable for this roll
     const advKeys = this.advantageKeys;
@@ -128,8 +131,8 @@ class AbilityBaseReminder extends BaseReminder {
     debug("advKeys", advKeys, "disKeys", disKeys);
 
     // find matching keys and update options
-    const accumulator = this._accumulator();
-    accumulator.add(this.actorKeys, advKeys, disKeys);
+    const accumulator = options.isConcentration ? this._accumulator(options) : this._accumulator();
+    accumulator.add(this.actorFlags, advKeys, disKeys);
     accumulator.update(options);
   }
 }
@@ -138,16 +141,16 @@ export class AbilityCheckReminder extends AbilityBaseReminder {
   /** @override */
   get advantageKeys() {
     return super.advantageKeys.concat([
-      "flags.midi-qol.advantage.ability.check.all",
-      `flags.midi-qol.advantage.ability.check.${this.abilityId}`,
+      "advantage.ability.check.all",
+      `advantage.ability.check.${this.abilityId}`,
     ]);
   }
 
   /** @override */
   get disadvantageKeys() {
     return super.disadvantageKeys.concat([
-      "flags.midi-qol.disadvantage.ability.check.all",
-      `flags.midi-qol.disadvantage.ability.check.${this.abilityId}`,
+      "disadvantage.ability.check.all",
+      `disadvantage.ability.check.${this.abilityId}`,
     ]);
   }
 }
@@ -156,23 +159,23 @@ export class AbilitySaveReminder extends AbilityBaseReminder {
   /** @override */
   get advantageKeys() {
     return super.advantageKeys.concat([
-      "flags.midi-qol.advantage.ability.save.all",
-      `flags.midi-qol.advantage.ability.save.${this.abilityId}`,
+      "advantage.ability.save.all",
+      `advantage.ability.save.${this.abilityId}`,
     ]);
   }
 
   /** @override */
   get disadvantageKeys() {
     return super.disadvantageKeys.concat([
-      "flags.midi-qol.disadvantage.ability.save.all",
-      `flags.midi-qol.disadvantage.ability.save.${this.abilityId}`,
+      "disadvantage.ability.save.all",
+      `disadvantage.ability.save.${this.abilityId}`,
     ]);
   }
 }
 
 export class SkillReminder extends AbilityCheckReminder {
-  constructor(actor, skillId, checkArmorStealth = true) {
-    super(actor, actor.data.data.skills[skillId].ability);
+  constructor(actor, abilityId, skillId, checkArmorStealth = true) {
+    super(actor, abilityId);
 
     /** @type {string} */
     this.skillId = skillId;
@@ -184,22 +187,21 @@ export class SkillReminder extends AbilityCheckReminder {
 
   /** @override */
   get advantageKeys() {
-    return super.advantageKeys.concat([
-      "flags.midi-qol.advantage.skill.all",
-      `flags.midi-qol.advantage.skill.${this.skillId}`,
-    ]);
+    return super.advantageKeys.concat(["advantage.skill.all", `advantage.skill.${this.skillId}`]);
   }
 
   /** @override */
   get disadvantageKeys() {
     return super.disadvantageKeys.concat([
-      "flags.midi-qol.disadvantage.skill.all",
-      `flags.midi-qol.disadvantage.skill.${this.skillId}`,
+      "disadvantage.skill.all",
+      `disadvantage.skill.${this.skillId}`,
     ]);
   }
 
   /** @override */
   updateOptions(options) {
+    this._message();
+
     // get the active effect keys applicable for this roll
     const advKeys = this.advantageKeys;
     const disKeys = this.disadvantageKeys;
@@ -210,7 +212,7 @@ export class SkillReminder extends AbilityCheckReminder {
     if (this.checkArmorStealth) {
       accumulator.disadvantage(this._armorStealthDisadvantage());
     }
-    accumulator.add(this.actorKeys, advKeys, disKeys);
+    accumulator.add(this.actorFlags, advKeys, disKeys);
     accumulator.update(options);
   }
 
@@ -221,15 +223,11 @@ export class SkillReminder extends AbilityCheckReminder {
   _armorStealthDisadvantage() {
     if (this.skillId === "ste") {
       const item = this.items.find(
-        (item) =>
-          item.type === "equipment" &&
-          item.data?.data?.equipped &&
-          item.data?.data?.stealth
+        (item) => item.type === "equipment" && item.system.equipped && item.system.properties.has("stealthDisadvantage")
       );
       debug("equiped item that imposes stealth disadvantage", item?.name);
-      return !!item;
+      return item?.name;
     }
-    return false;
   }
 }
 
@@ -240,58 +238,64 @@ export class DeathSaveReminder extends AbilityBaseReminder {
 
   /** @override */
   get advantageKeys() {
-    return super.advantageKeys.concat([
-      "flags.midi-qol.advantage.ability.save.all",
-      "flags.midi-qol.advantage.deathSave",
-    ]);
+    return super.advantageKeys.concat(["advantage.ability.save.all", "advantage.deathSave"]);
   }
 
   /** @override */
   get disadvantageKeys() {
     return super.disadvantageKeys.concat([
-      "flags.midi-qol.disadvantage.ability.save.all",
-      "flags.midi-qol.disadvantage.deathSave",
+      "disadvantage.ability.save.all",
+      "disadvantage.deathSave",
     ]);
   }
 }
 
 export class CriticalReminder extends BaseReminder {
-  constructor(actor, targetActor, item) {
+  constructor(actor, targetActor, item, distanceFn) {
     super(actor);
 
-    /** @type {string[]} */
-    this.targetKeys = this._getActiveEffectKeys(targetActor);
+    /** @type {object} */
+    this.targetFlags = this._getFlags(targetActor);
     /** @type {string} */
-    this.actionType = item.data.data.actionType;
+    this.actionType = item.system.actionType;
+
+    // get the Range directly from the actor's flags
+    if (targetActor) {
+      const grantsCriticalRange =
+        getProperty(targetActor, "flags.midi-qol.grants.critical.range") || -Infinity;
+      this._adjustRange(distanceFn, grantsCriticalRange);
+    }
   }
 
-  updateOptions(options) {
-    // quick return if there are no active effects
-    if (this.actorKeys.length == 0 && this.targetKeys.length == 0) return;
+  _adjustRange(distanceFn, grantsCriticalRange) {
+    // adjust the Range flag to look like a boolean like the rest
+    if ("grants.critical.range" in this.targetFlags) {
+      const distance = distanceFn();
+      this.targetFlags["grants.critical.range"] = distance <= grantsCriticalRange;
+    }
+  }
+
+  updateOptions(options, critProp = "critical") {
+    this._message();
+
+    // quick return if there are no flags
+    if (isEmpty(this.actorFlags) && isEmpty(this.targetFlags)) return;
 
     // build the active effect keys applicable for this roll
-    const critKeys = [
-      "flags.midi-qol.critical.all",
-      `flags.midi-qol.critical.${this.actionType}`,
-    ];
-    const normalKeys = [
-      "flags.midi-qol.noCritical.all",
-      `flags.midi-qol.noCritical.${this.actionType}`,
-    ];
+    const critKeys = ["critical.all", `critical.${this.actionType}`];
+    const normalKeys = ["noCritical.all", `noCritical.${this.actionType}`];
     const grantsCritKeys = [
-      "flags.midi-qol.grants.critical.all",
-      `flags.midi-qol.grants.critical.${this.actionType}`,
+      "grants.critical.all",
+      `grants.critical.${this.actionType}`,
+      "grants.critical.range",
     ];
-    const grantsNormalKeys = [
-      "flags.midi-qol.fail.critical.all",
-      `flags.midi-qol.fail.critical.${this.actionType}`,
-    ];
+    const grantsNormalKeys = ["fail.critical.all", `fail.critical.${this.actionType}`];
 
     // find matching keys and update options
     const accumulator = this._accumulator();
-    accumulator.add(this.actorKeys, critKeys, normalKeys);
-    accumulator.add(this.targetKeys, grantsCritKeys, grantsNormalKeys);
-    accumulator.update(options);
+    accumulator.add(this.actorFlags, critKeys, normalKeys);
+    accumulator.add(this.targetFlags, grantsCritKeys, grantsNormalKeys);
+    accumulator.update(options, critProp);
   }
 
   /** @override */
@@ -300,17 +304,15 @@ export class CriticalReminder extends BaseReminder {
     let normal;
 
     return {
-      add: (actorKeys, critKeys, normalKeys) => {
-        actorKeys.forEach((key) => {
-          if (critKeys.includes(key)) crit = true;
-          if (normalKeys.includes(key)) normal = true;
-        });
+      add: (actorFlags, critKeys, normalKeys) => {
+        crit = critKeys.reduce((accum, curr) => accum || actorFlags[curr], crit);
+        normal = normalKeys.reduce((accum, curr) => accum || actorFlags[curr], normal);
       },
-      update: (options) => {
+      update: (options, critProp) => {
         // a normal hit overrides a crit
         const critical = normal ? false : !!crit;
-        debug(`updating critical: ${critical}`);
-        options.critical = critical;
+        debug(`updating ${critProp}: ${critical}`);
+        options[critProp] = critical;
       },
     };
   }

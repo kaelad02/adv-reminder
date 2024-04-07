@@ -1,55 +1,67 @@
 import { debug } from "./util.js";
 
 class BaseMessage {
-  constructor(actor) {
+  constructor(actor, targetActor) {
     /** @type {Actor5e} */
     this.actor = actor;
     /** @type {EffectChangeData[]} */
-    this.changes = actor.effects
-      .filter((effect) => !effect.isSuppressed && !effect.data.disabled)
-      .flatMap((effect) => effect.data.changes)
-      .sort((a, b) => a.priority - b.priority);
+    this.changes = this._getActiveEffectKeys(actor);
+    /** @type {EffectChangeData[]} */
+    this.targetChanges = this._getActiveEffectKeys(targetActor);
+  }
+
+  _getActiveEffectKeys(actor) {
+    return actor
+      ? actor.appliedEffects
+          .flatMap((effect) => effect.changes)
+          .sort((a, b) => a.priority - b.priority)
+      : [];
   }
 
   get messageKeys() {
     return ["flags.adv-reminder.message.all"];
   }
 
-  async addMessage(options) {
+  get targetKeys() {
+    return undefined;
+  }
+
+  addMessage(options) {
+    debug("checking for message effects");
+
+    // get any existing messages
+    const messages = getProperty(options, "dialogOptions.adv-reminder.messages") ?? [];
+
+    // get messages from the actor and merge
     const keys = this.messageKeys;
-    const messages = this.changes
+    const actorMessages = this.changes
       .filter((change) => keys.includes(change.key))
       .map((change) => change.value);
+    messages.push(...actorMessages);
 
-    if (messages.length > 0) {
-      // build message
-      const message = await renderTemplate(
-        "modules/adv-reminder/templates/roll-dialog-messages.hbs",
-        { messages }
-      );
-      // enrich message, specifically replacing rolls
-      const enriched = TextEditor.enrichHTML(message, {
-        secrets: true,
-        documents: true,
-        links: false,
-        rolls: true,
-        rollData: this.actor.getRollData(),
-        async: false,
-      });
-      debug("message", message, "enriched", enriched);
-      setProperty(options, "dialogOptions.adv-reminder.message", enriched);
+    // get messages from the target and merge
+    const targetKeys = this.targetKeys;
+    if (targetKeys) {
+      const targetMessages = this.targetChanges
+        .filter((change) => targetKeys.includes(change.key))
+        .map((change) => change.value);
+      messages.push(...targetMessages);
     }
 
-    return messages;
+    if (messages.length > 0) {
+      debug("messages found:", messages);
+      setProperty(options, "dialogOptions.adv-reminder.messages", messages);
+      setProperty(options, "dialogOptions.adv-reminder.rollData", this.actor.getRollData());
+    }
   }
 }
 
 export class AttackMessage extends BaseMessage {
-  constructor(actor, item) {
-    super(actor);
+  constructor(actor, targetActor, item) {
+    super(actor, targetActor);
 
     /** @type {string} */
-    this.actionType = item.data.data.actionType;
+    this.actionType = item.system.actionType;
     /** @type {string} */
     this.abilityId = item.abilityMod;
   }
@@ -61,6 +73,15 @@ export class AttackMessage extends BaseMessage {
       `flags.adv-reminder.message.attack.${this.actionType}`,
       `flags.adv-reminder.message.attack.${this.abilityId}`
     );
+  }
+
+  /** @override */
+  get targetKeys() {
+    return [
+      "flags.adv-reminder.grants.message.attack.all",
+      `flags.adv-reminder.grants.message.attack.${this.actionType}`,
+      `flags.adv-reminder.grants.message.attack.${this.abilityId}`,
+    ];
   }
 }
 
@@ -98,9 +119,17 @@ export class AbilitySaveMessage extends AbilityBaseMessage {
   }
 }
 
+export class ConcentrationMessage extends AbilityBaseMessage {
+  /** @override */
+  get messageKeys() {
+    // don't call super since the system will trigger a saving throw
+    return ["flags.adv-reminder.message.ability.concentration"];
+  }
+}
+
 export class SkillMessage extends AbilityCheckMessage {
-  constructor(actor, skillId) {
-    super(actor, actor.data.data.skills[skillId].ability);
+  constructor(actor, abilityId, skillId) {
+    super(actor, abilityId);
 
     /** @type {string} */
     this.skillId = skillId;
@@ -130,11 +159,11 @@ export class DeathSaveMessage extends AbilityBaseMessage {
 }
 
 export class DamageMessage extends BaseMessage {
-  constructor(actor, item) {
-    super(actor);
+  constructor(actor, targetActor, item) {
+    super(actor, targetActor);
 
     /** @type {string} */
-    this.actionType = item.data.data.actionType;
+    this.actionType = item.system.actionType;
     /** @type {boolean} */
     this.critical = false;
   }
@@ -149,10 +178,11 @@ export class DamageMessage extends BaseMessage {
     return keys;
   }
 
-  async addMessage(options) {
-    if (options?.critical) this.critical = true;
-    // Damage options has a nested options variable, add that and pass it to super
-    options.options = options.options || {};
-    return super.addMessage(options.options);
+  /** @override */
+  get targetKeys() {
+    return [
+      "flags.adv-reminder.grants.message.damage.all",
+      `flags.adv-reminder.grants.message.damage.${this.actionType}`,
+    ];
   }
 }

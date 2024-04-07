@@ -1,272 +1,369 @@
-import { AbilitySaveFail } from "./fails.js";
-import {
-  AbilityCheckMessage,
-  AbilitySaveMessage,
-  AttackMessage,
-  DamageMessage,
-  DeathSaveMessage,
-  SkillMessage,
-} from "./messages.js";
-import {
-  AttackReminder,
-  AbilityCheckReminder,
-  AbilitySaveReminder,
-  CriticalReminder,
-  DeathSaveReminder,
-  SkillReminder,
-} from "./reminders.js";
-import { debug, isMinVersion, log } from "./util.js";
+import CoreRollerHooks from "./rollers/core.js";
+import MidiRollerHooks from "./rollers/midi.js";
+import ReadySetRollHooks from "./rollers/rsr.js";
+import SamplePackBuilder from "./sample-pack.js";
+import { debug, debugEnabled, log } from "./util.js";
 
-let checkArmorStealth;
+const CIRCLE_INFO = `<i class="fa-solid fa-circle-info"></i> `;
 
 Hooks.once("init", () => {
   log("initializing Advantage Reminder");
 
-  // DAE version 0.8.81 added support for "impose stealth disadvantage"
-  checkArmorStealth = !isMinVersion("dae", "0.8.81");
-  debug("checkArmorStealth", checkArmorStealth);
+  // initialize the roller hooks helper class
+  let rollerHooks;
+  if (game.modules.get("midi-qol")?.active) rollerHooks = new MidiRollerHooks();
+  else if (game.modules.get("ready-set-roll-5e")?.active) rollerHooks = new ReadySetRollHooks();
+  else rollerHooks = new CoreRollerHooks();
+  rollerHooks.init();
 
-  // Attack roll wrapper
-  libWrapper.register(
-    "adv-reminder",
-    "CONFIG.Item.documentClass.prototype.rollAttack",
-    onRollAttack,
-    "WRAPPER"
-  );
-
-  // Saving throw wrapper
-  libWrapper.register(
-    "adv-reminder",
-    "CONFIG.Actor.documentClass.prototype.rollAbilitySave",
-    onRollAbilitySave,
-    "MIXED"
-  );
-
-  // Ability check wrapper
-  libWrapper.register(
-    "adv-reminder",
-    "CONFIG.Actor.documentClass.prototype.rollAbilityTest",
-    onRollAbilityTest,
-    "WRAPPER"
-  );
-
-  // Skill check wrapper
-  libWrapper.register(
-    "adv-reminder",
-    "CONFIG.Actor.documentClass.prototype.rollSkill",
-    onRollSkill,
-    "WRAPPER"
-  );
-
-  // Tool check wrapper
-  libWrapper.register(
-    "adv-reminder",
-    "CONFIG.Item.documentClass.prototype.rollToolCheck",
-    onRollToolCheck,
-    "WRAPPER"
-  );
-
-  // Death save wrapper
-  libWrapper.register(
-    "adv-reminder",
-    "CONFIG.Actor.documentClass.prototype.rollDeathSave",
-    onRollDeathSave,
-    "WRAPPER"
-  );
-
-  // Critical hit wrapper
-  libWrapper.register(
-    "adv-reminder",
-    "CONFIG.Item.documentClass.prototype.rollDamage",
-    onRollDamage,
-    "WRAPPER"
-  );
-
-  // Render dialog hook
-  Hooks.on("renderDialog", addMessageHook);
+  // register hook to apply Midi's flags
+  if (rollerHooks.shouldApplyMidiActiveEffect()) Hooks.on("applyActiveEffect", applyMidiCustom);
 });
 
-// Add message flags to DAE so it shows them in the AE editor. Should do this in
-// a setup hook, but this module is loaded before DAE so do it in ready instead.
+// Apply Midi-QOL's custom active effects
+function applyMidiCustom(actor, change) {
+  const supportedKeys = [
+    "flags.midi-qol.advantage.",
+    "flags.midi-qol.disadvantage.",
+    "flags.midi-qol.grants.",
+    "flags.midi-qol.critical.",
+    "flags.midi-qol.noCritical.",
+    "flags.midi-qol.fail.",
+  ];
+  if (supportedKeys.some((k) => change.key.startsWith(k))) {
+    // update the actor
+    if (typeof change.value !== "string") setProperty(actor, change.key, change.value);
+    else if (["true", "1"].includes(change.value.trim())) setProperty(actor, change.key, true);
+    else if (["false", "0"].includes(change.value.trim())) setProperty(actor, change.key, false);
+    else setProperty(actor, change.key, change.value);
+  }
+}
+
+Hooks.once("setup", () => {
+  if (game.settings.get("adv-reminder", "updateStatusEffects")) {
+    updateStatusEffects();
+    Hooks.on("preCreateActiveEffect", addExhaustionEffects);
+    Hooks.on("preUpdateActiveEffect", addExhaustionEffects);
+  }
+});
+
+function updateStatusEffects() {
+  debug("updateStatusEffects");
+
+  const effectChanges = {
+    blinded: {
+      changes: [
+        {
+          key: "flags.midi-qol.disadvantage.attack.all",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "1",
+        },
+        {
+          key: "flags.midi-qol.grants.advantage.attack.all",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "1",
+        },
+      ],
+    },
+    dodging: {
+      flags: {
+        dae: {
+          specialDuration: ["turnStart"],
+        },
+      },
+      changes: [
+        {
+          key: "flags.midi-qol.grants.disadvantage.attack.all",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "1",
+        },
+        {
+          key: "flags.midi-qol.advantage.ability.save.dex",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "1",
+        },
+      ],
+    },
+    frightened: {
+      changes: [
+        {
+          key: "flags.midi-qol.disadvantage.attack.all",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "1",
+        },
+        {
+          key: "flags.midi-qol.disadvantage.ability.check.all",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "1",
+        },
+      ],
+    },
+    hidden: {
+      changes: [
+        {
+          key: "flags.midi-qol.advantage.attack.all",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "1",
+        },
+        {
+          key: "flags.midi-qol.grants.disadvantage.attack.all",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "1",
+        },
+      ],
+    },
+    invisible: {
+      changes: [
+        {
+          key: "flags.midi-qol.advantage.attack.all",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "1",
+        },
+        {
+          key: "flags.midi-qol.grants.disadvantage.attack.all",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "1",
+        },
+      ],
+    },
+    paralyzed: {
+      changes: [
+        {
+          key: "flags.midi-qol.fail.ability.save.dex",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "1",
+        },
+        {
+          key: "flags.midi-qol.fail.ability.save.str",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "1",
+        },
+        {
+          key: "flags.midi-qol.grants.advantage.attack.all",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "1",
+        },
+        {
+          key: "flags.midi-qol.grants.critical.range",
+          mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE,
+          value: "5",
+        },
+      ],
+    },
+    petrified: {
+      changes: [
+        {
+          key: "flags.midi-qol.grants.advantage.attack.all",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "1",
+        },
+        {
+          key: "flags.midi-qol.fail.ability.save.dex",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "1",
+        },
+        {
+          key: "flags.midi-qol.fail.ability.save.str",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "1",
+        },
+      ],
+    },
+    poisoned: {
+      changes: [
+        {
+          key: "flags.midi-qol.disadvantage.attack.all",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "1",
+        },
+        {
+          key: "flags.midi-qol.disadvantage.ability.check.all",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "1",
+        },
+      ],
+    },
+    prone: {
+      changes: [
+        {
+          key: "flags.midi-qol.grants.advantage.attack.mwak",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "1",
+        },
+        {
+          key: "flags.midi-qol.grants.advantage.attack.msak",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "1",
+        },
+        {
+          key: "flags.midi-qol.grants.disadvantage.attack.rwak",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "1",
+        },
+        {
+          key: "flags.midi-qol.grants.disadvantage.attack.rsak",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "1",
+        },
+        {
+          key: "flags.midi-qol.disadvantage.attack.all",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "1",
+        },
+      ],
+    },
+    restrained: {
+      changes: [
+        {
+          key: "flags.midi-qol.disadvantage.ability.save.dex",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "1",
+        },
+        {
+          key: "flags.midi-qol.disadvantage.attack.all",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "1",
+        },
+        {
+          key: "flags.midi-qol.grants.advantage.attack.all",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "1",
+        },
+      ],
+    },
+    stunned: {
+      changes: [
+        {
+          key: "flags.midi-qol.fail.ability.save.dex",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "1",
+        },
+        {
+          key: "flags.midi-qol.fail.ability.save.str",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "1",
+        },
+        {
+          key: "flags.midi-qol.grants.advantage.attack.all",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "1",
+        },
+      ],
+    },
+    unconscious: {
+      changes: [
+        {
+          key: "flags.midi-qol.fail.ability.save.dex",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "1",
+        },
+        {
+          key: "flags.midi-qol.fail.ability.save.str",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "1",
+        },
+        {
+          key: "flags.midi-qol.grants.advantage.attack.all",
+          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+          value: "1",
+        },
+        {
+          key: "flags.midi-qol.grants.critical.range",
+          mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE,
+          value: "5",
+        },
+      ],
+    },
+  };
+
+  Object.entries(effectChanges).forEach(([id, data]) => {
+    const effect = CONFIG.statusEffects.find((e) => e.id === id);
+    if (effect) foundry.utils.mergeObject(effect, data);
+  });
+}
+
+function addExhaustionEffects(effect, updates) {
+  debug("addExhaustionEffects");
+
+  if (effect.id !== dnd5e.documents.ActiveEffect5e.ID.EXHAUSTION) return;
+  const level = foundry.utils.getProperty(updates, "flags.dnd5e.exhaustionLevel");
+  if (!level) return;
+  // build the changes based on exhaustion level
+  const changes = [
+    {
+      key: "flags.midi-qol.disadvantage.ability.check.all",
+      mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+      value: "1",
+    },
+    {
+      key: "flags.dnd5e.initiativeDisadv",
+      mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+      value: "1",
+    },
+  ];
+  if (level >= 3)
+    changes.push(
+      {
+        key: "flags.midi-qol.disadvantage.attack.all",
+        mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+        value: "1",
+      },
+      {
+        key: "flags.midi-qol.disadvantage.ability.save.all",
+        mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+        value: "1",
+      }
+    );
+  // add changes to the active effect
+  effect.updateSource({ changes });
+}
+
+// Add message flags to DAE so it shows them in the AE editor
+Hooks.once("DAE.setupComplete", () => {
+  debug("adding Advantage Reminder flags to DAE");
+
+  const fields = [];
+  fields.push("flags.adv-reminder.message.all");
+  fields.push("flags.adv-reminder.message.attack.all");
+  fields.push("flags.adv-reminder.message.ability.all");
+  fields.push("flags.adv-reminder.message.ability.check.all");
+  fields.push("flags.adv-reminder.message.ability.save.all");
+  fields.push("flags.adv-reminder.message.skill.all");
+  fields.push("flags.adv-reminder.message.deathSave");
+  fields.push("flags.adv-reminder.message.damage.all");
+  fields.push("flags.adv-reminder.message.damage.critical");
+
+  const actionTypes = game.system.id === "sw5e" ? ["mwak", "rwak", "mpak", "rpak"] : ["mwak", "rwak", "msak", "rsak"];
+  actionTypes.forEach((actionType) => fields.push(`flags.adv-reminder.message.attack.${actionType}`));
+
+  Object.keys(CONFIG.DND5E.itemActionTypes).forEach((actionType) =>
+    fields.push(`flags.adv-reminder.message.damage.${actionType}`)
+  );
+
+  Object.keys(CONFIG.DND5E.abilities).forEach((abilityId) => {
+    fields.push(`flags.adv-reminder.message.attack.${abilityId}`);
+    fields.push(`flags.adv-reminder.message.ability.check.${abilityId}`);
+    fields.push(`flags.adv-reminder.message.ability.save.${abilityId}`);
+  });
+
+  Object.keys(CONFIG.DND5E.skills).forEach((skillId) => fields.push(`flags.adv-reminder.message.skill.${skillId}`));
+
+  window.DAE.addAutoFields(fields);
+});
+
 Hooks.once("ready", () => {
-  if (game.modules.get("dae")?.active) {
-    const fields = [];
-    fields.push("flags.adv-reminder.message.all");
-    fields.push("flags.adv-reminder.message.attack.all");
-    fields.push("flags.adv-reminder.message.ability.all");
-    fields.push("flags.adv-reminder.message.ability.check.all");
-    fields.push("flags.adv-reminder.message.ability.save.all");
-    fields.push("flags.adv-reminder.message.skill.all");
-    fields.push("flags.adv-reminder.message.deathSave");
-    fields.push("flags.adv-reminder.message.damage.all");
-    fields.push("flags.adv-reminder.message.damage.critical");
-
-    const actionTypes =
-      game.system.id === "sw5e"
-        ? ["mwak", "rwak", "mpak", "rpak"]
-        : ["mwak", "rwak", "msak", "rsak"];
-    actionTypes.forEach((actionType) => {
-      fields.push(`flags.adv-reminder.message.attack.${actionType}`);
-      fields.push(`flags.adv-reminder.message.damage.${actionType}`);
-    });
-
-    Object.keys(CONFIG.DND5E.abilities).forEach((abilityId) => {
-      fields.push(`flags.adv-reminder.message.attack.${abilityId}`);
-      fields.push(`flags.adv-reminder.message.ability.check.${abilityId}`);
-      fields.push(`flags.adv-reminder.message.ability.save.${abilityId}`);
-    });
-
-    Object.keys(CONFIG.DND5E.skills).forEach((skillId) =>
-      fields.push(`flags.adv-reminder.message.skill.${skillId}`)
-    );
-
-    window.DAE.addAutoFields(fields);
-  }
+  // expose SamplePackBuilder
+  if (debugEnabled) window.samplePack = new SamplePackBuilder();
 });
 
-async function onRollAttack(wrapped, options = {}) {
-  debug("onRollAttack method called");
+// Render dialog hook
+Hooks.on("renderDialog", async (dialog, html, data) => {
+  debug("renderDialog hook called");
 
-  // check for adv/dis flags unless the user pressed a fast-forward key
-  const isFF = isFastForwarding(options);
-  if (isFF) {
-    debug("fast-forwarding the roll, skip checking for adv/dis");
-  } else {
-    debug("checking for message effects on this attack roll");
-    await new AttackMessage(this.actor, this).addMessage(options);
-    debug("checking for adv/dis effects on this attack roll");
-    const reminder = new AttackReminder(this.actor, getTarget(), this);
-    reminder.updateOptions(options);
-  }
-
-  return wrapped(options);
-}
-
-async function onRollAbilitySave(wrapped, abilityId, options = {}) {
-  debug("onRollAbilitySave method called");
-
-  // check if an effect says to fail this roll
-  const failChecker = new AbilitySaveFail(this, abilityId);
-  if (await failChecker.fails(options)) return null;
-
-  // check for adv/dis flags unless the user pressed a fast-forward key
-  const isFF = isFastForwarding(options);
-  if (isFF) {
-    debug("fast-forwarding the roll, skip checking for adv/dis");
-  } else {
-    debug("checking for message effects on this saving throw");
-    await new AbilitySaveMessage(this, abilityId).addMessage(options);
-    debug("checking for adv/dis effects on this saving throw");
-    const reminder = new AbilitySaveReminder(this, abilityId);
-    reminder.updateOptions(options);
-  }
-
-  return wrapped(abilityId, options);
-}
-
-async function onRollAbilityTest(wrapped, abilityId, options = {}) {
-  debug("onRollAbilityTest method called");
-
-  // check for adv/dis flags unless the user pressed a fast-forward key
-  const isFF = isFastForwarding(options);
-  if (isFF) {
-    debug("fast-forwarding the roll, skip checking for adv/dis");
-  } else {
-    debug("checking for message effects on this ability check");
-    await new AbilityCheckMessage(this, abilityId).addMessage(options);
-    debug("checking for adv/dis effects on this ability check");
-    const reminder = new AbilityCheckReminder(this, abilityId);
-    reminder.updateOptions(options);
-  }
-
-  return wrapped(abilityId, options);
-}
-
-async function onRollSkill(wrapped, skillId, options = {}) {
-  debug("onRollSkill method called");
-
-  // check for adv/dis flags unless the user pressed a fast-forward key
-  const isFF = isFastForwarding(options);
-  if (isFF) {
-    debug("fast-forwarding the roll, skip checking for adv/dis");
-  } else {
-    debug("checking for message effects on this skill check");
-    await new SkillMessage(this, skillId).addMessage(options);
-    debug("checking for adv/dis effects on this skill check");
-    const reminder = new SkillReminder(this, skillId, checkArmorStealth);
-    reminder.updateOptions(options);
-  }
-
-  return wrapped(skillId, options);
-}
-
-async function onRollToolCheck(wrapped, options = {}) {
-  debug("onRollToolCheck method called");
-
-  // check for adv/dis flags unless the user pressed a fast-forward key
-  const isFF = isFastForwarding(options);
-  if (isFF) {
-    debug("fast-forwarding the roll, skip checking for adv/dis");
-  } else {
-    debug("checking for message effects on this tool check");
-    await new AbilityCheckMessage(
-      this.actor,
-      this.data.data.ability
-    ).addMessage(options);
-    debug("checking for adv/dis effects on this tool check");
-    const reminder = new AbilityCheckReminder(
-      this.actor,
-      this.data.data.ability
-    );
-    reminder.updateOptions(options);
-  }
-
-  return wrapped(options);
-}
-
-async function onRollDeathSave(wrapped, options = {}) {
-  debug("onRollDeathSave method called");
-
-  // check for adv/dis flags unless the user pressed a fast-forward key
-  const isFF = isFastForwarding(options);
-  if (isFF) {
-    debug("fast-forwarding the roll, skip checking for adv/dis");
-  } else {
-    debug("checking for message effects on this death save");
-    await new DeathSaveMessage(this).addMessage(options);
-    debug("checking for adv/dis effects on this death save");
-    const reminder = new DeathSaveReminder(this);
-    reminder.updateOptions(options);
-  }
-
-  return wrapped(options);
-}
-
-async function onRollDamage(wrapped, options = {}) {
-  debug("onRollDamage method called");
-
-  // check for critical flags unless the user pressed a fast-forward key
-  const isFF = isFastForwardingDamage(options);
-  if (isFF) {
-    debug("fast-forwarding the roll, skip checking for adv/dis");
-  } else {
-    debug("checking for message effects on this damage roll");
-    await new DamageMessage(this.actor, this).addMessage(options);
-    debug("checking for critical/normal effects on this damage roll");
-    const reminder = new CriticalReminder(this.actor, getTarget(), this);
-    reminder.updateOptions(options);
-  }
-
-  return wrapped(options);
-}
-
-function addMessageHook(dialog, html, data) {
-  debug("addMessageHook function called");
-
-  const message = dialog.options["adv-reminder"]?.message;
+  const message = await prepareMessage(dialog.options);
   if (message) {
     // add message at the end
-    const formGroups = html.find(".form-group:last");
+    const formGroups = html.find("form:first .form-group:last");
     formGroups.after(message);
     // swap "inline-roll" class for "dialog-roll"
     const inlineRolls = html.find("a.inline-roll");
@@ -291,43 +388,38 @@ function addMessageHook(dialog, html, data) {
     position.height = "auto";
     dialog.setPosition(position);
   }
-}
+});
 
-/**
- * Check if we should fast-forward the roll by checking the fastForward flag
- * and if one of the modifier keys was pressed.
- * @param {object} options
- * @param {boolean} [options.fastForward] a specific fastForward flag
- * @param {Event} [options.event] the triggering event
- * @returns {boolean} true if they are fast-forwarding, false otherwise
- */
-function isFastForwarding({ fastForward = false, event = {} }) {
-  return !!(
-    fastForward ||
-    event?.shiftKey ||
-    event?.altKey ||
-    event?.ctrlKey ||
-    event?.metaKey
-  );
-}
+async function prepareMessage(dialogOptions) {
+  const opt = dialogOptions["adv-reminder"];
+  if (!opt) return;
 
-/**
- * Check if the user is holding down a fast-forward key for a damage roll.
- * @param {object} [options] the options
- * @param {Event} [options.event] the triggering event
- * @param {object} [options.options] the nested options
- * @returns {boolean} true if they are fast-forwarding, false otherwise
- */
-function isFastForwardingDamage({ event = {}, options = {} }) {
-  // special handling for MRE and damage rolls, always process since it will run after this module
-  if (game.modules.get("mre-dnd5e")?.active) return false;
-  return isFastForwarding({ fastForward: options.fastForward, event });
-}
+  // merge the messages with the advantage/disadvantage from sources
+  const messages = [...(opt.messages ?? [])];
+  const addLabels = (labels, stringId) => {
+    if (labels) {
+      const sources = labels.join(", ");
+      messages.push(CIRCLE_INFO + game.i18n.format(stringId, { sources }));
+    }
+  };
+  addLabels(opt.advantageLabels, "adv-reminder.Source.Adv");
+  addLabels(opt.disadvantageLabels, "adv-reminder.Source.Dis");
+  addLabels(opt.criticalLabels, "adv-reminder.Source.Crit");
+  addLabels(opt.normalLabels, "adv-reminder.Source.Norm");
 
-/**
- * Get the first targeted actor, if there are any targets at all.
- * @returns {Actor5e} the first target, if there are any
- */
-function getTarget() {
-  return [...game.user.targets][0]?.actor;
+  if (messages.length) {
+    // build message
+    const message = await renderTemplate("modules/adv-reminder/templates/roll-dialog-messages.hbs", { messages });
+    // enrich message, specifically replacing rolls
+    const enriched = await TextEditor.enrichHTML(message, {
+      secrets: true,
+      documents: true,
+      links: false,
+      rolls: true,
+      rollData: opt.rollData ?? {},
+      async: true,
+    });
+    debug("messages", messages, "enriched", enriched);
+    return enriched;
+  }
 }

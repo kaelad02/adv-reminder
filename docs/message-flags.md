@@ -12,6 +12,9 @@ Some of the terms used in the keys are further explained in [Terms and Abbreviat
 | flags.adv-reminder.message.attack.all | Message on all attack rolls |
 | flags.adv-reminder.message.attack.mwak/rwak/msak/rsak | Message on attacks with a specific Action Type |
 | flags.adv-reminder.message.attack.str/dex/con/int/wis/cha | Message on attacks with a specific Ability Modifier |
+| flags.adv-reminder.grants.message.attack.all | Message when targeted by all attack rolls |
+| flags.adv-reminder.grants.message.attack.mwak/rwak/msak/rsak | Message when targeted by attacks with a specific Action Type |
+| flags.adv-reminder.grants.message.attack.str/dex/con/int/wis/cha | Message when targeted by attacks with a specific Ability Modifier |
 
 ## Damage Rolls
 
@@ -21,6 +24,8 @@ Some of the terms used in the keys are further explained in [Terms and Abbreviat
 | flags.adv-reminder.message.damage.all | Message on all damage rolls |
 | flags.adv-reminder.message.damage.mwak/rwak/msak/rsak | Message on damage rolls with a specific Action Type |
 | flags.adv-reminder.message.damage.critical | Message on critical damage rolls |
+| flags.adv-reminder.grants.message.damage.all | Message when targeted by all damage rolls |
+| flags.adv-reminder.grants.message.damage.mwak/rwak/msak/rsak | Message when targeted by damage rolls with a specific Action Type |
 
 ## Ability Checks 
 

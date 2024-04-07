@@ -4,6 +4,8 @@ The messages feature allows you to use active effects to include helpful message
 
 ![Saving Throw screenshot with message](poison-message.png?raw=true)
 
+There is an item compendium pack, AR Message Sample Items, that comes with some SRD features and spells that include messages.
+
 ## Creating a Message
 
 You create an message by first defining an active effect. In some cases, this could be an active effect on a feature or spell since it may only apply after using that feature or casting that spell. In other cases, they might always apply so creating them as passive effects directly on the actor would be best.

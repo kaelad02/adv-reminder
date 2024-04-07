@@ -28,15 +28,11 @@ In addition to active effects adding advantage or disadvantage, you can also add
 
 ![Saving Throw screenshot with message](docs/poison-message.png?raw=true)
 
-[Messages](docs/messages.md) has more information about the messages feature, including the active effect keys.
+[Messages](docs/messages.md) has more information about the messages feature, including the active effect keys. There is also a compendium pack, AR Message Sample Items, that contains samples.
 
 ## Other Modules
 
 Notes about other modules.
-
-### Required Modules
-
-[libWrapper](https://foundryvtt.com/packages/lib-wrapper) - A library that makes it easy to wrap core Foundry VTT code. It's used to check the active effects before one of the supported rolls happens to pass along the advantage, disadvantage, or critical option.
 
 ### Suggested Modules
 
@@ -48,17 +44,17 @@ Notes about other modules.
 
 ### Compatibility Notes
 
-[Better Rolls for 5e](https://foundryvtt.com/packages/betterrolls5e) This module works with Better Rolls, making rolls with advantage and disadvantage with the following known issues.
+[Midi QOL](https://foundryvtt.com/packages/midi-qol) This module works with Midi QOL, however there is a lot of crossover. Both modules can handle the advantage/disadvantage/critical flags, so you don't need this module for that. If you want the CSS change and messages feature, then it works with the following notes:
 
-- Active effects for critical hits do not work.
-- The "d20 Mode" Better Rolls setting of "Single Roll Upgradeable" does not give the hint in the pop-up asking what kind of roll to perform. It will still apply the active effects though possibly leading to some confusion, especially since advantage and disadvantage will not cancel each other out like they should.
-- Does not show messages, even if "d20 Mode" is set to "Query for (Dis)Advantage"
+- This module will not process the advantage/disadvantage/critical flags if Midi QOL is active, since it will process them already
+- Does not show messages if Midi QOL is configured to fast forward rolls since there is no dialog to show them 
 
-[Midi QOL](https://foundryvtt.com/packages/midi-qol) This module works with Midi QOL, however there is a lot of crossover. Both modules will handle the advantage/disadvantage/critical flags, so you don't need this module for that. If you want the CSS change and messages feature, then it works with these known issues:
+[Faster Rolling by Default DnD5e](https://foundryvtt.com/packages/faster-rolling-by-default-5e) This moodule works with Faster Rolling by Default. If the dialog is shown, it will show any messages and have the default button set correctly.
 
-- Midi QOL will ignore any advantage/disadvantage/critical settings that Advantage Reminder finds and passes along. It will perform the check for those flags itself. It is wasted work but shouldn't cause a noticable performance hit.
-- Does not show messages if Midi QOL is configured to fast forward rolls
+[Roll Groups](https://foundryvtt.com/packages/rollgroups) This module works with Roll Groups.
 
-[Minimal Rolling Enhancements for D&D5e](https://foundryvtt.com/packages/mre-dnd5e) This module works with MRE, making rolls with advantage/disadvantage and showing messages if you hold the "Roll Dialog Modifier Key" (an MRE setting).
+[Ready Set Roll for D&D5e](https://foundryvtt.com/packages/ready-set-roll-5e) This module works with Ready Set Roll with the following notes:
 
-[Dynamic effects using Active Effects](https://foundryvtt.com/packages/dae) If you're using the message feature to add inline roll formulas, you need to use DAE version 0.10.01 or newer. Earlier versions would evaluate the deferred die roll in the active effect's value, making the button not work.
+- This module will apply advantage/disadvantage on checks even if RSR is configured for quick rolls. This is skipped if you hold down one of the roll modifier keys to manually apply advantage/disadvantage (similar to core behavior). 
+- Effects for critical hits work but not those that cancel crits because of how early this module has to set the `isCrit` flag
+- Does not show messages if RSR is configured for quick rolls since there is no dialog to show them
