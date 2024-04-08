@@ -47,7 +47,8 @@ Notes about other modules.
 [Midi QOL](https://foundryvtt.com/packages/midi-qol) This module works with Midi QOL, however there is a lot of crossover. Both modules can handle the advantage/disadvantage/critical flags, so you don't need this module for that. If you want the CSS change and messages feature, then it works with the following notes:
 
 - This module will not process the advantage/disadvantage/critical flags if Midi QOL is active, since it will process them already
-- Does not show messages if Midi QOL is configured to fast forward rolls since there is no dialog to show them 
+- Does not show messages if Midi QOL is configured to fast forward rolls since there is no dialog to show them
+- Does not show `flags.adv-reminder.message.damage.critical` messages
 
 [Faster Rolling by Default DnD5e](https://foundryvtt.com/packages/faster-rolling-by-default-5e) This moodule works with Faster Rolling by Default. If the dialog is shown, it will show any messages and have the default button set correctly.
 
@@ -58,3 +59,4 @@ Notes about other modules.
 - This module will apply advantage/disadvantage on checks even if RSR is configured for quick rolls. This is skipped if you hold down one of the roll modifier keys to manually apply advantage/disadvantage (similar to core behavior). 
 - Effects for critical hits work but not those that cancel crits because of how early this module has to set the `isCrit` flag
 - Does not show messages if RSR is configured for quick rolls since there is no dialog to show them
+- Does not show `flags.adv-reminder.message.damage.critical` messages

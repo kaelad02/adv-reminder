@@ -185,4 +185,11 @@ export class DamageMessage extends BaseMessage {
       `flags.adv-reminder.grants.message.damage.${this.actionType}`,
     ];
   }
+
+  /** @override */
+  addMessage(options) {
+    // copy the critical status
+    this.critical = options.critical;
+    super.addMessage(options);
+  }
 }

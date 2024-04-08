@@ -148,9 +148,10 @@ export default class CoreRollerHooks {
     const target = getTarget();
     const distanceFn = getDistanceToTargetFn(config.messageData.speaker);
 
+    // run the reminder first so the critical flag can be used for messages
+    new CriticalReminder(item.actor, target, item, distanceFn).updateOptions(config);
     new DamageMessage(item.actor, target, item).addMessage(config);
     if (showSources) new CriticalSource(item.actor, target, item, distanceFn).updateOptions(config);
-    new CriticalReminder(item.actor, target, item, distanceFn).updateOptions(config);
   }
 
   /**
