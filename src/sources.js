@@ -36,11 +36,21 @@ const SourceMixin = (superclass) =>
 
     _getConditionForEffect(actor, key) {
       const props = super._getConditionForEffect(actor, key);
-      return props
-        // remove the number after exhaustion
-        .map((k) => k.split("-").shift())
-        // get name from statusEffects
-        .map((k) => CONFIG.statusEffects.find((s) => s.id === k)?.name);
+      return (
+        props
+          .toObject()
+          // remove the number after exhaustion
+          .map((k) => k.split("-").shift())
+          .flatMap((k) => {
+            // look for active effects with this status in it, get their names
+            const activeEffectNames = actor.appliedEffects
+              .filter((e) => e.statuses.some((s) => s === k))
+              .map((e) => e.name);
+            if (activeEffectNames.length) return activeEffectNames;
+            // fallback to the status effect's name (mostly for exhaustion)
+            return CONFIG.statusEffects.filter((s) => s.id === k).map((s) => s.name);
+          })
+      );
     }
 
     _accumulator() {
