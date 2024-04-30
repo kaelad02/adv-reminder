@@ -81,15 +81,19 @@ class BaseReminder {
 }
 
 export class AttackReminder extends BaseReminder {
-  constructor(actor, targetActor, item) {
+  constructor(actor, targetActor, item, distanceFn) {
     super(actor);
 
+    /** @type {Actor5e*} */
+    this.targetActor = targetActor;
     /** @type {object} */
     this.targetFlags = this._getFlags(targetActor);
     /** @type {string} */
     this.actionType = item.system.actionType;
     /** @type {string} */
     this.abilityId = item.abilityMod;
+    /** @type {function} */
+    this.distanceFn = distanceFn;
   }
 
   updateOptions(options) {
@@ -120,13 +124,22 @@ export class AttackReminder extends BaseReminder {
       `grants.disadvantage.attack.${this.actionType}`,
     ];
 
-    // find matching keys and update options
+    // find matching keys
     const accumulator = this._accumulator();
     accumulator.add(this.actorFlags, advKeys, disKeys);
     accumulator.add(this.targetFlags, grantsAdvKeys, grantsDisKeys);
-    this._getConditionForEffect(this.actor, "advReminderAdvantageAttack").forEach(
-      accumulator.advantage
-    );
+    // handle status effects
+    this._getConditionForEffect(this.actor, "advReminderAdvantageAttack").forEach(accumulator.advantage);
+    this._getConditionForEffect(this.actor, "advReminderDisadvantageAttack").forEach(accumulator.disadvantage);
+    this._getConditionForEffect(this.targetActor, "advReminderGrantAdvantageAttack").forEach(accumulator.advantage);
+    this._getConditionForEffect(this.targetActor, "advReminderGrantDisadvantageAttack").forEach(accumulator.disadvantage);
+    // handle distance-based status effects
+    const grantAdjacentAttack = this._getConditionForEffect(this.targetActor, "advReminderGrantAdjacentAttack");
+    if (grantAdjacentAttack.size) {
+      const distance = this.distanceFn();
+      const accumFn = distance <= 5 ? accumulator.advantage : accumulator.disadvantage;
+      grantAdjacentAttack.forEach(accumFn);
+    }
     accumulator.update(options);
   }
 }

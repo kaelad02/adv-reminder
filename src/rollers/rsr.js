@@ -26,7 +26,7 @@ import {
   SkillSource,
 } from "../sources.js";
 import { showSources } from "../settings.js";
-import { debug, getTarget } from "../util.js";
+import { debug, getDistanceToTargetFn, getTarget } from "../util.js";
 import CoreRollerHooks from "./core.js";
 
 // disable the grants.critical.range flag since RSR can't have it's critical flag changed anyways,
@@ -51,14 +51,15 @@ export default class ReadySetRollHooks extends CoreRollerHooks {
     debug("preRollAttack hook called");
 
     const target = getTarget();
+    const distanceFn = getDistanceToTargetFn(config.messageData.speaker);
 
     if (this._doMessages(config)) {
       new AttackMessage(item.actor, target, item).addMessage(config);
-      if (showSources) new AttackSource(item.actor, target, item).updateOptions(config);
+      if (showSources) new AttackSource(item.actor, target, item, distanceFn).updateOptions(config);
     }
 
     if (this._doReminder(config))
-      new AttackReminder(item.actor, target, item).updateOptions(config);
+      new AttackReminder(item.actor, target, item, distanceFn).updateOptions(config);
   }
 
   preRollAbilitySave(actor, config, abilityId) {

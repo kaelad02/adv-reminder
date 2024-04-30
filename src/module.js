@@ -319,15 +319,14 @@ function updateConditionEffects() {
   // flags.midi-qol.grants.advantage.attack.all
   CONFIG.DND5E.conditionEffects.advReminderGrantAdvantageAttack = new Set(["blinded", "paralyzed", "petrified", "restrained", "stunned", "unconscious"]);
 
-  CONFIG.DND5E.conditionEffects.advReminderGrantAdvantageAdjacentAttack = new Set(["prone"]);
-
   // flags.midi-qol.grants.critical.range
   CONFIG.DND5E.conditionEffects.advReminderGrantCriticalAdjacent = new Set(["paralyzed", "unconscious"]);
 
   // flags.midi-qol.grants.disadvantage.attack.all
   CONFIG.DND5E.conditionEffects.advReminderGrantDisadvantageAttack = new Set(["dodging", "exhaustion-3", "hidden", "invisible"]);
 
-  CONFIG.DND5E.conditionEffects.advReminderGrantDisadvantageFarAttack = new Set(["prone"]);
+  // if adjacent, grant advantage on the attack, else grant disadvantage
+  CONFIG.DND5E.conditionEffects.advReminderGrantAdjacentAttack = new Set(["prone"]);
 }
 
 function addExhaustionEffects(effect, updates) {
