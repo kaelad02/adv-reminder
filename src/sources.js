@@ -34,6 +34,15 @@ const SourceMixin = (superclass) =>
       debug("checking for adv/dis effects to display their source");
     }
 
+    _getConditionForEffect(actor, key) {
+      const props = super._getConditionForEffect(actor, key);
+      return props
+        // remove the number after exhaustion
+        .map((k) => k.split("-").shift())
+        // get name from statusEffects
+        .map((k) => CONFIG.statusEffects.find((s) => s.id === k)?.name);
+    }
+
     _accumulator() {
       const advantageLabels = [];
       const disadvantageLabels = [];

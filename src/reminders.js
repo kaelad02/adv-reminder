@@ -2,6 +2,8 @@ import { debug, isEmpty } from "./util.js";
 
 class BaseReminder {
   constructor(actor) {
+    /** @type {Actor5e*} */
+    this.actor = actor;
     /** @type {object} */
     this.actorFlags = this._getFlags(actor);
   }
@@ -21,6 +23,26 @@ class BaseReminder {
   }
 
   /**
+   * Modeled after Actor5e#hasConditionEffect, check to see if the actor is under the effect of
+   * this property from some status or due to its level of exhaustion. But instead of a true/false,
+   * it returns the ID of the condition.
+   * @param {Actor5e} actor the actor
+   * @param {string} key the effect key
+   * @returns {Set} a set of the condition IDs the actor has for the effect
+   */
+  _getConditionForEffect(actor, key) {
+    const props = CONFIG.DND5E.conditionEffects[key] ?? new Set();
+    const level = actor.system.attributes?.exhaustion ?? null;
+    const imms = actor.system.traits?.ci?.value ?? new Set();
+    const statuses = actor.statuses;
+    return props.filter(k => {
+      const l = Number(k.split("-").pop());
+      return (statuses.has(k) && !imms.has(k))
+        || (!imms.has("exhaustion") && (level !== null) && Number.isInteger(l) && (level >= l));
+    });
+  }
+
+  /**
    * An accumulator that looks for matching keys and tracks advantage/disadvantage.
    * @param {Object} options
    * @param {boolean} options.advantage initial value for advantage
@@ -33,6 +55,9 @@ class BaseReminder {
       add: (actorFlags, advKeys, disKeys) => {
         advantage = advKeys.reduce((accum, curr) => accum || actorFlags[curr], advantage);
         disadvantage = disKeys.reduce((accum, curr) => accum || actorFlags[curr], disadvantage);
+      },
+      advantage: (label) => {
+        if (label) advantage = true;
       },
       disadvantage: (label) => {
         if (label) disadvantage = true;
@@ -71,7 +96,7 @@ export class AttackReminder extends BaseReminder {
     this._message();
 
     // quick return if there are no flags
-    if (isEmpty(this.actorFlags) && isEmpty(this.targetFlags)) return;
+    //if (isEmpty(this.actorFlags) && isEmpty(this.targetFlags)) return;
 
     // build the active effect keys applicable for this roll
     const advKeys = [
@@ -99,6 +124,9 @@ export class AttackReminder extends BaseReminder {
     const accumulator = this._accumulator();
     accumulator.add(this.actorFlags, advKeys, disKeys);
     accumulator.add(this.targetFlags, grantsAdvKeys, grantsDisKeys);
+    this._getConditionForEffect(this.actor, "advReminderAdvantageAttack").forEach(
+      accumulator.advantage
+    );
     accumulator.update(options);
   }
 }

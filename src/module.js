@@ -41,9 +41,10 @@ function applyMidiCustom(actor, change) {
 
 Hooks.once("setup", () => {
   if (game.settings.get("adv-reminder", "updateStatusEffects")) {
-    updateStatusEffects();
-    Hooks.on("preCreateActiveEffect", addExhaustionEffects);
-    Hooks.on("preUpdateActiveEffect", addExhaustionEffects);
+    //updateStatusEffects();
+    updateConditionEffects();
+    //Hooks.on("preCreateActiveEffect", addExhaustionEffects);
+    //Hooks.on("preUpdateActiveEffect", addExhaustionEffects);
   }
 });
 
@@ -280,6 +281,53 @@ function updateStatusEffects() {
     const effect = CONFIG.statusEffects.find((e) => e.id === id);
     if (effect) foundry.utils.mergeObject(effect, data);
   });
+}
+
+/**
+ * Add advantage-like condition effects for all status effects.
+ * details: when adding to CONFIG.DND5E.conditionEffects, make sure to include an "advReminder"
+ * prefix to serve as a namespace to avoid conflicts
+ */
+function updateConditionEffects() {
+  // flags.midi-qol.advantage.attack.all
+  CONFIG.DND5E.conditionEffects.advReminderAdvantageAttack = new Set(["hiding", "invisible"]);
+
+  // flags.midi-qol.advantage.ability.save.dex
+  CONFIG.DND5E.conditionEffects.advReminderAdvantageDexSave = new Set(["dodging"]); 
+  
+  // flags.midi-qol.disadvantage.attack.all
+  CONFIG.DND5E.conditionEffects.advReminderDisadvantageAttack = new Set(["blinded", "frightened", "poisoned", "prone", "restrained"]);
+
+  // flags.midi-qol.disadvantage.ability.check.all
+  CONFIG.DND5E.conditionEffects.advReminderDisadvantageAbility = new Set(["exhaustion-1", "frightened", "poisoned"]);
+
+  // flags.midi-qol.disadvantage.ability.save.all
+  CONFIG.DND5E.conditionEffects.advReminderDisadvantageSave = new Set(["exhaustion-3"]);
+
+  // flags.midi-qol.disadvantage.ability.save.dex
+  CONFIG.DND5E.conditionEffects.advReminderDisadvantageDexSave = new Set(["restrained"]);
+
+  // flags.dnd5e.initiativeDisadv
+  CONFIG.DND5E.conditionEffects.advReminderDisadvantageInitiative = new Set(["exhaustion-1"]);
+
+  // flags.midi-qol.fail.ability.save.dex
+  CONFIG.DND5E.conditionEffects.advReminderFailDexSave = new Set(["paralyzed", "petrified", "stunned", "unconscious"]);
+
+  // flags.midi-qol.fail.ability.save.str
+  CONFIG.DND5E.conditionEffects.advReminderFailStrSave = new Set(["paralyzed", "petrified", "stunned", "unconscious"]);
+
+  // flags.midi-qol.grants.advantage.attack.all
+  CONFIG.DND5E.conditionEffects.advReminderGrantAdvantageAttack = new Set(["blinded", "paralyzed", "petrified", "restrained", "stunned", "unconscious"]);
+
+  CONFIG.DND5E.conditionEffects.advReminderGrantAdvantageAdjacentAttack = new Set(["prone"]);
+
+  // flags.midi-qol.grants.critical.range
+  CONFIG.DND5E.conditionEffects.advReminderGrantCriticalAdjacent = new Set(["paralyzed", "unconscious"]);
+
+  // flags.midi-qol.grants.disadvantage.attack.all
+  CONFIG.DND5E.conditionEffects.advReminderGrantDisadvantageAttack = new Set(["dodging", "exhaustion-3", "hidden", "invisible"]);
+
+  CONFIG.DND5E.conditionEffects.advReminderGrantDisadvantageFarAttack = new Set(["prone"]);
 }
 
 function addExhaustionEffects(effect, updates) {
