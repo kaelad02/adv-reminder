@@ -38,7 +38,6 @@ const SourceMixin = (superclass) =>
       const props = super._getConditionForEffect(actor, key);
       return (
         props
-          .toObject()
           // remove the number after exhaustion
           .map((k) => k.split("-").shift())
           .flatMap((k) => {
@@ -65,6 +64,10 @@ const SourceMixin = (superclass) =>
           disKeys.forEach((key) => {
             if (changes[key]) disadvantageLabels.push(...changes[key]);
           });
+        },
+        fromConditions: (actor, advConditions, disConditions) => {
+          advantageLabels.push(...advConditions.flatMap(c => this._getConditionForEffect(actor, c)));
+          disadvantageLabels.push(...disConditions.flatMap(c => this._getConditionForEffect(actor, c)));
         },
         advantage: (label) => {
           if (label) advantageLabels.push(label);

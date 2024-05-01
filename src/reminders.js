@@ -39,7 +39,7 @@ class BaseReminder {
       const l = Number(k.split("-").pop());
       return (statuses.has(k) && !imms.has(k))
         || (!imms.has("exhaustion") && (level !== null) && Number.isInteger(l) && (level >= l));
-    });
+    }).toObject();
   }
 
   /**
@@ -55,6 +55,10 @@ class BaseReminder {
       add: (actorFlags, advKeys, disKeys) => {
         advantage = advKeys.reduce((accum, curr) => accum || actorFlags[curr], advantage);
         disadvantage = disKeys.reduce((accum, curr) => accum || actorFlags[curr], disadvantage);
+      },
+      fromConditions: (actor, advConditions, disConditions) => {
+        if (advConditions.flatMap(c => this._getConditionForEffect(actor, c)).length) advantage = true;
+        if (disConditions.flatMap(c => this._getConditionForEffect(actor, c)).length) disadvantage = true;
       },
       advantage: (label) => {
         if (label) advantage = true;
@@ -160,20 +164,29 @@ class AbilityBaseReminder extends BaseReminder {
     return ["disadvantage.all", "disadvantage.ability.all"];
   }
 
+  get advantageConditions() {
+    return [];
+  }
+
+  get disadvantageConditions() {
+    return [];
+  }
+
   updateOptions(options) {
     this._message();
 
     // quick return if there are no flags
-    if (isEmpty(this.actorFlags)) return;
+    //if (isEmpty(this.actorFlags)) return;
 
     // get the active effect keys applicable for this roll
     const advKeys = this.advantageKeys;
     const disKeys = this.disadvantageKeys;
     debug("advKeys", advKeys, "disKeys", disKeys);
 
-    // find matching keys and update options
+    // find matching keys, status effects, and update options
     const accumulator = options.isConcentration ? this._accumulator(options) : this._accumulator();
     accumulator.add(this.actorFlags, advKeys, disKeys);
+    accumulator.fromConditions(this.actor, this.advantageConditions, this.disadvantageConditions);
     accumulator.update(options);
   }
 }
@@ -211,6 +224,19 @@ export class AbilitySaveReminder extends AbilityBaseReminder {
       "disadvantage.ability.save.all",
       `disadvantage.ability.save.${this.abilityId}`,
     ]);
+  }
+
+  /** @override */
+  get advantageConditions() {
+    const conditions = [];
+    if (this.abilityId === "dex") conditions.push("advReminderAdvantageDexSave");
+    return conditions;
+  }
+
+  get disadvantageConditions() {
+    const conditions = ["advReminderDisadvantageSave"];
+    if (this.abilityId === "dex") conditions.push("advReminderDisadvantageDexSave");
+    return conditions;
   }
 }
 
