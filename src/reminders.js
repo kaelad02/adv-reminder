@@ -213,6 +213,10 @@ export class AbilityCheckReminder extends AbilityBaseReminder {
       `disadvantage.ability.check.${this.abilityId}`,
     ]);
   }
+
+  get disadvantageConditions() {
+    return ["advReminderDisadvantageAbility"];
+  }
 }
 
 export class AbilitySaveReminder extends AbilityBaseReminder {
@@ -286,6 +290,7 @@ export class SkillReminder extends AbilityCheckReminder {
       accumulator.disadvantage(this._armorStealthDisadvantage());
     }
     accumulator.add(this.actorFlags, advKeys, disKeys);
+    accumulator.fromConditions(this.actor, this.advantageConditions, this.disadvantageConditions);
     accumulator.update(options);
   }
 
