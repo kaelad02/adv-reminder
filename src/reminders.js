@@ -144,7 +144,7 @@ export class AttackReminder extends BaseReminder {
     // handle distance-based status effects
     if (this.targetActor) {
       const grantAdjacentAttack = this._getConditionForEffect(this.targetActor, "advReminderGrantAdjacentAttack");
-      if (grantAdjacentAttack.size) {
+      if (grantAdjacentAttack.length) {
         const distance = this.distanceFn();
         const accumFn = distance <= 5 ? accumulator.advantage : accumulator.disadvantage;
         grantAdjacentAttack.forEach(accumFn);
@@ -332,10 +332,14 @@ export class CriticalReminder extends BaseReminder {
   constructor(actor, targetActor, item, distanceFn) {
     super(actor);
 
+    /** @type {Actor5e*} */
+    this.targetActor = targetActor;
     /** @type {object} */
     this.targetFlags = this._getFlags(targetActor);
     /** @type {string} */
     this.actionType = item.system.actionType;
+    /** @type {function} */
+    this.distanceFn = distanceFn;
 
     // get the Range directly from the actor's flags
     if (targetActor) {
@@ -357,7 +361,7 @@ export class CriticalReminder extends BaseReminder {
     this._message();
 
     // quick return if there are no flags
-    if (isEmpty(this.actorFlags) && isEmpty(this.targetFlags)) return;
+    //if (isEmpty(this.actorFlags) && isEmpty(this.targetFlags)) return;
 
     // build the active effect keys applicable for this roll
     const critKeys = ["critical.all", `critical.${this.actionType}`];
@@ -373,6 +377,14 @@ export class CriticalReminder extends BaseReminder {
     const accumulator = this._accumulator();
     accumulator.add(this.actorFlags, critKeys, normalKeys);
     accumulator.add(this.targetFlags, grantsCritKeys, grantsNormalKeys);
+    // handle distance-based status effects
+    if (this.targetActor) {
+      const grantAdjacentCritical = this._getConditionForEffect(this.targetActor, "advReminderGrantAdjacentCritical");
+      if (grantAdjacentCritical.length) {
+        const distance = this.distanceFn();
+        if (distance <= 5) grantAdjacentCritical.forEach(accumulator.critical);
+      }
+    }
     accumulator.update(options, critProp);
   }
 
@@ -385,6 +397,9 @@ export class CriticalReminder extends BaseReminder {
       add: (actorFlags, critKeys, normalKeys) => {
         crit = critKeys.reduce((accum, curr) => accum || actorFlags[curr], crit);
         normal = normalKeys.reduce((accum, curr) => accum || actorFlags[curr], normal);
+      },
+      critical: (label) => {
+        if (label) crit = true;
       },
       update: (options, critProp) => {
         // a normal hit overrides a crit

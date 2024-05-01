@@ -320,7 +320,7 @@ function updateConditionEffects() {
   CONFIG.DND5E.conditionEffects.advReminderGrantAdvantageAttack = new Set(["blinded", "paralyzed", "petrified", "restrained", "stunned", "unconscious"]);
 
   // flags.midi-qol.grants.critical.range
-  CONFIG.DND5E.conditionEffects.advReminderGrantCriticalAdjacent = new Set(["paralyzed", "unconscious"]);
+  CONFIG.DND5E.conditionEffects.advReminderGrantAdjacentCritical = new Set(["paralyzed", "unconscious"]);
 
   // flags.midi-qol.grants.disadvantage.attack.all
   CONFIG.DND5E.conditionEffects.advReminderGrantDisadvantageAttack = new Set(["dodging", "exhaustion-3", "hidden", "invisible"]);

@@ -149,6 +149,9 @@ export class CriticalSource extends SourceMixin(CriticalReminder) {
           if(changes[key]) normalLabels.push(...changes[key]);
         });
       },
+      critical: (label) => {
+        if (label) criticalLabels.push(label);
+      },
       update: (options) => {
         debug("criticalLabels", criticalLabels, "normalLabels", normalLabels);
         const merge = (newLabels, key) => {
