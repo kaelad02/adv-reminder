@@ -66,6 +66,7 @@ const SourceMixin = (superclass) =>
           });
         },
         fromConditions: (actor, advConditions, disConditions) => {
+          if (!actor) return;
           advantageLabels.push(...advConditions.flatMap(c => this._getConditionForEffect(actor, c)));
           disadvantageLabels.push(...disConditions.flatMap(c => this._getConditionForEffect(actor, c)));
         },

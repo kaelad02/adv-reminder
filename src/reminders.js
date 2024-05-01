@@ -57,6 +57,7 @@ class BaseReminder {
         disadvantage = disKeys.reduce((accum, curr) => accum || actorFlags[curr], disadvantage);
       },
       fromConditions: (actor, advConditions, disConditions) => {
+        if (!actor) return;
         if (advConditions.flatMap(c => this._getConditionForEffect(actor, c)).length) advantage = true;
         if (disConditions.flatMap(c => this._getConditionForEffect(actor, c)).length) disadvantage = true;
       },
@@ -127,22 +128,27 @@ export class AttackReminder extends BaseReminder {
       "grants.disadvantage.attack.all",
       `grants.disadvantage.attack.${this.actionType}`,
     ];
+    // build the condition effect keys for this roll
+    const advConditions = ["advReminderAdvantageAttack"];
+    const disConditions = ["advReminderDisadvantageAttack"];
+    const grantsAdvConditions = ["advReminderGrantAdvantageAttack"];
+    const grantsDisConditions = ["advReminderGrantDisadvantageAttack"];    
 
     // find matching keys
     const accumulator = this._accumulator();
     accumulator.add(this.actorFlags, advKeys, disKeys);
     accumulator.add(this.targetFlags, grantsAdvKeys, grantsDisKeys);
     // handle status effects
-    this._getConditionForEffect(this.actor, "advReminderAdvantageAttack").forEach(accumulator.advantage);
-    this._getConditionForEffect(this.actor, "advReminderDisadvantageAttack").forEach(accumulator.disadvantage);
-    this._getConditionForEffect(this.targetActor, "advReminderGrantAdvantageAttack").forEach(accumulator.advantage);
-    this._getConditionForEffect(this.targetActor, "advReminderGrantDisadvantageAttack").forEach(accumulator.disadvantage);
+    accumulator.fromConditions(this.actor, advConditions, disConditions);
+    accumulator.fromConditions(this.targetActor, grantsAdvConditions, grantsDisConditions);
     // handle distance-based status effects
-    const grantAdjacentAttack = this._getConditionForEffect(this.targetActor, "advReminderGrantAdjacentAttack");
-    if (grantAdjacentAttack.size) {
-      const distance = this.distanceFn();
-      const accumFn = distance <= 5 ? accumulator.advantage : accumulator.disadvantage;
-      grantAdjacentAttack.forEach(accumFn);
+    if (this.targetActor) {
+      const grantAdjacentAttack = this._getConditionForEffect(this.targetActor, "advReminderGrantAdjacentAttack");
+      if (grantAdjacentAttack.size) {
+        const distance = this.distanceFn();
+        const accumFn = distance <= 5 ? accumulator.advantage : accumulator.disadvantage;
+        grantAdjacentAttack.forEach(accumFn);
+      }
     }
     accumulator.update(options);
   }
