@@ -307,9 +307,6 @@ function updateConditionEffects() {
   // flags.midi-qol.disadvantage.ability.save.dex
   CONFIG.DND5E.conditionEffects.advReminderDisadvantageDexSave = new Set(["restrained"]);
 
-  // flags.dnd5e.initiativeDisadv
-  CONFIG.DND5E.conditionEffects.advReminderDisadvantageInitiative = new Set(["exhaustion-1"]);
-
   // flags.midi-qol.fail.ability.save.dex
   CONFIG.DND5E.conditionEffects.advReminderFailDexSave = new Set(["paralyzed", "petrified", "stunned", "unconscious"]);
 
