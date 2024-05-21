@@ -1,4 +1,4 @@
-import { debug, isEmpty } from "./util.js";
+import { debug } from "./util.js";
 
 class BaseReminder {
   constructor(actor) {
@@ -15,7 +15,7 @@ class BaseReminder {
    */
   _getFlags(actor) {
     const midiFlags = actor?.flags["midi-qol"] || {};
-    return flattenObject(midiFlags);
+    return foundry.utils.flattenObject(midiFlags);
   }
 
   _message() {
@@ -345,7 +345,7 @@ export class CriticalReminder extends BaseReminder {
     // get the Range directly from the actor's flags
     if (targetActor) {
       const grantsCriticalRange =
-        getProperty(targetActor, "flags.midi-qol.grants.critical.range") || -Infinity;
+        foundry.utils.getProperty(targetActor, "flags.midi-qol.grants.critical.range") || -Infinity;
       this._adjustRange(distanceFn, grantsCriticalRange);
     }
   }

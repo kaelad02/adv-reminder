@@ -80,9 +80,9 @@ const SourceMixin = (superclass) =>
           debug("advantageLabels", advantageLabels, "disadvantageLabels", disadvantageLabels);
           const merge = (newLabels, key) => {
             if (newLabels.length) {
-              const labels = getProperty(options, key);
+              const labels = foundry.utils.getProperty(options, key);
               if (labels) newLabels.push(...labels);
-              setProperty(options, key, newLabels);
+              foundry.utils.setProperty(options, key, newLabels);
             }
           };
           merge(advantageLabels, "dialogOptions.adv-reminder.advantageLabels");
@@ -156,9 +156,9 @@ export class CriticalSource extends SourceMixin(CriticalReminder) {
         debug("criticalLabels", criticalLabels, "normalLabels", normalLabels);
         const merge = (newLabels, key) => {
           if (newLabels.length) {
-            const labels = getProperty(options, key);
+            const labels = foundry.utils.getProperty(options, key);
             if (labels) newLabels.push(...labels);
-            setProperty(options, key, newLabels);
+            foundry.utils.setProperty(options, key, newLabels);
           }
         };
         merge(criticalLabels, "dialogOptions.adv-reminder.criticalLabels");
