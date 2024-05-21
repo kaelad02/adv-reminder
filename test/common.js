@@ -4,12 +4,35 @@ export default function commonTestInit() {
   globalThis.createActorWithFlags = (...keys) => {
     const actor = {
       flags: {},
+      hasConditionEffect: () => false,
+      system: {},
     };
     keys.forEach((k) => setProperty(actor, k, true));
     return actor;
   };
 
+  globalThis.CONFIG = {};
+  globalThis.CONFIG.DND5E = {};
+  globalThis.CONFIG.DND5E.conditionEffects = {};
+
   // copied from Foundry
+
+  function filter(test) {
+    const filtered = new Set();
+    let i = 0;
+    for ( const v of this ) {
+      if ( test(v, i, this) ) filtered.add(v);
+      i++;
+    }
+    return filtered;
+  }
+  function toObject() {
+    return Array.from(this);
+  }
+  Object.defineProperties(Set.prototype, {
+    filter: {value: filter},
+    toObject: {value: toObject}
+  });
 
   globalThis.setProperty = (object, key, value) => {
     // split the key into parts, removing the last one

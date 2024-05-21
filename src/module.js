@@ -40,282 +40,30 @@ function applyMidiCustom(actor, change) {
 }
 
 Hooks.once("setup", () => {
-  if (game.settings.get("adv-reminder", "updateStatusEffects")) {
-    updateStatusEffects();
-    Hooks.on("preCreateActiveEffect", addExhaustionEffects);
-    Hooks.on("preUpdateActiveEffect", addExhaustionEffects);
-  }
+  if (game.settings.get("adv-reminder", "updateStatusEffects")) updateConditionEffects();
 });
 
-function updateStatusEffects() {
-  debug("updateStatusEffects");
-
-  const effectChanges = {
-    blinded: {
-      changes: [
-        {
-          key: "flags.midi-qol.disadvantage.attack.all",
-          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
-          value: "1",
-        },
-        {
-          key: "flags.midi-qol.grants.advantage.attack.all",
-          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
-          value: "1",
-        },
-      ],
-    },
-    dodging: {
-      flags: {
-        dae: {
-          specialDuration: ["turnStart"],
-        },
-      },
-      changes: [
-        {
-          key: "flags.midi-qol.grants.disadvantage.attack.all",
-          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
-          value: "1",
-        },
-        {
-          key: "flags.midi-qol.advantage.ability.save.dex",
-          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
-          value: "1",
-        },
-      ],
-    },
-    frightened: {
-      changes: [
-        {
-          key: "flags.midi-qol.disadvantage.attack.all",
-          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
-          value: "1",
-        },
-        {
-          key: "flags.midi-qol.disadvantage.ability.check.all",
-          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
-          value: "1",
-        },
-      ],
-    },
-    hidden: {
-      changes: [
-        {
-          key: "flags.midi-qol.advantage.attack.all",
-          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
-          value: "1",
-        },
-        {
-          key: "flags.midi-qol.grants.disadvantage.attack.all",
-          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
-          value: "1",
-        },
-      ],
-    },
-    invisible: {
-      changes: [
-        {
-          key: "flags.midi-qol.advantage.attack.all",
-          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
-          value: "1",
-        },
-        {
-          key: "flags.midi-qol.grants.disadvantage.attack.all",
-          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
-          value: "1",
-        },
-      ],
-    },
-    paralyzed: {
-      changes: [
-        {
-          key: "flags.midi-qol.fail.ability.save.dex",
-          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
-          value: "1",
-        },
-        {
-          key: "flags.midi-qol.fail.ability.save.str",
-          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
-          value: "1",
-        },
-        {
-          key: "flags.midi-qol.grants.advantage.attack.all",
-          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
-          value: "1",
-        },
-        {
-          key: "flags.midi-qol.grants.critical.range",
-          mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE,
-          value: "5",
-        },
-      ],
-    },
-    petrified: {
-      changes: [
-        {
-          key: "flags.midi-qol.grants.advantage.attack.all",
-          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
-          value: "1",
-        },
-        {
-          key: "flags.midi-qol.fail.ability.save.dex",
-          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
-          value: "1",
-        },
-        {
-          key: "flags.midi-qol.fail.ability.save.str",
-          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
-          value: "1",
-        },
-      ],
-    },
-    poisoned: {
-      changes: [
-        {
-          key: "flags.midi-qol.disadvantage.attack.all",
-          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
-          value: "1",
-        },
-        {
-          key: "flags.midi-qol.disadvantage.ability.check.all",
-          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
-          value: "1",
-        },
-      ],
-    },
-    prone: {
-      changes: [
-        {
-          key: "flags.midi-qol.grants.advantage.attack.mwak",
-          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
-          value: "1",
-        },
-        {
-          key: "flags.midi-qol.grants.advantage.attack.msak",
-          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
-          value: "1",
-        },
-        {
-          key: "flags.midi-qol.grants.disadvantage.attack.rwak",
-          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
-          value: "1",
-        },
-        {
-          key: "flags.midi-qol.grants.disadvantage.attack.rsak",
-          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
-          value: "1",
-        },
-        {
-          key: "flags.midi-qol.disadvantage.attack.all",
-          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
-          value: "1",
-        },
-      ],
-    },
-    restrained: {
-      changes: [
-        {
-          key: "flags.midi-qol.disadvantage.ability.save.dex",
-          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
-          value: "1",
-        },
-        {
-          key: "flags.midi-qol.disadvantage.attack.all",
-          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
-          value: "1",
-        },
-        {
-          key: "flags.midi-qol.grants.advantage.attack.all",
-          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
-          value: "1",
-        },
-      ],
-    },
-    stunned: {
-      changes: [
-        {
-          key: "flags.midi-qol.fail.ability.save.dex",
-          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
-          value: "1",
-        },
-        {
-          key: "flags.midi-qol.fail.ability.save.str",
-          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
-          value: "1",
-        },
-        {
-          key: "flags.midi-qol.grants.advantage.attack.all",
-          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
-          value: "1",
-        },
-      ],
-    },
-    unconscious: {
-      changes: [
-        {
-          key: "flags.midi-qol.fail.ability.save.dex",
-          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
-          value: "1",
-        },
-        {
-          key: "flags.midi-qol.fail.ability.save.str",
-          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
-          value: "1",
-        },
-        {
-          key: "flags.midi-qol.grants.advantage.attack.all",
-          mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
-          value: "1",
-        },
-        {
-          key: "flags.midi-qol.grants.critical.range",
-          mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE,
-          value: "5",
-        },
-      ],
-    },
-  };
-
-  Object.entries(effectChanges).forEach(([id, data]) => {
-    const effect = CONFIG.statusEffects.find((e) => e.id === id);
-    if (effect) foundry.utils.mergeObject(effect, data);
-  });
-}
-
-function addExhaustionEffects(effect, updates) {
-  debug("addExhaustionEffects");
-
-  if (effect.id !== dnd5e.documents.ActiveEffect5e.ID.EXHAUSTION) return;
-  const level = foundry.utils.getProperty(updates, "flags.dnd5e.exhaustionLevel");
-  if (!level) return;
-  // build the changes based on exhaustion level
-  const changes = [
-    {
-      key: "flags.midi-qol.disadvantage.ability.check.all",
-      mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
-      value: "1",
-    },
-    {
-      key: "flags.dnd5e.initiativeDisadv",
-      mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
-      value: "1",
-    },
-  ];
-  if (level >= 3)
-    changes.push(
-      {
-        key: "flags.midi-qol.disadvantage.attack.all",
-        mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
-        value: "1",
-      },
-      {
-        key: "flags.midi-qol.disadvantage.ability.save.all",
-        mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
-        value: "1",
-      }
-    );
-  // add changes to the active effect
-  effect.updateSource({ changes });
+/**
+ * Add advantage-like condition effects for all status effects.
+ * details: when adding to CONFIG.DND5E.conditionEffects, make sure to include an "advReminder"
+ * prefix to serve as a namespace to avoid conflicts
+ */
+function updateConditionEffects() {
+  const ce = CONFIG.DND5E.conditionEffects;
+  ce.advReminderAdvantageAttack = new Set(["hiding", "invisible"]);
+  ce.advReminderAdvantageDexSave = new Set(["dodging"]); 
+  ce.advReminderDisadvantageAttack = new Set(["blinded", "frightened", "poisoned", "prone", "restrained"]);
+  ce.advReminderDisadvantageAbility = new Set(["exhaustion-1", "frightened", "poisoned"]);
+  ce.advReminderDisadvantageSave = new Set(["exhaustion-3"]);
+  ce.advReminderDisadvantageDexSave = new Set(["restrained"]);
+  ce.advReminderDisadvantagePhysicalRolls = new Set(["heavilyEncumbered"]);
+  ce.advReminderFailDexSave = new Set(["paralyzed", "petrified", "stunned", "unconscious"]);
+  ce.advReminderFailStrSave = new Set(["paralyzed", "petrified", "stunned", "unconscious"]);
+  ce.advReminderGrantAdvantageAttack = new Set(["blinded", "paralyzed", "petrified", "restrained", "stunned", "unconscious"]);
+  ce.advReminderGrantAdjacentCritical = new Set(["paralyzed", "unconscious"]);
+  ce.advReminderGrantDisadvantageAttack = new Set(["dodging", "exhaustion-3", "hidden", "invisible"]);
+  // if adjacent, grant advantage on the attack, else grant disadvantage
+  ce.advReminderGrantAdjacentAttack = new Set(["prone"]);
 }
 
 // Add message flags to DAE so it shows them in the AE editor

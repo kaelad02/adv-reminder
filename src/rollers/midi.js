@@ -33,9 +33,16 @@ export default class MidiRollerHooks extends CoreRollerHooks {
 
     if (this.isFastForwarding(config)) return;
     const target = getTarget();
+    // use distance from Midi's Workflow
+    const distanceFn = () => {
+      const workflow = MidiQOL.Workflow.getWorkflow(item.uuid);
+      if (!workflow) return Infinity;
+      const firstTarget = workflow.hitTargets.values().next().value;
+      return MidiQOL.computeDistance(firstTarget, workflow.token, false);
+    }
 
     new AttackMessage(item.actor, target, item).addMessage(config);
-    if (showSources) new AttackSource(item.actor, target, item).updateOptions(config);
+    if (showSources) new AttackSource(item.actor, target, item, distanceFn).updateOptions(config);
   }
 
   preRollAbilitySave(actor, config, abilityId) {

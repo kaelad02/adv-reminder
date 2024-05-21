@@ -34,6 +34,24 @@ const SourceMixin = (superclass) =>
       debug("checking for adv/dis effects to display their source");
     }
 
+    _getConditionForEffect(actor, key) {
+      const props = super._getConditionForEffect(actor, key);
+      return (
+        props
+          // remove the number after exhaustion
+          .map((k) => k.split("-").shift())
+          .flatMap((k) => {
+            // look for active effects with this status in it, get their names
+            const activeEffectNames = actor.appliedEffects
+              .filter((e) => e.statuses.some((s) => s === k))
+              .map((e) => e.name);
+            if (activeEffectNames.length) return activeEffectNames;
+            // fallback to the status effect's name (mostly for exhaustion)
+            return CONFIG.statusEffects.filter((s) => s.id === k).map((s) => s.name);
+          })
+      );
+    }
+
     _accumulator() {
       const advantageLabels = [];
       const disadvantageLabels = [];
@@ -46,6 +64,11 @@ const SourceMixin = (superclass) =>
           disKeys.forEach((key) => {
             if (changes[key]) disadvantageLabels.push(...changes[key]);
           });
+        },
+        fromConditions: (actor, advConditions, disConditions) => {
+          if (!actor) return;
+          advantageLabels.push(...advConditions.flatMap(c => this._getConditionForEffect(actor, c)));
+          disadvantageLabels.push(...disConditions.flatMap(c => this._getConditionForEffect(actor, c)));
         },
         advantage: (label) => {
           if (label) advantageLabels.push(label);
@@ -125,6 +148,9 @@ export class CriticalSource extends SourceMixin(CriticalReminder) {
         normalKeys.forEach(key => {
           if(changes[key]) normalLabels.push(...changes[key]);
         });
+      },
+      critical: (label) => {
+        if (label) criticalLabels.push(label);
       },
       update: (options) => {
         debug("criticalLabels", criticalLabels, "normalLabels", normalLabels);

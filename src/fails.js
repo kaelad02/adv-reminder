@@ -20,6 +20,10 @@ class BaseFail {
     return ["fail.all"];
   }
 
+  get failCondition() {
+    return undefined;
+  }
+
   /**
    * Check for auto-fail flags to see if this roll should fail.
    * @param {object} options the roll options
@@ -33,7 +37,9 @@ class BaseFail {
     debug("failKeys", failKeys);
 
     const actorFlags = this._getFlags(this.actor);
-    const shouldFail = failKeys.reduce((accum, curr) => actorFlags[curr] || accum, false);
+    const shouldFail =
+      failKeys.reduce((accum, curr) => actorFlags[curr] || accum, false) ||
+      this.actor.hasConditionEffect(this.failCondition);
     if (shouldFail) {
       const messageData = this.createMessageData(options);
       this.toMessage(messageData);
@@ -76,6 +82,14 @@ export class AbilitySaveFail extends BaseFail {
       `fail.ability.save.all`,
       `fail.ability.save.${this.abilityId}`,
     ]);
+  }
+
+  /** @override */
+  get failCondition() {
+    switch (this.abilityId) {
+      case "dex": return "advReminderFailDexSave";
+      case "str": return "advReminderFailDexSave";
+    }
   }
 
   createMessageData(options = {}) {

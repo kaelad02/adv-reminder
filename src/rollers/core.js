@@ -70,10 +70,11 @@ export default class CoreRollerHooks {
 
     if (this.isFastForwarding(config)) return;
     const target = getTarget();
+    const distanceFn = getDistanceToTargetFn(config.messageData.speaker);
 
     new AttackMessage(item.actor, target, item).addMessage(config);
-    if (showSources) new AttackSource(item.actor, target, item).updateOptions(config);
-    new AttackReminder(item.actor, target, item).updateOptions(config);
+    if (showSources) new AttackSource(item.actor, target, item, distanceFn).updateOptions(config);
+    new AttackReminder(item.actor, target, item, distanceFn).updateOptions(config);
   }
 
   preRollAbilitySave(actor, config, abilityId) {
