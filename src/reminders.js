@@ -213,7 +213,9 @@ export class AbilityCheckReminder extends AbilityBaseReminder {
   }
 
   get disadvantageConditions() {
-    return super.disadvantageConditions().push("advReminderDisadvantageAbility");
+    const conditions = super.disadvantageConditions;
+    conditions.push("advReminderDisadvantageAbility");
+    return conditions;
   }
 }
 
@@ -242,7 +244,8 @@ export class AbilitySaveReminder extends AbilityBaseReminder {
   }
 
   get disadvantageConditions() {
-    const conditions = super.disadvantageConditions().push("advReminderDisadvantageSave");
+    const conditions = super.disadvantageConditions;
+    conditions.push("advReminderDisadvantageSave");
     if (this.abilityId === "dex") conditions.push("advReminderDisadvantageDexSave");
     return conditions;
   }
