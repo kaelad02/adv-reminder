@@ -7,7 +7,7 @@ export default function commonTestInit() {
       hasConditionEffect: () => false,
       system: {},
     };
-    keys.forEach((k) => setProperty(actor, k, true));
+    keys.forEach((k) => foundry.utils.setProperty(actor, k, true));
     return actor;
   };
 
@@ -34,7 +34,10 @@ export default function commonTestInit() {
     toObject: {value: toObject}
   });
 
-  globalThis.setProperty = (object, key, value) => {
+  globalThis.foundry = {};
+  globalThis.foundry.utils = {};
+
+  globalThis.foundry.utils.setProperty = (object, key, value) => {
     // split the key into parts, removing the last one
     const parts = key.split(".");
     const lastProp = parts.pop();
@@ -47,12 +50,12 @@ export default function commonTestInit() {
     lastObj[lastProp] = value;
   };
 
-  globalThis.getProperty = (object, key) => {
+  globalThis.foundry.utils.getProperty = (object, key) => {
     if (!key) return undefined;
     if (key in object) return object[key];
     let target = object;
     for (let p of key.split(".")) {
-      getType(target);
+      foundry.utils.getType(target);
       if (!(typeof target === "object")) return undefined;
       if (p in target) target = target[p];
       else return undefined;
@@ -60,16 +63,16 @@ export default function commonTestInit() {
     return target;
   };
 
-  globalThis.flattenObject = (obj, _d = 0) => {
+  globalThis.foundry.utils.flattenObject = (obj, _d = 0) => {
     const flat = {};
     if (_d > 100) {
       throw new Error("Maximum depth exceeded");
     }
     for (let [k, v] of Object.entries(obj)) {
-      let t = getType(v);
+      let t = foundry.utils.getType(v);
       if (t === "Object") {
-        if (isEmpty(v)) flat[k] = v;
-        let inner = flattenObject(v, _d + 1);
+        if (foundry.utils.isEmpty(v)) flat[k] = v;
+        let inner = foundry.utils.flattenObject(v, _d + 1);
         for (let [ik, iv] of Object.entries(inner)) {
           flat[`${k}.${ik}`] = iv;
         }
@@ -78,7 +81,7 @@ export default function commonTestInit() {
     return flat;
   };
 
-  globalThis.getType = (variable) => {
+  globalThis.foundry.utils.getType = (variable) => {
     // Primitive types, handled with simple typeof check
     const typeOf = typeof variable;
     if (typeOf !== "object") return typeOf;
@@ -106,15 +109,15 @@ export default function commonTestInit() {
     return "Object";
   };
 
-  globalThis.isEmpty = (value) => {
-    const t = getType(value);
+  globalThis.foundry.utils.isEmpty = (value) => {
+    const t = foundry.utils.getType(value);
     switch (t) {
       case "undefined":
         return true;
       case "Array":
         return !value.length;
       case "Object":
-        return getType(value) === "Object" && !Object.keys(value).length;
+        return foundry.utils.getType(value) === "Object" && !Object.keys(value).length;
       case "Set":
       case "Map":
         return !value.size;

@@ -32,10 +32,10 @@ function applyMidiCustom(actor, change) {
   ];
   if (supportedKeys.some((k) => change.key.startsWith(k))) {
     // update the actor
-    if (typeof change.value !== "string") setProperty(actor, change.key, change.value);
-    else if (["true", "1"].includes(change.value.trim())) setProperty(actor, change.key, true);
-    else if (["false", "0"].includes(change.value.trim())) setProperty(actor, change.key, false);
-    else setProperty(actor, change.key, change.value);
+    if (typeof change.value !== "string") foundry.utils.setProperty(actor, change.key, change.value);
+    else if (["true", "1"].includes(change.value.trim())) foundry.utils.setProperty(actor, change.key, true);
+    else if (["false", "0"].includes(change.value.trim())) foundry.utils.setProperty(actor, change.key, false);
+    else foundry.utils.setProperty(actor, change.key, change.value);
   }
 }
 

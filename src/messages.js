@@ -30,7 +30,7 @@ class BaseMessage {
     debug("checking for message effects");
 
     // get any existing messages
-    const messages = getProperty(options, "dialogOptions.adv-reminder.messages") ?? [];
+    const messages = foundry.utils.getProperty(options, "dialogOptions.adv-reminder.messages") ?? [];
 
     // get messages from the actor and merge
     const keys = this.messageKeys;
@@ -50,8 +50,8 @@ class BaseMessage {
 
     if (messages.length > 0) {
       debug("messages found:", messages);
-      setProperty(options, "dialogOptions.adv-reminder.messages", messages);
-      setProperty(options, "dialogOptions.adv-reminder.rollData", this.actor.getRollData());
+      foundry.utils.setProperty(options, "dialogOptions.adv-reminder.messages", messages);
+      foundry.utils.setProperty(options, "dialogOptions.adv-reminder.rollData", this.actor.getRollData());
     }
   }
 }

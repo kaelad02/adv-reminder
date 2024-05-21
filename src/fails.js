@@ -13,7 +13,7 @@ class BaseFail {
    */
   _getFlags(actor) {
     const midiFlags = actor?.flags["midi-qol"] || {};
-    return flattenObject(midiFlags);
+    return foundry.utils.flattenObject(midiFlags);
   }
 
   get failKeys() {

@@ -29,15 +29,6 @@ export function getTarget() {
   return [...game.user.targets][0]?.actor;
 }
 
-/**
- * Test if an object is empty.
- * @param {object} obj object to test
- * @returns true if an object is empty, false otherwise
- */
-export function isEmpty(obj) {
-  return !Object.keys(obj).length;
-}
-
 export function getDistanceToTargetFn(speaker) {
   return () => {
     const controlledTokenDoc = game.scenes.get(speaker.scene).tokens.get(speaker.token);
