@@ -104,9 +104,6 @@ export class AttackReminder extends BaseReminder {
   updateOptions(options) {
     this._message();
 
-    // quick return if there are no flags
-    //if (isEmpty(this.actorFlags) && isEmpty(this.targetFlags)) return;
-
     // build the active effect keys applicable for this roll
     const advKeys = [
       "advantage.all",
@@ -184,9 +181,6 @@ class AbilityBaseReminder extends BaseReminder {
 
   updateOptions(options) {
     this._message();
-
-    // quick return if there are no flags
-    //if (isEmpty(this.actorFlags)) return;
 
     // get the active effect keys applicable for this roll
     const advKeys = this.advantageKeys;
@@ -363,9 +357,6 @@ export class CriticalReminder extends BaseReminder {
 
   updateOptions(options, critProp = "critical") {
     this._message();
-
-    // quick return if there are no flags
-    //if (isEmpty(this.actorFlags) && isEmpty(this.targetFlags)) return;
 
     // build the active effect keys applicable for this roll
     const critKeys = ["critical.all", `critical.${this.actionType}`];
