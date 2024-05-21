@@ -56,6 +56,7 @@ function updateConditionEffects() {
   ce.advReminderDisadvantageAbility = new Set(["exhaustion-1", "frightened", "poisoned"]);
   ce.advReminderDisadvantageSave = new Set(["exhaustion-3"]);
   ce.advReminderDisadvantageDexSave = new Set(["restrained"]);
+  ce.advReminderDisadvantagePhysicalRolls = new Set(["heavilyEncumbered"]);
   ce.advReminderFailDexSave = new Set(["paralyzed", "petrified", "stunned", "unconscious"]);
   ce.advReminderFailStrSave = new Set(["paralyzed", "petrified", "stunned", "unconscious"]);
   ce.advReminderGrantAdvantageAttack = new Set(["blinded", "paralyzed", "petrified", "restrained", "stunned", "unconscious"]);

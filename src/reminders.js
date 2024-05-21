@@ -132,7 +132,9 @@ export class AttackReminder extends BaseReminder {
     const advConditions = ["advReminderAdvantageAttack"];
     const disConditions = ["advReminderDisadvantageAttack"];
     const grantsAdvConditions = ["advReminderGrantAdvantageAttack"];
-    const grantsDisConditions = ["advReminderGrantDisadvantageAttack"];    
+    const grantsDisConditions = ["advReminderGrantDisadvantageAttack"];
+    if (this.abilityId === "str" || this.abilityId === "dex" || this.abilityId === "con")
+      disConditions.push("advReminderDisadvantagePhysicalRolls");
 
     // find matching keys
     const accumulator = this._accumulator();
@@ -175,6 +177,8 @@ class AbilityBaseReminder extends BaseReminder {
   }
 
   get disadvantageConditions() {
+    if (this.abilityId === "str" || this.abilityId === "dex" || this.abilityId === "con")
+      return ["advReminderDisadvantagePhysicalRolls"];
     return [];
   }
 
@@ -215,7 +219,7 @@ export class AbilityCheckReminder extends AbilityBaseReminder {
   }
 
   get disadvantageConditions() {
-    return ["advReminderDisadvantageAbility"];
+    return super.disadvantageConditions().push("advReminderDisadvantageAbility");
   }
 }
 
@@ -244,7 +248,7 @@ export class AbilitySaveReminder extends AbilityBaseReminder {
   }
 
   get disadvantageConditions() {
-    const conditions = ["advReminderDisadvantageSave"];
+    const conditions = super.disadvantageConditions().push("advReminderDisadvantageSave");
     if (this.abilityId === "dex") conditions.push("advReminderDisadvantageDexSave");
     return conditions;
   }
