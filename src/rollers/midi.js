@@ -104,6 +104,9 @@ export default class MidiRollerHooks extends CoreRollerHooks {
   preRollDamage(item, config) {
     debug("preRollDamage hook called");
 
+    // damage/healing enricher doesn't have an item, skip
+    if (!item) return;
+
     if (this.isFastForwarding(config)) return;
     const target = getTarget();
     // use distance from Midi's Workflow
