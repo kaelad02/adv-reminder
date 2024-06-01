@@ -1,4 +1,4 @@
-# upcoming
+# 4.0.1
 
 - bug fix: [#70](https://github.com/kaelad02/adv-reminder/issues/70) Fix error when using a damage or healing enricher
 
