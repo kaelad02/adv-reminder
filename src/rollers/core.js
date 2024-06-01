@@ -145,6 +145,9 @@ export default class CoreRollerHooks {
   preRollDamage(item, config) {
     debug("preRollDamage hook called");
 
+    // damage/healing enricher doesn't have an item, skip
+    if (!item) return;
+
     if (this.isFastForwarding(config)) return;
     const target = getTarget();
     const distanceFn = getDistanceToTargetFn(config.messageData.speaker);

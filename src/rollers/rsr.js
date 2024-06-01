@@ -138,6 +138,9 @@ export default class ReadySetRollHooks extends CoreRollerHooks {
   preRollDamage(item, config) {
     debug("preRollDamage hook called");
 
+    // damage/healing enricher doesn't have an item, skip
+    if (!item) return;
+
     const target = getTarget();
 
     if (this._doMessages(config)) {

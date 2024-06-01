@@ -1,3 +1,7 @@
+# upcoming
+
+- bug fix: [#70](https://github.com/kaelad02/adv-reminder/issues/70) Fix error when using a damage or healing enricher
+
 # 4.0.0
 
 - feature: Support the system's new concentration rolls with sources and messages with `flags.adv-reminder.message.ability.concentration` (system already handles advantage/disadvantage)
