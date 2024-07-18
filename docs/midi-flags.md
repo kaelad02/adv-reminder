@@ -1,6 +1,6 @@
 # Midi Flags
 
-This document covers the different types of Midi flags that Advantage Reminder supports for things like advantage, disadvantage, and critical roles.
+This document covers the different types of Midi flags that Advantage Reminder supports for things like advantage, disadvantage, and critical rolls.
 
 # Basic Usage
 
