@@ -221,42 +221,112 @@ flags.midi-qol.disadvantage.ability.check.all
 | ----------------------------------------------- | ----------- | ------------ |
 | `flags.midi-qol.disadvantage.ability.check.all` | Custom      | `1`          |
 
-## Skill Checks
+# Skill Checks
 
-Since all skill checks are also ability checks, this list is in addition to the keys for Ability Checks.
+Note: Since all skill checks are also ability checks, advantage/disadvantage on an Ability Check can also apply to Skill Checks.
 
-| Attribute Key | Description |
-|----|----|
-| flags.midi-qol.advantage.skill.all | Advantage on all skill checks |
-| flags.midi-qol.advantage.skill.acr/ani/arc/ath/dec/his/ins/itm/inv/med/nat/prc/prf/per/rel/slt/ste/sur | Advantage on specific Skills |
-| flags.midi-qol.disadvantage.skill.all | Disadvantage on all skill checks |
-| flags.midi-qol.disadvantage.skill.acr/ani/arc/ath/dec/his/ins/itm/inv/med/nat/prc/prf/per/rel/slt/ste/sur | Disadvantage on specific Skills |
+```
+flags.midi-qol.advantage.skill.all
+                               [skill]
+flags.midi-qol.disadvantage.skill.all
+                                  [skill]
+```
 
-## Saving Throws
+> <details>
+> <summary>Skill Abbreviations</summary>
+>
+> | Skill           | Abbreviation |
+> | --------------- | ------------ |
+> | Acrobatics      | `acr`        |
+> | Animal Handling | `ani`        |
+> | Arcana          | `arc`        |
+> | Athletics       | `ath`        |
+> | Deception       | `dec`        |
+> | History         | `his`        |
+> | Insight         | `ins`        |
+> | Investigation   | `inv`        |
+> | Intimidation    | `itm`        |
+> | Medicine        | `med`        |
+> | Nature          | `nat`        |
+> | Persuasion      | `per`        |
+> | Perception      | `prc`        |
+> | Performance     | `prf`        |
+> | Religion        | `rel`        |
+> | Sleight of Hand | `slt`        |
+> | Stealth         | `ste`        |
+> | Survival        | `sur`        |
+>
+> Source: `CONFIG.DND5E.skills`
+> </details>
 
-| Attribute Key | Description |
-|----|----|
-| flags.midi-qol.advantage.all | Advantage on all rolls, including saving throws |
-| flags.midi-qol.advantage.ability.all | Advantage on all ability checks, saves, and skills |
-| flags.midi-qol.advantage.ability.save.all | Advantage on all saving throws |
-| flags.midi-qol.advantage.ability.save.str/dex/con/int/wis/cha | Advantage on saving throws with a specific Ability Modifier |
-| flags.midi-qol.disadvantage.all | Disadvantage on all rolls, including saving throws |
-| flags.midi-qol.disadvantage.ability.all | Disadvantage on all ability checks, saves, and skills |
-| flags.midi-qol.disadvantage.ability.save.all | Disadvantage on all saving throws |
-| flags.midi-qol.disadvantage.ability.save.str/dex/con/int/wis/cha | Disadvantage on saving throws with a specific Ability Modifier |
+### Advantage on Animal Handling Checks
 
-## Death Saving Throw
+| Attribute Key                        | Change Mode | Effect Value |
+| ------------------------------------ | ----------- | ------------ |
+| `flags.midi-qol.advantage.skill.ani` | Custom      | `1`          |
 
-| Attribute Key | Description |
-|----|----|
-| flags.midi-qol.advantage.all | Advantage on all rolls, including death saves |
-| flags.midi-qol.advantage.ability.all | Advantage on all ability checks, saves, and skills |
-| flags.midi-qol.advantage.ability.save.all | Advantage on all saving throws |
-| flags.midi-qol.advantage.deathSave | Advantage on death saving throws |
-| flags.midi-qol.disadvantage.all | Disadvantage on all rolls, including death saves |
-| flags.midi-qol.disadvantage.ability.all | Disadvantage on all ability checks, saves, and skills |
-| flags.midi-qol.disadvantage.ability.save.all | Disadvantage on all saving throws |
-| flags.midi-qol.disadvantage.deathSave | Disadvantage on death saving throws |
+### Disadvantage on Stealth Checks
+
+| Attribute Key                           | Change Mode | Effect Value |
+| --------------------------------------- | ----------- | ------------ |
+| `flags.midi-qol.disadvantage.skill.ste` | Custom      | `1`          |
+
+# Saving Throws
+
+```
+flags.midi-qol.advantage.ability.save.all
+                                      [ability]
+flags.midi-qol.disadvantage.ability.save.all
+                                         [ability]
+```
+
+> <details>
+> <summary>Ability Abbreviations</summary>
+>
+> | Ability      | Abbreviation |
+> | ------------ | ------------ |
+> | Strength     | `str`        |
+> | Dexterity    | `dex`        |
+> | Constitution | `con`        |
+> | Wisdom       | `wis`        |
+> | Intelligence | `int`        |
+> | Charisma     | `cha`        |
+>
+> Source: `CONFIG.DND5E.abilities`
+> </details>
+
+### Advantage on All Saving Throws
+
+| Attribute Key                               | Change Mode | Effect Value |
+| ------------------------------------------- | ----------- | ------------ |
+| `flags.midi-qol.advantage.ability.save.all` | Custom      | `1`          |
+
+### Disadvantage on Dexterity Saving Throws
+
+| Attribute Key                                  | Change Mode | Effect Value |
+| ---------------------------------------------- | ----------- | ------------ |
+| `flags.midi-qol.disadvantage.ability.save.dex` | Custom      | `1`          |
+
+# Death Saving Throw
+
+Note: Since a death saving throw is a saving throw, advantage/disadvantage on All Saving Throws will also apply to Death Saving Throws.
+
+```
+flags.midi-qol.advantage.deathSave
+flags.midi-qol.disadvantage.deathSave
+```
+
+### Advantage on Death Saving Throws
+
+| Attribute Key                        | Change Mode | Effect Value |
+| ------------------------------------ | ----------- | ------------ |
+| `flags.midi-qol.advantage.deathSave` | Custom      | `1`          |
+
+### Disadvantage on Death Saving Throws
+
+| Attribute Key                           | Change Mode | Effect Value |
+| --------------------------------------- | ----------- | ------------ |
+| `flags.midi-qol.disadvantage.deathSave` | Custom      | `1`          |
 
 # Shared Flags
 
