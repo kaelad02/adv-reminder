@@ -1,25 +1,121 @@
 # Midi Flags
 
-Here are the different types of Midi flags that Advantage Reminder supports. All of these should be setup in the effects tab with the Change Mode of `Custom` and the Effect Value of `1`. They're treated like boolean settings with a `1` enabling it and a `0` disabling it.
+This document covers the different types of Midi flags that Advantage Reminder supports for things like advantage, disadvantage, and critical roles.
 
-Some of the terms used in the keys are further explained in [Terms and Abbreviations](terms.md)
+# Basic Usage
 
-## Attack Rolls
+When creating an active effect with these Midi flags, it is recommended to use the `Custom` Change Mode and a `1` for the Effect Value. These flags are treated like boolean settings with a `1` enabling it and a `0` disabling it.
 
-| Attribute Key | Description |
-|----|----|
-| flags.midi-qol.advantage.all | Advantage on all rolls, including attacks |
-| flags.midi-qol.advantage.attack.all | Advantage on all attack rolls |
-| flags.midi-qol.advantage.attack.mwak/rwak/msak/rsak | Advantage on attacks with a specific Action Type |
-| flags.midi-qol.advantage.attack.str/dex/con/int/wis/cha | Advantage on attacks with a specific Ability Modifier |
-| flags.midi-qol.disadvantage.all | Disadvantage on all rolls, including attacks |
-| flags.midi-qol.disadvantage.attack.all | Disadvantage on all attack rolls |
-| flags.midi-qol.disadvantage.attack.mwak/rwak/msak/rsak | Disadvantage on attacks with a specific Action Type |
-| flags.midi-qol.disadvantage.attack.str/dex/con/int/wis/cha | Disadvantage on attacks with a specific Ability Modifier |
-| flags.midi-qol.grants.advantage.attack.all | Advantage when targeted by any attack roll |
-| flags.midi-qol.grants.advantage.attack.mwak/rwak/msak/rsak | Advantage when targeted by attacks with a specific Action Type |
-| flags.midi-qol.grants.disadvantage.attack.all | Disadvantage when targeted by any attack roll |
-| flags.midi-qol.grants.disadvantage.attack.mwak/rwak/msak/rsak | Disadvantage when targeted by attacks with a specific Action Type |
+In general, flags that start with `flags.midi-qol.advantage` will give advantage on a roll and `flags.midi-qol.disadvantage` will give disadvantage. Flags will use these to start with and then further specify what kind or rolls they apply to.
+
+# Common Flags
+
+```
+flags.midi-qol.advantage.all
+flags.midi-qol.disadvantage.all
+```
+
+Not often used, but useful if you need an effect that applies to all d20 rolls.
+
+# Attack Rolls
+
+Advantage and disadvantage on attack rolls can either come from an effect on the attacker or target.
+
+## Attacker
+
+These apply when they are the one making the attack roll.
+
+```
+flags.midi-qol.advantage.attack.all
+                                [type]
+                                [ability]
+flags.midi-qol.disadvantage.attack.all
+                                   [type]
+                                   [ability]
+```
+
+> <details>
+> <summary>Action Types</summary>
+>
+> | Action Type          | Value  |
+> | -------------------- | -----  |
+> | Melee Spell Attack   | `msak` |
+> | Melee Weapon Attack  | `mwak` |
+> | Ranged Spell Attack  | `rsak` |
+> | Ranged Weapon Attack | `rwak` |
+>
+> Source: `CONFIG.DND5E.itemActionTypes`
+> </details>
+
+> <details>
+> <summary>Ability Abbreviations</summary>
+>
+> | Ability      | Abbreviation |
+> | ------------ | ------------ |
+> | Strength     | `str`        |
+> | Dexterity    | `dex`        |
+> | Constitution | `con`        |
+> | Wisdom       | `wis`        |
+> | Intelligence | `int`        |
+> | Charisma     | `cha`        |
+>
+> Source: `CONFIG.DND5E.abilities`
+> </details>
+
+### Advantage on All Attack Rolls
+
+| Attribute Key                         | Change Mode | Effect Value |
+| ------------------------------------- | ----------- | ------------ |
+| `flags.midi-qol.advantage.attack.all` | Custom      | `1`          |
+
+### Advantage on Melee Weapon Attack Rolls
+
+| Attribute Key                          | Change Mode | Effect Value |
+| -------------------------------------- | ----------- | ------------ |
+| `flags.midi-qol.advantage.attack.mwak` | Custom      | `1`          |
+
+### Advantage on Attack Rolls using Strength
+
+| Attribute Key                         | Change Mode | Effect Value |
+| ------------------------------------- | ----------- | ------------ |
+| `flags.midi-qol.advantage.attack.str` | Custom      | `1`          |
+
+## Target of Attack
+
+These apply when they are the target of an attack. In other words, you are granting the attacker advantage or disadvantage.
+
+```
+flags.midi-qol.grants.advantage.attack.all
+                                       [type]
+flags.midi-qol.grants.disadvantage.attack.all
+                                          [type]
+```
+
+> <details>
+> <summary>Action Types</summary>
+>
+> | Action Type          | Value  |
+> | -------------------- | -----  |
+> | Melee Spell Attack   | `msak` |
+> | Melee Weapon Attack  | `mwak` |
+> | Ranged Spell Attack  | `rsak` |
+> | Ranged Weapon Attack | `rwak` |
+>
+> Source: `CONFIG.DND5E.itemActionTypes`
+> </details>
+
+### Grant Advantage to All Melee Attack Rolls (both spell and weapon)
+
+| Attribute Key                                 | Change Mode | Effect Value |
+| --------------------------------------------  | ----------- | ------------ |
+| `flags.midi-qol.grants.advantage.attack.msak` | Custom      | `1`          |
+| `flags.midi-qol.grants.advantage.attack.mwak` | Custom      | `1`          |
+
+### Grant Disadvantage to All Attack Rolls
+
+| Attribute Key                                   | Change Mode | Effect Value |
+| ----------------------------------------------- | ----------- | ------------ |
+| `flags.midi-qol.grants.disadvantage.attack.all` | Custom      | `1`          |
 
 ## Critical Hits
 
