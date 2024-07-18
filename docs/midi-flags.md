@@ -185,18 +185,41 @@ flags.midi-qol.fail.critical.all
 | -----------------------------------| ----------- | ------------ |
 | `flags.midi-qol.fail.critical.all` | Custom      | `1`          |
 
-## Ability Checks
+# Ability Checks
 
-| Attribute Key | Description |
-|----|----|
-| flags.midi-qol.advantage.all | Advantage on all rolls, including ability checks |
-| flags.midi-qol.advantage.ability.all | Advantage on all ability checks, saves, and skills |
-| flags.midi-qol.advantage.ability.check.all | Advantage on all ability checks |
-| flags.midi-qol.advantage.ability.check.str/dex/con/int/wis/cha | Advantage on ability checks with a specific Ability Modifier |
-| flags.midi-qol.disadvantage.all | Disadvantage on all rolls, including ability checks |
-| flags.midi-qol.disadvantage.ability.all | Disadvantage on all ability checks, saves, and skills |
-| flags.midi-qol.disadvantage.ability.check.all | Disadvantage on all ability checks |
-| flags.midi-qol.disadvantage.ability.check.str/dex/con/int/wis/cha | Disadvantage on ability checks with a specific Ability Modifier |
+```
+flags.midi-qol.advantage.ability.check.all
+                                       [ability]
+flags.midi-qol.disadvantage.ability.check.all
+                                          [ability]
+```
+
+> <details>
+> <summary>Ability Abbreviations</summary>
+>
+> | Ability      | Abbreviation |
+> | ------------ | ------------ |
+> | Strength     | `str`        |
+> | Dexterity    | `dex`        |
+> | Constitution | `con`        |
+> | Wisdom       | `wis`        |
+> | Intelligence | `int`        |
+> | Charisma     | `cha`        |
+>
+> Source: `CONFIG.DND5E.abilities`
+> </details>
+
+### Advantage on Strength Ability Checks
+
+| Attribute Key                                | Change Mode | Effect Value |
+| -------------------------------------------- | ----------- | ------------ |
+| `flags.midi-qol.advantage.ability.check.str` | Custom      | `1`          |
+
+### Disadvantage on All Ability Checks
+
+| Attribute Key                                   | Change Mode | Effect Value |
+| ----------------------------------------------- | ----------- | ------------ |
+| `flags.midi-qol.disadvantage.ability.check.all` | Custom      | `1`          |
 
 ## Skill Checks
 
