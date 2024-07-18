@@ -8,15 +8,6 @@ When creating an active effect with these Midi flags, it is recommended to use t
 
 In general, flags that start with `flags.midi-qol.advantage` will give advantage on a roll and `flags.midi-qol.disadvantage` will give disadvantage. Flags will use these to start with and then further specify what kind or rolls they apply to.
 
-# Common Flags
-
-```
-flags.midi-qol.advantage.all
-flags.midi-qol.disadvantage.all
-```
-
-Not often used, but useful if you need an effect that applies to all d20 rolls.
-
 # Attack Rolls
 
 Advantage and disadvantage on attack rolls can either come from an effect on the attacker or target.
@@ -243,3 +234,26 @@ Since all skill checks are also ability checks, this list is in addition to the 
 | flags.midi-qol.disadvantage.ability.all | Disadvantage on all ability checks, saves, and skills |
 | flags.midi-qol.disadvantage.ability.save.all | Disadvantage on all saving throws |
 | flags.midi-qol.disadvantage.deathSave | Disadvantage on death saving throws |
+
+# Shared Flags
+
+While not commonly used, these apply to multiple types of rolls with just one flag.
+
+```
+flags.midi-qol.advantage.all
+flags.midi-qol.advantage.ability.all
+flags.midi-qol.disadvantage.all
+flags.midi-qol.disadvantage.ability.all
+```
+
+### Advantage on All d20 Rolls
+
+| Attribute Key                  | Change Mode | Effect Value |
+| ------------------------------ | ----------- | ------------ |
+| `flags.midi-qol.advantage.all` | Custom      | `1`          |
+
+### Advantage on All Ability Checks, Saves, and Skill Rolls
+
+| Attribute Key                          | Change Mode | Effect Value |
+| -------------------------------------- | ----------- | ------------ |
+| `flags.midi-qol.advantage.ability.all` | Custom      | `1`          |
