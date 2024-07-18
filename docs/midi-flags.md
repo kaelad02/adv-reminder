@@ -223,7 +223,8 @@ flags.midi-qol.disadvantage.ability.check.all
 
 # Skill Checks
 
-Note: Since all skill checks are also ability checks, advantage/disadvantage on an Ability Check can also apply to Skill Checks.
+> [!NOTE]
+> Since all skill checks are also ability checks, advantage/disadvantage on an Ability Check can also apply to Skill Checks.
 
 ```
 flags.midi-qol.advantage.skill.all
@@ -309,7 +310,8 @@ flags.midi-qol.disadvantage.ability.save.all
 
 # Death Saving Throw
 
-Note: Since a death saving throw is a saving throw, advantage/disadvantage on All Saving Throws will also apply to Death Saving Throws.
+> [!NOTE]
+> Since a death saving throw is a saving throw, advantage/disadvantage on All Saving Throws will also apply to Death Saving Throws.
 
 ```
 flags.midi-qol.advantage.deathSave
