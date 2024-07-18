@@ -117,18 +117,82 @@ flags.midi-qol.grants.disadvantage.attack.all
 | ----------------------------------------------- | ----------- | ------------ |
 | `flags.midi-qol.grants.disadvantage.attack.all` | Custom      | `1`          |
 
-## Critical Hits
+# Critical Hits
 
-| Attribute Key | Description |
-|----|----|
-| flags.midi-qol.critical.all | Critical hit on all attacks |
-| flags.midi-qol.critical.mwak/rwak/msak/rsak | Critical hit on attacks with a specific Action Type |
-| flags.midi-qol.noCritical.all | Normal hit on all attacks |
-| flags.midi-qol.noCritical.mwak/rwak/msak/rsak | Normal hit on attacks with a specific Action Type |
-| flags.midi-qol.grants.critical.all | Critical hit when targeted by any attack |
-| flags.midi-qol.grants.critical.mwak/rwak/msak/rsak | Critical hit when targeted by attacks with a specific Action Type |
-| flags.midi-qol.fail.critical.all | Normal hit when targeted by any attack |
-| flags.midi-qol.fail.critical.mwak/rwak/msak/rsak | Normal hit when targeted by attacks with a specific Action Type |
+Critical hits can either come from an effect on the attacker or target.
+
+## Attacker
+
+These apply when they are the one making the attack roll.
+
+```
+flags.midi-qol.critical.all
+                        [type]
+flags.midi-qol.noCritical.all
+                          [type]
+```
+
+> <details>
+> <summary>Action Types</summary>
+>
+> | Action Type          | Value  |
+> | -------------------- | -----  |
+> | Melee Spell Attack   | `msak` |
+> | Melee Weapon Attack  | `mwak` |
+> | Ranged Spell Attack  | `rsak` |
+> | Ranged Weapon Attack | `rwak` |
+>
+> Source: `CONFIG.DND5E.itemActionTypes`
+> </details>
+
+### Critical Hit on All Damage Rolls
+
+| Attribute Key                 | Change Mode | Effect Value |
+| ------------------------------| ----------- | ------------ |
+| `flags.midi-qol.critical.all` | Custom      | `1`          |
+
+### Critical Hit on All Weapon Damage Rolls (both melee and ranged)
+
+| Attribute Key                  | Change Mode | Effect Value |
+| -------------------------------| ----------- | ------------ |
+| `flags.midi-qol.critical.mwak` | Custom      | `1`          |
+| `flags.midi-qol.critical.rwak` | Custom      | `1`          |
+
+## Target of Attack
+
+These apply when they are the target of an attack. In other words, you are granting the attacker a critical hit or canceling it.
+
+```
+flags.midi-qol.grants.critical.all
+                               [type]
+flags.midi-qol.fail.critical.all
+                             [type]
+```
+
+> <details>
+> <summary>Action Types</summary>
+>
+> | Action Type          | Value  |
+> | -------------------- | -----  |
+> | Melee Spell Attack   | `msak` |
+> | Melee Weapon Attack  | `mwak` |
+> | Ranged Spell Attack  | `rsak` |
+> | Ranged Weapon Attack | `rwak` |
+>
+> Source: `CONFIG.DND5E.itemActionTypes`
+> </details>
+
+### Grant Critical Hit on All Damage Rolls
+
+| Attribute Key                        | Change Mode | Effect Value |
+| -------------------------------------| ----------- | ------------ |
+| `flags.midi-qol.grants.critical.all` | Custom      | `1`          |
+
+### Cancel Critical Hit Against All Damage Rolls
+
+| Attribute Key                      | Change Mode | Effect Value |
+| -----------------------------------| ----------- | ------------ |
+| `flags.midi-qol.fail.critical.all` | Custom      | `1`          |
 
 ## Ability Checks
 
