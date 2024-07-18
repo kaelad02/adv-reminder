@@ -139,13 +139,13 @@ flags.midi-qol.noCritical.all
 ### Critical Hit on All Damage Rolls
 
 | Attribute Key                 | Change Mode | Effect Value |
-| ------------------------------| ----------- | ------------ |
+| ----------------------------- | ----------- | ------------ |
 | `flags.midi-qol.critical.all` | Custom      | `1`          |
 
 ### Critical Hit on All Weapon Damage Rolls (both melee and ranged)
 
 | Attribute Key                  | Change Mode | Effect Value |
-| -------------------------------| ----------- | ------------ |
+| ------------------------------ | ----------- | ------------ |
 | `flags.midi-qol.critical.mwak` | Custom      | `1`          |
 | `flags.midi-qol.critical.rwak` | Custom      | `1`          |
 
@@ -176,13 +176,13 @@ flags.midi-qol.fail.critical.all
 ### Grant Critical Hit on All Damage Rolls
 
 | Attribute Key                        | Change Mode | Effect Value |
-| -------------------------------------| ----------- | ------------ |
+| ------------------------------------ | ----------- | ------------ |
 | `flags.midi-qol.grants.critical.all` | Custom      | `1`          |
 
 ### Cancel Critical Hit Against All Damage Rolls
 
 | Attribute Key                      | Change Mode | Effect Value |
-| -----------------------------------| ----------- | ------------ |
+| ---------------------------------- | ----------- | ------------ |
 | `flags.midi-qol.fail.critical.all` | Custom      | `1`          |
 
 # Ability Checks
