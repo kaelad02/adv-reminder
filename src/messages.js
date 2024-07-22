@@ -48,9 +48,14 @@ class BaseMessage {
       messages.push(...targetMessages);
     }
 
-    if (messages.length > 0) {
-      debug("messages found:", messages);
-      foundry.utils.setProperty(options, "dialogOptions.adv-reminder.messages", messages);
+    const finalMessages = [];
+    for (const message of messages) {
+      finalMessages.push(game.i18n.localize(message));
+    }
+
+    if (finalMessages.length > 0) {
+      debug("messages found:", finalMessages);
+      foundry.utils.setProperty(options, "dialogOptions.adv-reminder.messages", finalMessages);
       foundry.utils.setProperty(options, "dialogOptions.adv-reminder.rollData", this.actor.getRollData());
     }
   }
