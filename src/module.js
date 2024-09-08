@@ -53,17 +53,23 @@ function updateConditionEffects() {
   ce.advReminderAdvantageAttack = new Set(["hiding", "invisible"]);
   ce.advReminderAdvantageDexSave = new Set(["dodging"]); 
   ce.advReminderDisadvantageAttack = new Set(["blinded", "frightened", "poisoned", "prone", "restrained"]);
-  ce.advReminderDisadvantageAbility = new Set(["exhaustion-1", "frightened", "poisoned"]);
-  ce.advReminderDisadvantageSave = new Set(["exhaustion-3"]);
+  ce.advReminderDisadvantageAbility = new Set(["frightened", "poisoned"]);
+  ce.advReminderDisadvantageSave = new Set();
   ce.advReminderDisadvantageDexSave = new Set(["restrained"]);
   ce.advReminderDisadvantagePhysicalRolls = new Set(["heavilyEncumbered"]);
   ce.advReminderFailDexSave = new Set(["paralyzed", "petrified", "stunned", "unconscious"]);
   ce.advReminderFailStrSave = new Set(["paralyzed", "petrified", "stunned", "unconscious"]);
   ce.advReminderGrantAdvantageAttack = new Set(["blinded", "paralyzed", "petrified", "restrained", "stunned", "unconscious"]);
   ce.advReminderGrantAdjacentCritical = new Set(["paralyzed", "unconscious"]);
-  ce.advReminderGrantDisadvantageAttack = new Set(["dodging", "exhaustion-3", "hidden", "invisible"]);
+  ce.advReminderGrantDisadvantageAttack = new Set(["dodging", "hidden", "invisible"]);
   // if adjacent, grant advantage on the attack, else grant disadvantage
   ce.advReminderGrantAdjacentAttack = new Set(["prone"]);
+
+  if (game.settings.get("dnd5e", "rulesVersion") === "legacy") {
+    ce.advReminderDisadvantageAbility.add("exhaustion-1");
+    ce.advReminderDisadvantageSave.add("exhaustion-3");
+    ce.advReminderGrantDisadvantageAttack.add("exhaustion-3");
+  }
 }
 
 // Add message flags to DAE so it shows them in the AE editor
