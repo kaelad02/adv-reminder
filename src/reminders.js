@@ -153,6 +153,12 @@ export class AttackReminder extends BaseReminder {
   }
 }
 
+export class AttackReminderV2 extends AttackReminder {
+  constructor(actor, targetActor, activity, distanceFn) {
+    super(actor, targetActor, { system: { actionType: activity.actionType} , abilityMod: activity.ability }, distanceFn);
+  }
+} 
+
 class AbilityBaseReminder extends BaseReminder {
   constructor(actor, abilityId) {
     super(actor);

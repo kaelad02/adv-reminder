@@ -2,6 +2,7 @@ import {
   AbilityCheckReminder,
   AbilitySaveReminder,
   AttackReminder,
+  AttackReminderV2,
   CriticalReminder,
   DeathSaveReminder,
   SkillReminder,
@@ -52,6 +53,10 @@ const SourceMixin = (superclass) =>
       );
     }
 
+    get _prefix() {
+      return "dialogOptions";
+    }
+
     _accumulator() {
       const advantageLabels = [];
       const disadvantageLabels = [];
@@ -85,14 +90,20 @@ const SourceMixin = (superclass) =>
               foundry.utils.setProperty(options, key, newLabels);
             }
           };
-          merge(advantageLabels, "dialogOptions.adv-reminder.advantageLabels");
-          merge(disadvantageLabels, "dialogOptions.adv-reminder.disadvantageLabels");
+          merge(advantageLabels, `${this._prefix}.adv-reminder.advantageLabels`);
+          merge(disadvantageLabels, `${this._prefix}.adv-reminder.disadvantageLabels`);
         },
       };
     }
   };
 
 export class AttackSource extends SourceMixin(AttackReminder) {}
+
+export class AttackSourceV2 extends SourceMixin(AttackReminderV2) {
+  get _prefix() {
+    return "options";
+  }
+}
 
 export class AbilitySaveSource extends SourceMixin(AbilitySaveReminder) {}
 

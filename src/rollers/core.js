@@ -2,14 +2,14 @@ import { AbilitySaveFail } from "../fails.js";
 import {
   AbilityCheckMessage,
   AbilitySaveMessage,
-  AttackMessage,
+  AttackMessageV2,
   ConcentrationMessage,
   DamageMessage,
   DeathSaveMessage,
   SkillMessage,
 } from "../messages.js";
 import {
-  AttackReminder,
+  AttackReminderV2,
   AbilityCheckReminder,
   AbilitySaveReminder,
   CriticalReminder,
@@ -19,7 +19,7 @@ import {
 import {
   AbilityCheckSource,
   AbilitySaveSource,
-  AttackSource,
+  AttackSourceV2,
   ConcentrationSource,
   CriticalSource,
   DeathSaveSource,
@@ -47,7 +47,7 @@ export default class CoreRollerHooks {
     debug("checkArmorStealth", this.checkArmorStealth);
 
     // register all the dnd5e.pre hooks
-    Hooks.on("dnd5e.preRollAttack", this.preRollAttack.bind(this));
+    Hooks.on("dnd5e.preRollAttackV2", this.preRollAttackV2.bind(this));
     Hooks.on("dnd5e.preRollAbilitySave", this.preRollAbilitySave.bind(this));
     Hooks.on("dnd5e.preRollConcentration", this.preRollConcentration.bind(this));
     Hooks.on("dnd5e.preRollAbilityTest", this.preRollAbilityTest.bind(this));
@@ -65,16 +65,17 @@ export default class CoreRollerHooks {
     return true;
   }
 
-  preRollAttack(item, config) {
-    debug("preRollAttack hook called");
+  preRollAttackV2(config, dialog, message) {
+    debug("preRollAttackV2 hook called", config, dialog, message);
 
-    if (this.isFastForwarding(config)) return;
+    if (this.isFastForwarding(config, dialog)) return;
     const target = getTarget();
-    const distanceFn = getDistanceToTargetFn(config.messageData.speaker);
+    const distanceFn = getDistanceToTargetFn(message.data.speaker);
+    const activity = config.origin;
 
-    new AttackMessage(item.actor, target, item).addMessage(config);
-    if (showSources) new AttackSource(item.actor, target, item, distanceFn).updateOptions(config);
-    new AttackReminder(item.actor, target, item, distanceFn).updateOptions(config);
+    new AttackMessageV2(activity.actor, target, activity).addMessage(dialog);
+    if (showSources) new AttackSourceV2(activity.actor, target, activity, distanceFn).updateOptions(dialog);
+    new AttackReminderV2(activity.actor, target, activity, distanceFn).updateOptions(config.rolls[0].options);
   }
 
   preRollAbilitySave(actor, config, abilityId) {
@@ -163,11 +164,14 @@ export default class CoreRollerHooks {
    * @param {object} options
    * @param {boolean} [options.fastForward] a specific fastForward flag
    * @param {Event} [options.event] the triggering event
+   * @param {object} dialog
+   * @param {boolean} [dialog.configure] whether or not to show the dialog
    * @returns {boolean} true if they are fast-forwarding, false otherwise
    */
-  isFastForwarding({ fastForward = false, event = {} }) {
+  isFastForwarding({ fastForward = false, event = {} }, { configure = true } = {}) {
     const isFF = !!(
       fastForward ||
+      !configure ||
       event?.shiftKey ||
       event?.altKey ||
       event?.ctrlKey ||
