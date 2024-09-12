@@ -10,7 +10,9 @@
       "chat": "",
       "unidentified": ""
     },
-    "source": "PHB pg. 96",
+    "source": {
+      "custom": "PHB pg. 96"
+    },
     "activation": {
       "type": "",
       "cost": null,
