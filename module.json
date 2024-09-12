@@ -29,7 +29,7 @@
       "name": "sample-items",
       "label": "AR Message Sample Items",
       "system": "dnd5e",
-      "path": "packs/sample-items.db",
+      "path": "packs/sample-items",
       "type": "Item"
     }
   ],
