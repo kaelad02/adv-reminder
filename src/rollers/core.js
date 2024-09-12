@@ -4,7 +4,7 @@ import {
   AbilitySaveMessage,
   AttackMessageV2,
   ConcentrationMessage,
-  DamageMessage,
+  DamageMessageV2,
   DeathSaveMessage,
   SkillMessage,
 } from "../messages.js";
@@ -12,7 +12,7 @@ import {
   AttackReminderV2,
   AbilityCheckReminder,
   AbilitySaveReminder,
-  CriticalReminder,
+  CriticalReminderV2,
   DeathSaveReminder,
   SkillReminder,
 } from "../reminders.js";
@@ -21,7 +21,7 @@ import {
   AbilitySaveSource,
   AttackSourceV2,
   ConcentrationSource,
-  CriticalSource,
+  CriticalSourceV2,
   DeathSaveSource,
   SkillSource,
 } from "../sources.js";
@@ -54,7 +54,7 @@ export default class CoreRollerHooks {
     Hooks.on("dnd5e.preRollSkill", this.preRollSkill.bind(this));
     Hooks.on("dnd5e.preRollToolCheck", this.preRollToolCheck.bind(this));
     Hooks.on("dnd5e.preRollDeathSave", this.preRollDeathSave.bind(this));
-    Hooks.on("dnd5e.preRollDamage", this.preRollDamage.bind(this));
+    Hooks.on("dnd5e.preRollDamageV2", this.preRollDamageV2.bind(this));
   }
 
   /**
@@ -143,19 +143,17 @@ export default class CoreRollerHooks {
     new DeathSaveReminder(actor).updateOptions(config);
   }
 
-  preRollDamage(item, config) {
-    debug("preRollDamage hook called");
+  preRollDamageV2(config, dialog, message) {
+    debug("preRollDamageV2 hook called", config, dialog, message);
 
-    // damage/healing enricher doesn't have an item, skip
-    if (!item) return;
-
-    if (this.isFastForwarding(config)) return;
+    if (this.isFastForwarding(config, dialog)) return;
     const target = getTarget();
-    const distanceFn = getDistanceToTargetFn(config.messageData.speaker);
+    const distanceFn = getDistanceToTargetFn(message.data.speaker);
+    const activity = config.origin;
 
-    new DamageMessage(item.actor, target, item).addMessage(config);
-    if (showSources) new CriticalSource(item.actor, target, item, distanceFn).updateOptions(config);
-    new CriticalReminder(item.actor, target, item, distanceFn).updateOptions(config);
+    new DamageMessageV2(activity.actor, target, activity).addMessage(dialog);
+    if (showSources) new CriticalSourceV2(activity.actor, target, activity, distanceFn).updateOptions(dialog);
+    new CriticalReminderV2(activity.actor, target, activity, distanceFn).updateOptions(config.rolls[0] ?? {}, "isCritical");
   }
 
   /**

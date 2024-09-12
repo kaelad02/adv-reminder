@@ -414,3 +414,9 @@ export class CriticalReminder extends BaseReminder {
     };
   }
 }
+
+export class CriticalReminderV2 extends CriticalReminder {
+  constructor(actor, targetActor, activity, distanceFn) {
+    super(actor, targetActor, { system: { actionType: activity.actionType } }, distanceFn);
+  }
+}

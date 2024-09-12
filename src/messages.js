@@ -196,3 +196,13 @@ export class DamageMessage extends BaseMessage {
     ];
   }
 }
+
+export class DamageMessageV2 extends DamageMessage {
+  constructor(actor, targetActor, activity) {
+    super(actor, targetActor, { system: { actionType: activity.actionType } });
+  }
+
+  get prefix() {
+    return "options";
+  }
+}

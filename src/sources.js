@@ -4,6 +4,7 @@ import {
   AttackReminder,
   AttackReminderV2,
   CriticalReminder,
+  CriticalReminderV2,
   DeathSaveReminder,
   SkillReminder,
 } from "./reminders.js";
@@ -176,5 +177,11 @@ export class CriticalSource extends SourceMixin(CriticalReminder) {
         merge(normalLabels, "dialogOptions.adv-reminder.normalLabels");
       },
     };
+  }
+}
+
+export class CriticalSourceV2 extends SourceMixin(CriticalReminderV2) {
+  get _prefix() {
+    return "options";
   }
 }
