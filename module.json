@@ -5,7 +5,7 @@
   "authors": [{ "name": "kaelad", "discord": "kaelad#1693" }],
   "version": "0.1",
   "compatibility": {
-    "minimum": "11",
+    "minimum": "11.315",
     "verified": "12"
   },
   "relationships": {
