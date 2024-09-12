@@ -86,7 +86,6 @@
         "combat": null
       },
       "icon": "icons/skills/melee/strike-dagger-arcane-pink.webp",
-      "label": "Sneak Attack",
       "origin": "Compendium.adv-reminder.sample-items.3hOXS0gA0zia6vgU",
       "tint": null,
       "transfer": true,
@@ -106,15 +105,18 @@
       ],
       "_id": "7jUy2bl0IGt1f7dt",
       "flags": {},
+      "name": "Sneak Attack",
+      "description": "",
+      "statuses": [],
       "_key": "!items.effects!3hOXS0gA0zia6vgU.7jUy2bl0IGt1f7dt"
     }
   ],
   "_stats": {
     "systemId": "dnd5e",
-    "systemVersion": "2.0.3",
-    "coreVersion": "10.286",
+    "systemVersion": "3.0.0",
+    "coreVersion": "11.315",
     "createdTime": 1661787234348,
-    "modifiedTime": 1664175030439,
+    "modifiedTime": 1726183385571,
     "lastModifiedBy": "dnd5ebuilder0000"
   },
   "folder": null,

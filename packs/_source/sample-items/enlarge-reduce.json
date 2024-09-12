@@ -10,21 +10,24 @@
       "chat": "",
       "unidentified": ""
     },
-    "source": "PHB pg. 237",
+    "source": {
+      "custom": "PHB pg. 237"
+    },
     "activation": {
       "type": "action",
       "cost": 1,
       "condition": ""
     },
     "duration": {
-      "value": 1,
+      "value": "1",
       "units": "minute"
     },
     "target": {
       "value": 1,
       "width": null,
       "units": "",
-      "type": "creature"
+      "type": "creature",
+      "prompt": true
     },
     "range": {
       "value": 30,
@@ -33,18 +36,20 @@
     },
     "uses": {
       "value": null,
-      "max": 0,
-      "per": "",
-      "recovery": ""
+      "max": "",
+      "per": null,
+      "recovery": "",
+      "prompt": true
     },
     "consume": {
       "type": "",
       "target": null,
-      "amount": null
+      "amount": null,
+      "scale": false
     },
     "ability": "",
     "actionType": "save",
-    "attackBonus": 0,
+    "attackBonus": "",
     "chatFlavor": "",
     "critical": {
       "threshold": null,
@@ -84,7 +89,15 @@
     "scaling": {
       "mode": "none",
       "formula": ""
-    }
+    },
+    "cover": null,
+    "crewed": false,
+    "properties": [
+      "vocal",
+      "somatic",
+      "material",
+      "concentration"
+    ]
   },
   "flags": {},
   "img": "icons/magic/control/energy-stream-link-large-blue.webp",
@@ -101,7 +114,6 @@
         "combat": null
       },
       "icon": "icons/magic/control/energy-stream-link-large-blue.webp",
-      "label": "Enlarge/Reduce",
       "origin": "Compendium.adv-reminder.sample-items.UmWhRvI4lb3MmUld",
       "tint": null,
       "transfer": true,
@@ -133,15 +145,18 @@
       ],
       "_id": "i6PJKNSmx5O0nJ7U",
       "flags": {},
+      "name": "Enlarge/Reduce",
+      "description": "",
+      "statuses": [],
       "_key": "!items.effects!UmWhRvI4lb3MmUld.i6PJKNSmx5O0nJ7U"
     }
   ],
   "_stats": {
     "systemId": "dnd5e",
-    "systemVersion": "2.0.3",
-    "coreVersion": "10.286",
+    "systemVersion": "3.0.0",
+    "coreVersion": "11.315",
     "createdTime": 1661787234153,
-    "modifiedTime": 1664175030523,
+    "modifiedTime": 1726183385646,
     "lastModifiedBy": "dnd5ebuilder0000"
   },
   "folder": null,

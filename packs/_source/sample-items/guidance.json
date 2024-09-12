@@ -10,21 +10,24 @@
       "chat": "",
       "unidentified": ""
     },
-    "source": "PHB pg. 248",
+    "source": {
+      "custom": "PHB pg. 248"
+    },
     "activation": {
       "type": "action",
       "cost": 1,
       "condition": ""
     },
     "duration": {
-      "value": 1,
+      "value": "1",
       "units": "minute"
     },
     "target": {
       "value": 1,
       "width": null,
       "units": "",
-      "type": "creature"
+      "type": "creature",
+      "prompt": true
     },
     "range": {
       "value": null,
@@ -33,18 +36,20 @@
     },
     "uses": {
       "value": null,
-      "max": 0,
-      "per": "",
-      "recovery": ""
+      "max": "",
+      "per": null,
+      "recovery": "",
+      "prompt": true
     },
     "consume": {
       "type": "",
       "target": null,
-      "amount": null
+      "amount": null,
+      "scale": false
     },
     "ability": "",
     "actionType": "util",
-    "attackBonus": 0,
+    "attackBonus": "",
     "chatFlavor": "",
     "critical": {
       "threshold": null,
@@ -85,7 +90,14 @@
     "scaling": {
       "mode": "none",
       "formula": ""
-    }
+    },
+    "cover": null,
+    "crewed": false,
+    "properties": [
+      "vocal",
+      "somatic",
+      "concentration"
+    ]
   },
   "flags": {},
   "img": "icons/magic/control/buff-flight-wings-blue.webp",
@@ -102,7 +114,6 @@
         "combat": null
       },
       "icon": "icons/magic/control/buff-flight-wings-blue.webp",
-      "label": "Guidance",
       "origin": "Compendium.adv-reminder.sample-items.5UAa8jcIguGkF1qJ",
       "tint": null,
       "transfer": true,
@@ -116,15 +127,18 @@
       ],
       "_id": "SkoYMd0RXtSiQZD2",
       "flags": {},
+      "name": "Guidance",
+      "description": "",
+      "statuses": [],
       "_key": "!items.effects!5UAa8jcIguGkF1qJ.SkoYMd0RXtSiQZD2"
     }
   ],
   "_stats": {
     "systemId": "dnd5e",
-    "systemVersion": "2.0.3",
-    "coreVersion": "10.286",
+    "systemVersion": "3.0.0",
+    "coreVersion": "11.315",
     "createdTime": 1661787234132,
-    "modifiedTime": 1664175030541,
+    "modifiedTime": 1726183385625,
     "lastModifiedBy": "dnd5ebuilder0000"
   },
   "folder": null,

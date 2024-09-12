@@ -81,7 +81,6 @@
         "combat": null
       },
       "icon": "icons/creatures/mammals/elk-moose-marked-green.webp",
-      "label": "Fey Ancestry",
       "origin": "Compendium.adv-reminder.sample-items.qdXssoktmNpdirM2",
       "tint": null,
       "transfer": true,
@@ -95,15 +94,18 @@
       ],
       "_id": "sza7fSreKpLWrFB4",
       "flags": {},
+      "name": "Fey Ancestry",
+      "description": "",
+      "statuses": [],
       "_key": "!items.effects!qdXssoktmNpdirM2.sza7fSreKpLWrFB4"
     }
   ],
   "_stats": {
     "systemId": "dnd5e",
-    "systemVersion": "2.0.3",
-    "coreVersion": "10.286",
+    "systemVersion": "3.0.0",
+    "coreVersion": "11.315",
     "createdTime": 1661787234471,
-    "modifiedTime": 1664175030479,
+    "modifiedTime": 1726183385574,
     "lastModifiedBy": "dnd5ebuilder0000"
   },
   "folder": null,

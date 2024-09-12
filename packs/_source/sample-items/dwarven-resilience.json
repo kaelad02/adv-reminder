@@ -81,7 +81,8 @@
         {
           "key": "flags.adv-reminder.message.ability.save.con",
           "mode": 0,
-          "value": "Advantage against poison"
+          "value": "Advantage against poison",
+          "priority": null
         }
       ],
       "disabled": false,
@@ -95,20 +96,22 @@
         "startTurn": null
       },
       "icon": "icons/creatures/abilities/stinger-poison-green.webp",
-      "label": "Dwarven Resilience",
       "origin": "Item.ufysTkqet2Ctmtyi",
       "transfer": true,
       "flags": {},
       "tint": null,
+      "name": "Dwarven Resilience",
+      "description": "",
+      "statuses": [],
       "_key": "!items.effects!hBhQ4hKPvKhIFNED.hIaIpLxcMZSY3qXi"
     }
   ],
   "_stats": {
     "systemId": "dnd5e",
-    "systemVersion": "2.0.3",
-    "coreVersion": "10.286",
+    "systemVersion": "3.0.0",
+    "coreVersion": "11.315",
     "createdTime": 1661787234474,
-    "modifiedTime": 1664175030462,
+    "modifiedTime": 1726183385573,
     "lastModifiedBy": "dnd5ebuilder0000"
   },
   "folder": null,
