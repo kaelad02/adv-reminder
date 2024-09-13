@@ -1,0 +1,117 @@
+{
+  "name": "Fey Ancestry",
+  "ownership": {
+    "default": 0
+  },
+  "type": "feat",
+  "system": {
+    "description": {
+      "value": "<p>You have advantage on saving throws against being charmed, and magic can't put you to sleep.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": {
+      "custom": "PHB pg. 23, 39"
+    },
+    "activation": {
+      "type": "",
+      "cost": null,
+      "condition": ""
+    },
+    "duration": {
+      "value": null,
+      "units": ""
+    },
+    "target": {
+      "value": null,
+      "width": null,
+      "units": "",
+      "type": ""
+    },
+    "range": {
+      "value": null,
+      "long": null,
+      "units": ""
+    },
+    "uses": {
+      "value": null,
+      "max": "",
+      "per": null,
+      "recovery": ""
+    },
+    "consume": {
+      "type": "",
+      "target": null,
+      "amount": null
+    },
+    "ability": "",
+    "actionType": "",
+    "attackBonus": 0,
+    "chatFlavor": "",
+    "critical": {
+      "threshold": null,
+      "damage": ""
+    },
+    "damage": {
+      "parts": [],
+      "versatile": ""
+    },
+    "formula": "",
+    "save": {
+      "ability": "",
+      "dc": null,
+      "scaling": "spell"
+    },
+    "requirements": "Elf, Half-Elf",
+    "recharge": {
+      "value": null,
+      "charged": false
+    }
+  },
+  "flags": {},
+  "img": "icons/creatures/mammals/elk-moose-marked-green.webp",
+  "effects": [
+    {
+      "disabled": false,
+      "duration": {
+        "startTime": 0,
+        "seconds": null,
+        "rounds": null,
+        "turns": null,
+        "startRound": 1,
+        "startTurn": 0,
+        "combat": null
+      },
+      "icon": "icons/creatures/mammals/elk-moose-marked-green.webp",
+      "origin": "Compendium.adv-reminder.sample-items.qdXssoktmNpdirM2",
+      "tint": null,
+      "transfer": true,
+      "changes": [
+        {
+          "key": "flags.adv-reminder.message.ability.save.wis",
+          "mode": 0,
+          "value": "You have advantage when saving against being charmed.",
+          "priority": null
+        }
+      ],
+      "_id": "sza7fSreKpLWrFB4",
+      "flags": {},
+      "name": "Fey Ancestry",
+      "description": "",
+      "statuses": [],
+      "_key": "!items.effects!qdXssoktmNpdirM2.sza7fSreKpLWrFB4"
+    }
+  ],
+  "_stats": {
+    "systemId": "dnd5e",
+    "systemVersion": "3.0.0",
+    "coreVersion": "11.315",
+    "createdTime": 1661787234471,
+    "modifiedTime": 1726183385574,
+    "lastModifiedBy": "dnd5ebuilder0000"
+  },
+  "folder": null,
+  "sort": 0,
+  "_id": "qdXssoktmNpdirM2",
+  "_key": "!items!qdXssoktmNpdirM2"
+}

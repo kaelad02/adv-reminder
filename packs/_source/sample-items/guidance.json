@@ -1,0 +1,148 @@
+{
+  "name": "Guidance",
+  "ownership": {
+    "default": 0
+  },
+  "type": "spell",
+  "system": {
+    "description": {
+      "value": "<p>You touch one willing creature. Once before the spell ends, the target can roll a d4 and add the number rolled to one ability check of its choice. It can roll the die before or after making the ability check. The spell then ends.</p>",
+      "chat": "",
+      "unidentified": ""
+    },
+    "source": {
+      "custom": "PHB pg. 248"
+    },
+    "activation": {
+      "type": "action",
+      "cost": 1,
+      "condition": ""
+    },
+    "duration": {
+      "value": "1",
+      "units": "minute"
+    },
+    "target": {
+      "value": 1,
+      "width": null,
+      "units": "",
+      "type": "creature",
+      "prompt": true
+    },
+    "range": {
+      "value": null,
+      "long": null,
+      "units": "touch"
+    },
+    "uses": {
+      "value": null,
+      "max": "",
+      "per": null,
+      "recovery": "",
+      "prompt": true
+    },
+    "consume": {
+      "type": "",
+      "target": null,
+      "amount": null,
+      "scale": false
+    },
+    "ability": "",
+    "actionType": "util",
+    "attackBonus": "",
+    "chatFlavor": "",
+    "critical": {
+      "threshold": null,
+      "damage": ""
+    },
+    "damage": {
+      "parts": [],
+      "versatile": "",
+      "value": ""
+    },
+    "formula": "1d4",
+    "save": {
+      "ability": "",
+      "dc": null,
+      "scaling": "spell",
+      "value": ""
+    },
+    "level": 0,
+    "school": "div",
+    "components": {
+      "value": "",
+      "vocal": true,
+      "somatic": true,
+      "material": false,
+      "ritual": false,
+      "concentration": true
+    },
+    "materials": {
+      "value": "",
+      "consumed": false,
+      "cost": 0,
+      "supply": 0
+    },
+    "preparation": {
+      "mode": "prepared",
+      "prepared": false
+    },
+    "scaling": {
+      "mode": "none",
+      "formula": ""
+    },
+    "cover": null,
+    "crewed": false,
+    "properties": [
+      "vocal",
+      "somatic",
+      "concentration"
+    ]
+  },
+  "flags": {},
+  "img": "icons/magic/control/buff-flight-wings-blue.webp",
+  "effects": [
+    {
+      "disabled": true,
+      "duration": {
+        "startTime": null,
+        "seconds": 60,
+        "rounds": 10,
+        "turns": null,
+        "startRound": null,
+        "startTurn": null,
+        "combat": null
+      },
+      "icon": "icons/magic/control/buff-flight-wings-blue.webp",
+      "origin": "Compendium.adv-reminder.sample-items.5UAa8jcIguGkF1qJ",
+      "tint": null,
+      "transfer": true,
+      "changes": [
+        {
+          "key": "flags.adv-reminder.message.ability.check.all",
+          "mode": 0,
+          "value": "[[/r 1d4]]{Guidance} on one ability check, can roll before or after",
+          "priority": null
+        }
+      ],
+      "_id": "SkoYMd0RXtSiQZD2",
+      "flags": {},
+      "name": "Guidance",
+      "description": "",
+      "statuses": [],
+      "_key": "!items.effects!5UAa8jcIguGkF1qJ.SkoYMd0RXtSiQZD2"
+    }
+  ],
+  "_stats": {
+    "systemId": "dnd5e",
+    "systemVersion": "3.0.0",
+    "coreVersion": "11.315",
+    "createdTime": 1661787234132,
+    "modifiedTime": 1726183385625,
+    "lastModifiedBy": "dnd5ebuilder0000"
+  },
+  "folder": null,
+  "sort": 0,
+  "_id": "5UAa8jcIguGkF1qJ",
+  "_key": "!items!5UAa8jcIguGkF1qJ"
+}
