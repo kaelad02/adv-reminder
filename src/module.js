@@ -153,7 +153,7 @@ Hooks.on("renderRollConfigurationDialog", async (dialog, html) => {
     const messageFieldset = document.createElement("fieldset");
     messageFieldset.innerHTML = message;
     const legend = document.createElement("legend");
-    legend.innerText = "Messages";
+    legend.innerText = game.i18n.localize("adv-reminder.Messages");
     messageFieldset.insertBefore(legend, messageFieldset.firstChild);
     // add messages right after configuration
     const configFieldset = html.querySelector('fieldset[data-application-part="configuration"]');
