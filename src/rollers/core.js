@@ -71,7 +71,7 @@ export default class CoreRollerHooks {
     if (this.isFastForwarding(config, dialog)) return;
     const target = getTarget();
     const distanceFn = getDistanceToTargetFn(message.data.speaker);
-    const activity = config.origin;
+    const activity = config.subject;
 
     new AttackMessageV2(activity.actor, target, activity).addMessage(dialog);
     if (showSources) new AttackSourceV2(activity.actor, target, activity, distanceFn).updateOptions(dialog);
@@ -149,11 +149,12 @@ export default class CoreRollerHooks {
     if (this.isFastForwarding(config, dialog)) return;
     const target = getTarget();
     const distanceFn = getDistanceToTargetFn(message.data.speaker);
-    const activity = config.origin;
+    const activity = config.subject;
 
     new DamageMessageV2(activity.actor, target, activity).addMessage(dialog);
     if (showSources) new CriticalSourceV2(activity.actor, target, activity, distanceFn).updateOptions(dialog);
-    new CriticalReminderV2(activity.actor, target, activity, distanceFn).updateOptions(config.rolls[0] ?? {}, "isCritical");
+    const reminder = new CriticalReminderV2(activity.actor, target, activity, distanceFn);
+    config.rolls.forEach(roll => reminder.updateOptions(roll.options, "isCritical"));
   }
 
   /**

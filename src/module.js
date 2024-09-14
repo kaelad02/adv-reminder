@@ -143,9 +143,48 @@ Hooks.on("renderDialog", async (dialog, html, data) => {
   }
 });
 
+// New roll dialog hook, as of dnd5e v4.0
+Hooks.on("renderRollConfigurationDialog", async (dialog, html) => {
+  debug("renderRollConfigurationDialog hook called");
+
+  const message = await prepareMessage(dialog.options);
+  if (message) {
+    // put messages inside their own fieldset
+    const messageFieldset = document.createElement("fieldset");
+    messageFieldset.innerHTML = message;
+    const legend = document.createElement("legend");
+    legend.innerText = "Messages";
+    messageFieldset.insertBefore(legend, messageFieldset.firstChild);
+    // add messages right after configuration
+    const configFieldset = html.querySelector('fieldset[data-application-part="configuration"]');
+    configFieldset.after(messageFieldset);
+    // swap "inline-roll" class for "dialog-roll"
+    const inlineRolls = html.querySelectorAll("a.inline-roll");
+    inlineRolls.forEach(ir => {
+      debug("found inline-roll", ir);
+      ir.classList.remove("inline-roll");
+      ir.classList.add("dialog-roll");
+      // add click listener
+      ir.addEventListener("click", (event) => {
+        // get the formula from the button
+        const button = event.currentTarget;
+        const formula = button.dataset.formula;
+        debug("adding to input:", formula);
+        // add the formula to the bonus input
+        const dialogContent = button.closest(".window-content");
+        const input = dialogContent.querySelector('.rolls input[name="roll.0.situational"]');
+        input.value = !!input.value ? `${input.value} + ${formula}` : formula;
+        // rebuild dialog (i.e. show new die icons)
+        dialog.rebuild();
+      });
+    });
+  }
+});
+
 async function prepareMessage(dialogOptions) {
   const opt = dialogOptions["adv-reminder"];
   if (!opt) return;
+  if (opt.rendered) return;
 
   // merge the messages with the advantage/disadvantage from sources
   const messages = [...(opt.messages ?? [])];
@@ -173,6 +212,7 @@ async function prepareMessage(dialogOptions) {
       async: true,
     });
     debug("messages", messages, "enriched", enriched);
+    opt.rendered = true;
     return enriched;
   }
 }
