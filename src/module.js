@@ -216,3 +216,14 @@ async function prepareMessage(dialogOptions) {
     return enriched;
   }
 }
+
+// set default button on Damage Roll dialog
+Hooks.on("renderDamageRollConfigurationDialog", (dialog, html) => {
+  debug("renderDamageRollConfigurationDialog hook called", dialog);
+
+  const isCritical = dialog.rolls[0]?.options?.isCritical;
+  const selector = `.dialog-buttons button[data-action="${isCritical ? "critical" : "normal"}"]`;
+  const button = html.querySelector(selector);
+  button.classList.add("default");
+  button.focus();
+});

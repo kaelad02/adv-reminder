@@ -56,3 +56,12 @@
 .adv-reminder-messages a.dialog-roll i {
   color: var(--color-text-dark-inactive);
 }
+
+/* AppV2 Dialogs */
+.dnd5e2.roll-configuration .dialog-buttons button {
+  flex: 2;
+}
+.dnd5e2.roll-configuration .dialog-buttons button.default {
+  flex: 3;
+  border-color: var(--dnd5e-color-gold);
+}
