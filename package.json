@@ -6,9 +6,14 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "build": "node ./utils/packs.mjs package pack",
+    "unpack": "node ./utils/packs.mjs package unpack",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
   },
   "devDependencies": {
-    "jest": "^27.4.7"
+    "@foundryvtt/foundryvtt-cli": "^1.0.3",
+    "fancy-log": "^2.0.0",
+    "jest": "^27.4.7",
+    "yargs": "^17.7.2"
   }
 }

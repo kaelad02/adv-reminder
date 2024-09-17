@@ -1,3 +1,8 @@
+# 4.0.2
+
+- bug fix: [#74](https://github.com/kaelad02/adv-reminder/pull/74) Fix pt-BR localization file
+- feature: [#75](https://github.com/kaelad02/adv-reminder/pull/75) Use foundryvtt-cli to build compendium packs
+
 # 4.0.1
 
 - bug fix: [#70](https://github.com/kaelad02/adv-reminder/issues/70) Fix error when using a damage or healing enricher
