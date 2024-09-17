@@ -1,5 +1,6 @@
 {
   "adv-reminder.AutoFail": "Auto fail",
+  "adv-reminder.Messages": "Messages",
   "adv-reminder.ColorMenu": {
     "Name": "Roll Dialog Colors",
     "Hint": "Change the colors of messages and default buttons on roll dialogs",

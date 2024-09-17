@@ -53,17 +53,23 @@ function updateConditionEffects() {
   ce.advReminderAdvantageAttack = new Set(["hiding", "invisible"]);
   ce.advReminderAdvantageDexSave = new Set(["dodging"]); 
   ce.advReminderDisadvantageAttack = new Set(["blinded", "frightened", "poisoned", "prone", "restrained"]);
-  ce.advReminderDisadvantageAbility = new Set(["exhaustion-1", "frightened", "poisoned"]);
-  ce.advReminderDisadvantageSave = new Set(["exhaustion-3"]);
+  ce.advReminderDisadvantageAbility = new Set(["frightened", "poisoned"]);
+  ce.advReminderDisadvantageSave = new Set();
   ce.advReminderDisadvantageDexSave = new Set(["restrained"]);
   ce.advReminderDisadvantagePhysicalRolls = new Set(["heavilyEncumbered"]);
   ce.advReminderFailDexSave = new Set(["paralyzed", "petrified", "stunned", "unconscious"]);
   ce.advReminderFailStrSave = new Set(["paralyzed", "petrified", "stunned", "unconscious"]);
   ce.advReminderGrantAdvantageAttack = new Set(["blinded", "paralyzed", "petrified", "restrained", "stunned", "unconscious"]);
   ce.advReminderGrantAdjacentCritical = new Set(["paralyzed", "unconscious"]);
-  ce.advReminderGrantDisadvantageAttack = new Set(["dodging", "exhaustion-3", "hidden", "invisible"]);
+  ce.advReminderGrantDisadvantageAttack = new Set(["dodging", "hidden", "invisible"]);
   // if adjacent, grant advantage on the attack, else grant disadvantage
   ce.advReminderGrantAdjacentAttack = new Set(["prone"]);
+
+  if (game.settings.get("dnd5e", "rulesVersion") === "legacy") {
+    ce.advReminderDisadvantageAbility.add("exhaustion-1");
+    ce.advReminderDisadvantageSave.add("exhaustion-3");
+    ce.advReminderGrantDisadvantageAttack.add("exhaustion-3");
+  }
 }
 
 // Add message flags to DAE so it shows them in the AE editor
@@ -137,9 +143,48 @@ Hooks.on("renderDialog", async (dialog, html, data) => {
   }
 });
 
+// New roll dialog hook, as of dnd5e v4.0
+Hooks.on("renderRollConfigurationDialog", async (dialog, html) => {
+  debug("renderRollConfigurationDialog hook called");
+
+  const message = await prepareMessage(dialog.options);
+  if (message) {
+    // put messages inside their own fieldset
+    const messageFieldset = document.createElement("fieldset");
+    messageFieldset.innerHTML = message;
+    const legend = document.createElement("legend");
+    legend.innerText = game.i18n.localize("adv-reminder.Messages");
+    messageFieldset.insertBefore(legend, messageFieldset.firstChild);
+    // add messages right after configuration
+    const configFieldset = html.querySelector('fieldset[data-application-part="configuration"]');
+    configFieldset.after(messageFieldset);
+    // swap "inline-roll" class for "dialog-roll"
+    const inlineRolls = html.querySelectorAll("a.inline-roll");
+    inlineRolls.forEach(ir => {
+      debug("found inline-roll", ir);
+      ir.classList.remove("inline-roll");
+      ir.classList.add("dialog-roll");
+      // add click listener
+      ir.addEventListener("click", (event) => {
+        // get the formula from the button
+        const button = event.currentTarget;
+        const formula = button.dataset.formula;
+        debug("adding to input:", formula);
+        // add the formula to the bonus input
+        const dialogContent = button.closest(".window-content");
+        const input = dialogContent.querySelector('.rolls input[name="roll.0.situational"]');
+        input.value = !!input.value ? `${input.value} + ${formula}` : formula;
+        // rebuild dialog (i.e. show new die icons)
+        dialog.rebuild();
+      });
+    });
+  }
+});
+
 async function prepareMessage(dialogOptions) {
   const opt = dialogOptions["adv-reminder"];
   if (!opt) return;
+  if (opt.rendered) return;
 
   // merge the messages with the advantage/disadvantage from sources
   const messages = [...(opt.messages ?? [])];
@@ -167,6 +212,18 @@ async function prepareMessage(dialogOptions) {
       async: true,
     });
     debug("messages", messages, "enriched", enriched);
+    opt.rendered = true;
     return enriched;
   }
 }
+
+// set default button on Damage Roll dialog
+Hooks.on("renderDamageRollConfigurationDialog", (dialog, html) => {
+  debug("renderDamageRollConfigurationDialog hook called", dialog);
+
+  const isCritical = dialog.rolls[0]?.options?.isCritical;
+  const selector = `.dialog-buttons button[data-action="${isCritical ? "critical" : "normal"}"]`;
+  const button = html.querySelector(selector);
+  button.classList.add("default");
+  button.focus();
+});

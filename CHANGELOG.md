@@ -1,3 +1,7 @@
+# 4.1.0
+
+- feature: [#77](https://github.com/kaelad02/adv-reminder/pull/77) System version 4.0 compatibility
+
 # 4.0.2
 
 - bug fix: [#74](https://github.com/kaelad02/adv-reminder/pull/74) Fix pt-BR localization file

@@ -2,26 +2,26 @@ import { AbilitySaveFail } from "../fails.js";
 import {
   AbilityCheckMessage,
   AbilitySaveMessage,
-  AttackMessage,
+  AttackMessageV2,
   ConcentrationMessage,
-  DamageMessage,
+  DamageMessageV2,
   DeathSaveMessage,
   SkillMessage,
 } from "../messages.js";
 import {
-  AttackReminder,
+  AttackReminderV2,
   AbilityCheckReminder,
   AbilitySaveReminder,
-  CriticalReminder,
+  CriticalReminderV2,
   DeathSaveReminder,
   SkillReminder,
 } from "../reminders.js";
 import {
   AbilityCheckSource,
   AbilitySaveSource,
-  AttackSource,
+  AttackSourceV2,
   ConcentrationSource,
-  CriticalSource,
+  CriticalSourceV2,
   DeathSaveSource,
   SkillSource,
 } from "../sources.js";
@@ -47,14 +47,14 @@ export default class CoreRollerHooks {
     debug("checkArmorStealth", this.checkArmorStealth);
 
     // register all the dnd5e.pre hooks
-    Hooks.on("dnd5e.preRollAttack", this.preRollAttack.bind(this));
+    Hooks.on("dnd5e.preRollAttackV2", this.preRollAttackV2.bind(this));
     Hooks.on("dnd5e.preRollAbilitySave", this.preRollAbilitySave.bind(this));
     Hooks.on("dnd5e.preRollConcentration", this.preRollConcentration.bind(this));
     Hooks.on("dnd5e.preRollAbilityTest", this.preRollAbilityTest.bind(this));
     Hooks.on("dnd5e.preRollSkill", this.preRollSkill.bind(this));
     Hooks.on("dnd5e.preRollToolCheck", this.preRollToolCheck.bind(this));
     Hooks.on("dnd5e.preRollDeathSave", this.preRollDeathSave.bind(this));
-    Hooks.on("dnd5e.preRollDamage", this.preRollDamage.bind(this));
+    Hooks.on("dnd5e.preRollDamageV2", this.preRollDamageV2.bind(this));
   }
 
   /**
@@ -65,16 +65,17 @@ export default class CoreRollerHooks {
     return true;
   }
 
-  preRollAttack(item, config) {
-    debug("preRollAttack hook called");
+  preRollAttackV2(config, dialog, message) {
+    debug("preRollAttackV2 hook called", config, dialog, message);
 
-    if (this.isFastForwarding(config)) return;
+    if (this.isFastForwarding(config, dialog)) return;
     const target = getTarget();
-    const distanceFn = getDistanceToTargetFn(config.messageData.speaker);
+    const distanceFn = getDistanceToTargetFn(message.data.speaker);
+    const activity = config.subject;
 
-    new AttackMessage(item.actor, target, item).addMessage(config);
-    if (showSources) new AttackSource(item.actor, target, item, distanceFn).updateOptions(config);
-    new AttackReminder(item.actor, target, item, distanceFn).updateOptions(config);
+    new AttackMessageV2(activity.actor, target, activity).addMessage(dialog);
+    if (showSources) new AttackSourceV2(activity.actor, target, activity, distanceFn).updateOptions(dialog);
+    new AttackReminderV2(activity.actor, target, activity, distanceFn).updateOptions(config.rolls[0].options);
   }
 
   preRollAbilitySave(actor, config, abilityId) {
@@ -142,19 +143,18 @@ export default class CoreRollerHooks {
     new DeathSaveReminder(actor).updateOptions(config);
   }
 
-  preRollDamage(item, config) {
-    debug("preRollDamage hook called");
+  preRollDamageV2(config, dialog, message) {
+    debug("preRollDamageV2 hook called", config, dialog, message);
 
-    // damage/healing enricher doesn't have an item, skip
-    if (!item) return;
-
-    if (this.isFastForwarding(config)) return;
+    if (this.isFastForwarding(config, dialog)) return;
     const target = getTarget();
-    const distanceFn = getDistanceToTargetFn(config.messageData.speaker);
+    const distanceFn = getDistanceToTargetFn(message.data.speaker);
+    const activity = config.subject;
 
-    new DamageMessage(item.actor, target, item).addMessage(config);
-    if (showSources) new CriticalSource(item.actor, target, item, distanceFn).updateOptions(config);
-    new CriticalReminder(item.actor, target, item, distanceFn).updateOptions(config);
+    new DamageMessageV2(activity.actor, target, activity).addMessage(dialog);
+    if (showSources) new CriticalSourceV2(activity.actor, target, activity, distanceFn).updateOptions(dialog);
+    const reminder = new CriticalReminderV2(activity.actor, target, activity, distanceFn);
+    config.rolls.forEach(roll => reminder.updateOptions(roll.options, "isCritical"));
   }
 
   /**
@@ -163,15 +163,17 @@ export default class CoreRollerHooks {
    * @param {object} options
    * @param {boolean} [options.fastForward] a specific fastForward flag
    * @param {Event} [options.event] the triggering event
+   * @param {object} dialog
+   * @param {boolean} [dialog.configure] whether or not to show the dialog
    * @returns {boolean} true if they are fast-forwarding, false otherwise
    */
-  isFastForwarding({ fastForward = false, event = {} }) {
+  isFastForwarding({ fastForward = false, event = {} }, { configure = true } = {}) {
     const isFF = !!(
       fastForward ||
-      event?.shiftKey ||
-      event?.altKey ||
-      event?.ctrlKey ||
-      event?.metaKey
+      !configure ||
+      dnd5e.utils.areKeysPressed(event, "skipDialogNormal") ||
+      dnd5e.utils.areKeysPressed(event, "skipDialogAdvantage") ||
+      dnd5e.utils.areKeysPressed(event, "skipDialogDisadvantage")
     );
     if (isFF) debug("fast-forwarding the roll, stop processing");
     return isFF;

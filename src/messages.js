@@ -26,11 +26,15 @@ class BaseMessage {
     return undefined;
   }
 
+  get prefix() {
+    return "dialogOptions";
+  }
+
   addMessage(options) {
     debug("checking for message effects");
 
     // get any existing messages
-    const messages = foundry.utils.getProperty(options, "dialogOptions.adv-reminder.messages") ?? [];
+    const messages = foundry.utils.getProperty(options, `${this.prefix}.adv-reminder.messages`) ?? [];
 
     // get messages from the actor and merge
     const keys = this.messageKeys;
@@ -50,8 +54,8 @@ class BaseMessage {
 
     if (messages.length > 0) {
       debug("messages found:", messages);
-      foundry.utils.setProperty(options, "dialogOptions.adv-reminder.messages", messages);
-      foundry.utils.setProperty(options, "dialogOptions.adv-reminder.rollData", this.actor.getRollData());
+      foundry.utils.setProperty(options, `${this.prefix}.adv-reminder.messages`, messages);
+      foundry.utils.setProperty(options, `${this.prefix}.adv-reminder.rollData`, this.actor.getRollData());
     }
   }
 }
@@ -82,6 +86,16 @@ export class AttackMessage extends BaseMessage {
       `flags.adv-reminder.grants.message.attack.${this.actionType}`,
       `flags.adv-reminder.grants.message.attack.${this.abilityId}`,
     ];
+  }
+}
+
+export class AttackMessageV2 extends AttackMessage {
+  constructor(actor, targetActor, activity) {
+    super(actor, targetActor, { system: { actionType: activity.actionType} , abilityMod: activity.ability });
+  }
+
+  get prefix() {
+    return "options";
   }
 }
 
@@ -180,5 +194,15 @@ export class DamageMessage extends BaseMessage {
       "flags.adv-reminder.grants.message.damage.all",
       `flags.adv-reminder.grants.message.damage.${this.actionType}`,
     ];
+  }
+}
+
+export class DamageMessageV2 extends DamageMessage {
+  constructor(actor, targetActor, activity) {
+    super(actor, targetActor, { system: { actionType: activity.actionType } });
+  }
+
+  get prefix() {
+    return "options";
   }
 }
