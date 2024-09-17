@@ -171,10 +171,9 @@ export default class CoreRollerHooks {
     const isFF = !!(
       fastForward ||
       !configure ||
-      event?.shiftKey ||
-      event?.altKey ||
-      event?.ctrlKey ||
-      event?.metaKey
+      dnd5e.utils.areKeysPressed(event, "skipDialogNormal") ||
+      dnd5e.utils.areKeysPressed(event, "skipDialogAdvantage") ||
+      dnd5e.utils.areKeysPressed(event, "skipDialogDisadvantage")
     );
     if (isFF) debug("fast-forwarding the roll, stop processing");
     return isFF;
