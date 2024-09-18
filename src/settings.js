@@ -2,8 +2,13 @@ import { debug } from "./util.js";
 
 export let showSources;
 
-Hooks.once("init", () => {
-  // register settings
+export function initSettings() {
+  registerSettings();
+  applySettings();
+}
+
+function registerSettings() {
+  // Roll Dialog Colors
   game.settings.registerMenu("adv-reminder", "colorMenu", {
     name: "adv-reminder.ColorMenu.Name",
     hint: "adv-reminder.ColorMenu.Hint",
@@ -71,9 +76,9 @@ Hooks.once("init", () => {
     scope: "client",
     config: false,
   });
-});
+};
 
-Hooks.once("ready", () => {
+function applySettings() {
   // initialize the color variables
   setStyleVariables(
     game.settings.get("adv-reminder", "defaultButtonColor"),
@@ -81,7 +86,7 @@ Hooks.once("ready", () => {
   );
 
   showSources = game.settings.get("adv-reminder", "showSources");
-});
+};
 
 function setStyleVariables(option, customColor) {
   debug("setStyleVariables called");

@@ -22,7 +22,7 @@
       }
     ]
   },
-  "esmodules": ["src/module.js", "src/settings.js"],
+  "esmodules": ["src/module.js"],
   "styles": ["css/adv-reminder.css"],
   "packs": [
     {
