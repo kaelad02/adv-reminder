@@ -64,6 +64,13 @@ Hooks.once("init", () => {
     type: Boolean,
     default: false,
   });
+
+  // Hidden debugMode setting
+  game.settings.register("adv-reminder", "debugMode", {
+    type: new foundry.data.fields.BooleanField({ required: true, initial: false }),
+    scope: "client",
+    config: false,
+  });
 });
 
 Hooks.once("ready", () => {
@@ -75,10 +82,6 @@ Hooks.once("ready", () => {
 
   showSources = game.settings.get("adv-reminder", "showSources");
 });
-
-Hooks.once("devModeReady", ({ registerPackageDebugFlag }) =>
-  registerPackageDebugFlag("adv-reminder")
-);
 
 function setStyleVariables(option, customColor) {
   debug("setStyleVariables called");

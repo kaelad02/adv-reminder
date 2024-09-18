@@ -1,5 +1,5 @@
 export function debugEnabled() {
-  return game.modules.get("_dev-mode")?.api?.getPackageDebugValue("adv-reminder");
+  return game.settings.get("adv-reminder", "debugMode");
 }
 
 export const debug = (...args) => {
