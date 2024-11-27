@@ -48,12 +48,12 @@ export default class CoreRollerHooks {
 
     // register all the dnd5e.pre hooks
     Hooks.on("dnd5e.preRollAttackV2", this.preRollAttackV2.bind(this));
-    Hooks.on("dnd5e.preRollAbilitySave", this.preRollAbilitySave.bind(this));
-    Hooks.on("dnd5e.preRollConcentration", this.preRollConcentration.bind(this));
-    Hooks.on("dnd5e.preRollAbilityTest", this.preRollAbilityTest.bind(this));
-    Hooks.on("dnd5e.preRollSkill", this.preRollSkill.bind(this));
-    Hooks.on("dnd5e.preRollToolCheck", this.preRollToolCheck.bind(this));
-    Hooks.on("dnd5e.preRollDeathSave", this.preRollDeathSave.bind(this));
+    Hooks.on("dnd5e.preRollSkillV2", this.preRollSkillV2.bind(this));
+    Hooks.on("dnd5e.preRollAbilityCheckV2", this.preRollAbilityCheckV2.bind(this));  
+    Hooks.on("dnd5e.preRollSavingThrowV2", this.preRollSavingThrowV2.bind(this));
+    //Hooks.on("dnd5e.preRollToolV2", this.preRollToolV2.bind(this));
+    Hooks.on("dnd5e.preRollDeathSaveV2", this.preRollDeathSaveV2.bind(this));
+    Hooks.on("dnd5e.preRollConcentrationV2", this.preRollConcentrationV2.bind(this));
     Hooks.on("dnd5e.preRollDamageV2", this.preRollDamageV2.bind(this));
   }
 
@@ -77,70 +77,68 @@ export default class CoreRollerHooks {
     if (showSources) new AttackSourceV2(activity.actor, target, activity, distanceFn).updateOptions(dialog);
     new AttackReminderV2(activity.actor, target, activity, distanceFn).updateOptions(config.rolls[0].options);
   }
-
-  preRollAbilitySave(actor, config, abilityId) {
+  
+  preRollSavingThrowV2(config, dialog, message) {
     debug("preRollAbilitySave hook called");
 
-    const failChecker = new AbilitySaveFail(actor, abilityId);
+    const failChecker = new AbilitySaveFail(config.subject, config.ability);
     if (failChecker.fails(config)) return false;
 
-    if (this.isFastForwarding(config)) return;
+    if (this.isFastForwarding(config, dialog)) return;
 
-    new AbilitySaveMessage(actor, abilityId).addMessage(config);
-    if (showSources) new AbilitySaveSource(actor, abilityId).updateOptions(config);
-    new AbilitySaveReminder(actor, abilityId).updateOptions(config);
+    new AbilitySaveMessage(config.subject, config.ability).addMessage(dialog);
+    if (showSources) new AbilitySaveSource(config.subject, config.ability).updateOptions(dialog);
+    new AbilitySaveReminder(config.subject, config.ability).updateOptions(dialog);
   }
-
-  preRollConcentration(actor, options) {
+  
+  preRollConcentrationV2(config, dialog, message) {
     debug("preRollConcentration hook called");
 
-    if (this.isFastForwarding(options)) return;
+    if (this.isFastForwarding(config, dialog)) return;
 
-    new ConcentrationMessage(actor, options.ability).addMessage(options);
-    if (showSources) new ConcentrationSource(actor, options.ability).updateOptions(options);
+    new ConcentrationMessage(config.subject, config.ability).addMessage(dialog);
+    if (showSources) new ConcentrationSource(config.subject, config.ability).updateOptions(dialog);
     // don't need a reminder, the system will set advantage/disadvantage
   }
 
-  preRollAbilityTest(actor, config, abilityId) {
+  preRollAbilityCheckV2(config, dialog, message) {
     debug("preRollAbilityTest hook called");
 
-    if (this.isFastForwarding(config)) return;
-
-    new AbilityCheckMessage(actor, abilityId).addMessage(config);
-    if (showSources) new AbilityCheckSource(actor, abilityId).updateOptions(config);
-    new AbilityCheckReminder(actor, abilityId).updateOptions(config);
+    if (this.isFastForwarding(config, dialog)) return;
+   
+    new AbilityCheckMessage(config.subject, config.ability).addMessage(dialog);
+    if (showSources) new AbilityCheckSource(config.subject, config.ability).updateOptions(dialog);
+    new AbilityCheckReminder(config.subject, config.ability).updateOptions(dialog); 
   }
 
-  preRollSkill(actor, config, skillId) {
-    debug("preRollSkill hook called");
+  preRollSkillV2(config, dialog, message) {
+    debug("preRollSkillV2 hook called");
+    
+    if (this.isFastForwarding(config, dialog)) return;
 
-    if (this.isFastForwarding(config)) return;
-
-    const ability = config.data.defaultAbility;
-    new SkillMessage(actor, ability, skillId).addMessage(config);
-    if (showSources) new SkillSource(actor, ability, skillId, true).updateOptions(config);
-    new SkillReminder(actor, ability, skillId, this.checkArmorStealth).updateOptions(config);
+    new SkillMessage(config.subject, config.ability, config.skill).addMessage(dialog);
+    if (showSources) new SkillSource(config.subject, config.ability, config.skill, true).updateOptions(dialog);
+    new SkillReminder(config.subject, config.ability, config.skill, this.checkArmorStealth).updateOptions(dialog);
   }
 
-  preRollToolCheck(actor, config, toolId) {
+  /**preRollToolV2(config, dialog, message)  {//toDo: Missing Message for tools
     debug("preRollToolCheck hook called");
 
-    if (this.isFastForwarding(config)) return;
+    if (this.isFastForwarding(config, dialog)) return;
 
-    const ability = config.data.defaultAbility;
-    new AbilityCheckMessage(actor, ability).addMessage(config);
-    if (showSources) new AbilityCheckSource(actor, ability).updateOptions(config);
-    new AbilityCheckReminder(actor, ability).updateOptions(config);
-  }
+    new AbilityCheckMessage(config.subject, config.ability).addMessage(dialog);
+    if (showSources) new AbilityCheckSource(config.subject, config.ability).updateOptions(dialog);
+    new AbilityCheckReminder(config.subject, config.ability).updateOptions(dialog);
+  }*/
 
-  preRollDeathSave(actor, config) {
+  preRollDeathSaveV2(config, dialog, message)  {
     debug("preRollDeathSave hook called");
 
-    if (this.isFastForwarding(config)) return;
+    if (this.isFastForwarding(config, dialog)) return;
 
-    new DeathSaveMessage(actor).addMessage(config);
-    if (showSources) new DeathSaveSource(actor).updateOptions(config);
-    new DeathSaveReminder(actor).updateOptions(config);
+    new DeathSaveMessage(config.subject).addMessage(dialog);
+    if (showSources) new DeathSaveSource(config.subject).updateOptions(dialog);
+    new DeathSaveReminder(config.subject).updateOptions(dialog);
   }
 
   preRollDamageV2(config, dialog, message) {
