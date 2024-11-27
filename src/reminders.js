@@ -271,15 +271,16 @@ export class SkillReminder extends AbilityCheckReminder {
 
   /** @override */
   get advantageKeys() {
-    return super.advantageKeys.concat(["advantage.skill.all", `advantage.skill.${this.skillId}`]);
+    return [
+      "advantage.skill.all",
+      `advantage.skill.${this.skillId}`];
   }
 
   /** @override */
   get disadvantageKeys() {
-    return super.disadvantageKeys.concat([
+    return [
       "disadvantage.skill.all",
-      `disadvantage.skill.${this.skillId}`,
-    ]);
+      `disadvantage.skill.${this.skillId}`,];
   }
 
   /** @override */
@@ -322,16 +323,14 @@ export class DeathSaveReminder extends AbilityBaseReminder {
   }
 
   /** @override */
+  /** @override */
   get advantageKeys() {
-    return super.advantageKeys.concat(["advantage.ability.save.all", "advantage.deathSave"]);
+    return ["advantage.deathSave"];
   }
 
   /** @override */
   get disadvantageKeys() {
-    return super.disadvantageKeys.concat([
-      "disadvantage.ability.save.all",
-      "disadvantage.deathSave",
-    ]);
+    return ["disadvantage.deathSave"];
   }
 }
 
