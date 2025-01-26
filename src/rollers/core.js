@@ -88,7 +88,7 @@ export default class CoreRollerHooks {
 
     new AbilitySaveMessage(config.subject, config.ability).addMessage(dialog);
     if (showSources) new AbilitySaveSource(config.subject, config.ability).updateOptions(dialog);
-    new AbilitySaveReminder(config.subject, config.ability).updateOptions(dialog);
+    new AbilitySaveReminder(config.subject, config.ability).updateOptions(config.rolls[0].options);
   }
   
   preRollConcentrationV2(config, dialog, message) {
@@ -108,7 +108,7 @@ export default class CoreRollerHooks {
    
     new AbilityCheckMessage(config.subject, config.ability).addMessage(dialog);
     if (showSources) new AbilityCheckSource(config.subject, config.ability).updateOptions(dialog);
-    new AbilityCheckReminder(config.subject, config.ability).updateOptions(dialog); 
+    new AbilityCheckReminder(config.subject, config.ability).updateOptions(config.rolls[0].options); 
   }
 
   preRollSkillV2(config, dialog, message) {
@@ -118,7 +118,7 @@ export default class CoreRollerHooks {
 
     new SkillMessage(config.subject, config.ability, config.skill).addMessage(dialog);
     if (showSources) new SkillSource(config.subject, config.ability, config.skill, true).updateOptions(dialog);
-    new SkillReminder(config.subject, config.ability, config.skill, this.checkArmorStealth).updateOptions(dialog);
+    new SkillReminder(config.subject, config.ability, config.skill, this.checkArmorStealth).updateOptions(config.rolls[0].options);
   }
 
   /**preRollToolV2(config, dialog, message)  {//toDo: Missing Message for tools
@@ -138,7 +138,7 @@ export default class CoreRollerHooks {
 
     new DeathSaveMessage(config.subject).addMessage(dialog);
     if (showSources) new DeathSaveSource(config.subject).updateOptions(dialog);
-    new DeathSaveReminder(config.subject).updateOptions(dialog);
+    new DeathSaveReminder(config.subject).updateOptions(config.rolls[0].options);
   }
 
   preRollDamageV2(config, dialog, message) {
