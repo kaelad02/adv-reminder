@@ -40,15 +40,12 @@ export default class ReadySetRollHooks extends CoreRollerHooks {
   init() {
     // delay registering these dnd5e hooks so they run after RSR's hooks
     Hooks.once("setup", () => {
-      super.init();
-
-      // register another hook for CriticalReminder
-      //Hooks.on("dnd5e.useItem", this.useItem.bind(this));  
+      super.init(); 
     });
   }
 
   preRollAttackV2(config, dialog, message) {
-    debug("preRollAttack hook called");
+    debug("preRollAttackV2 hook called");
 
     const target = getTarget();
     const distanceFn = getDistanceToTargetFn(message.data.speaker);
@@ -64,7 +61,7 @@ export default class ReadySetRollHooks extends CoreRollerHooks {
   }
 
   preRollSavingThrowV2(config, dialog, message){
-    debug("preRollAbilitySave hook called");
+    debug("preRollSavingThrowV2 hook called");
 
     const failChecker = new AbilitySaveFail(config.subject, config.ability);
     if (failChecker.fails(config)) return false;
@@ -78,7 +75,7 @@ export default class ReadySetRollHooks extends CoreRollerHooks {
   }
 
   preRollConcentrationV2(config, dialog, message) {
-    debug("preRollConcentration hook called");
+    debug("preRollConcentrationV2 hook called");
 
     if (this._doMessages(options)) {
       new ConcentrationMessage(config.subject, config.ability).addMessage(dialog);
@@ -88,7 +85,7 @@ export default class ReadySetRollHooks extends CoreRollerHooks {
   }
 
   preRollAbilityCheckV2(config, dialog, message)  {
-    debug("preRollAbilityTest hook called");
+    debug("preRollAbilityCheckV2 hook called");
 
     if (this._doMessages(config)) {
       new AbilityCheckMessage(config.subject, config.ability).addMessage(dialog);
@@ -99,7 +96,7 @@ export default class ReadySetRollHooks extends CoreRollerHooks {
   }
 
   preRollSkillV2(config, dialog, message) {
-    debug("preRollSkill hook called");
+    debug("preRollSkillV2 hook called");
     
     if (this._doMessages(config)) {
       new SkillMessage(config.subject, config.ability, config.skill).addMessage(dialog);
@@ -125,7 +122,7 @@ export default class ReadySetRollHooks extends CoreRollerHooks {
   // }
 
   preRollDeathSaveV2(config, dialog, message) {
-    debug("preRollDeathSave hook called");
+    debug("preRollDeathSaveV2 hook called");
 
     if (this._doMessages(config)) {
       new DeathSaveMessage(config.subject).addMessage(dialog);
@@ -136,7 +133,7 @@ export default class ReadySetRollHooks extends CoreRollerHooks {
   }
 
   preRollDamageV2(config, dialog, message) {
-    debug("preRollDamage hook called");
+    debug("preRollDamageV2 hook called");
 
     // damage/healing enricher doesn't have an item, skip
     if (!config.subject) return;
@@ -149,18 +146,9 @@ export default class ReadySetRollHooks extends CoreRollerHooks {
       new DamageMessageV2(activity.actor, target, activity).addMessage(dialog);
       if (showSources) new CriticalSourceV2(activity.actor, target, activity, distanceFn).updateOptions(dialog);
       const reminder = new CriticalReminderV2(activity.actor, target, activity, distanceFn);
-      config.rolls.forEach(roll => reminder.updateOptions(roll.options, "isCrit"));
+      config.rolls.forEach(roll => reminder.updateOptions(roll.options, "isCritical"));
     }
-    // don't use CriticalReminder here, it's done in another hook
   }
-
-  // useItem(item, config, options) {
-  //   debug("useItem hook called");
-
-  //   // check for critical hits but set the "isCrit" property instead of the default "critical"
-  //   const target = getTarget();
-  //   new CriticalReminder(item.actor, target, item, distanceFn).updateOptions(config, "isCrit");
-  // }
 
   _doMessages({ fastForward = false }) {
     if (fastForward) debug("fast-forwarding the roll, skip messages");

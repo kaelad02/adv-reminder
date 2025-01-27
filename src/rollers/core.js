@@ -79,7 +79,7 @@ export default class CoreRollerHooks {
   }
   
   preRollSavingThrowV2(config, dialog, message) {
-    debug("preRollAbilitySave hook called");
+    debug("preRollSavingThrowV2 hook called");
 
     const failChecker = new AbilitySaveFail(config.subject, config.ability);
     if (failChecker.fails(config)) return false;
@@ -92,7 +92,7 @@ export default class CoreRollerHooks {
   }
   
   preRollConcentrationV2(config, dialog, message) {
-    debug("preRollConcentration hook called");
+    debug("preRollConcentrationV2 hook called");
 
     if (this.isFastForwarding(config, dialog)) return;
 
@@ -102,7 +102,7 @@ export default class CoreRollerHooks {
   }
 
   preRollAbilityCheckV2(config, dialog, message) {
-    debug("preRollAbilityTest hook called");
+    debug("preRollAbilityCheckV2 hook called");
 
     if (this.isFastForwarding(config, dialog)) return;
    
@@ -132,7 +132,7 @@ export default class CoreRollerHooks {
   }*/
 
   preRollDeathSaveV2(config, dialog, message)  {
-    debug("preRollDeathSave hook called");
+    debug("preRollDeathSaveV2 hook called");
 
     if (this.isFastForwarding(config, dialog)) return;
 
