@@ -45,14 +45,18 @@ export default class ReadySetRollHooks extends CoreRollerHooks {
   }
 
   preRollAttackV2(config, dialog, message) {
+
     debug("preRollAttackV2 hook called");
+
 
     const target = getTarget();
     const distanceFn = getDistanceToTargetFn(message.data.speaker);
     const activity = config.subject;
 
     if (this._doMessages(config)) {
+
       new AttackMessageV2(activity.actor, target, activity).addMessage(dialog);
+
       if (showSources) new AttackSourceV2(activity.actor, target, activity, distanceFn).updateOptions(dialog);
     }
 
@@ -133,6 +137,7 @@ export default class ReadySetRollHooks extends CoreRollerHooks {
   }
 
   preRollDamageV2(config, dialog, message) {
+
     debug("preRollDamageV2 hook called");
 
     // damage/healing enricher doesn't have an item, skip
@@ -143,6 +148,7 @@ export default class ReadySetRollHooks extends CoreRollerHooks {
     const activity = config.subject;
 
     if (this._doMessages(config)) {
+
       new DamageMessageV2(activity.actor, target, activity).addMessage(dialog);
       if (showSources) new CriticalSourceV2(activity.actor, target, activity, distanceFn).updateOptions(dialog);
       const reminder = new CriticalReminderV2(activity.actor, target, activity, distanceFn);
