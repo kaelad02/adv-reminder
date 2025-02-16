@@ -1,3 +1,8 @@
+# 4.1.1
+
+- feature: [#80](https://github.com/kaelad02/adv-reminder/pull/80) Update Ready-Set-Roll compatibility
+- feature: [#86](https://github.com/kaelad02/adv-reminder/pull/86) Small update to pt-BR translation
+
 # 4.1.0
 
 - feature: [#77](https://github.com/kaelad02/adv-reminder/pull/77) System version 4.0 compatibility
