@@ -1,5 +1,6 @@
 {
   "adv-reminder.AutoFail": "Falha Automática",
+  "adv-reminder.Messages": "Mensagens",
   "adv-reminder.ColorMenu": {
     "Name": "Cores do Diálogo de Rolagem",
     "Hint": "Mude as cores das menssagens e botões padrão nos diálogos de rolagem.",
