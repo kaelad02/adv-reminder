@@ -2,14 +2,14 @@ import { AbilitySaveFail } from "../fails.js";
 import {
   AbilityCheckMessage,
   AbilitySaveMessage,
-  AttackMessage,
+  AttackMessageV2,
   ConcentrationMessage,
-  DamageMessage,
+  DamageMessageV2,
   DeathSaveMessage,
   SkillMessage,
 } from "../messages.js";
 import {
-  AttackReminder,
+  AttackReminderV2,
   AbilityCheckReminder,
   AbilitySaveReminder,
   CriticalReminder,
@@ -19,9 +19,9 @@ import {
 import {
   AbilityCheckSource,
   AbilitySaveSource,
-  AttackSource,
+  AttackSourceV2,
   ConcentrationSource,
-  CriticalSource,
+  CriticalSourceV2,
   DeathSaveSource,
   SkillSource,
 } from "../sources.js";
@@ -47,19 +47,20 @@ export default class ReadySetRollHooks extends CoreRollerHooks {
     });
   }
 
-  preRollAttack(item, config) {
-    debug("preRollAttack hook called");
+  preRollAttackV2(config, dialog, message) {
+    debug("preRollAttackV2 hook called", config, dialog, message);
 
     const target = getTarget();
-    const distanceFn = getDistanceToTargetFn(config.messageData.speaker);
+    const distanceFn = getDistanceToTargetFn(message.data.speaker);
+    const activity = config.subject;
 
     if (this._doMessages(config)) {
-      new AttackMessage(item.actor, target, item).addMessage(config);
-      if (showSources) new AttackSource(item.actor, target, item, distanceFn).updateOptions(config);
+      new AttackMessageV2(activity.actor, target, activity).addMessage(config);
+      if (showSources) new AttackSourceV2(activity.actor, target, activity, distanceFn).updateOptions(dialog);
     }
 
     if (this._doReminder(config))
-      new AttackReminder(item.actor, target, item, distanceFn).updateOptions(config);
+      new AttackReminderV2(activity.actor, target, activity, distanceFn).updateOptions(config.rolls[0].options);
   }
 
   preRollAbilitySave(actor, config, abilityId) {
@@ -135,17 +136,19 @@ export default class ReadySetRollHooks extends CoreRollerHooks {
     if (this._doReminder(config)) new DeathSaveReminder(actor).updateOptions(config);
   }
 
-  preRollDamage(item, config) {
-    debug("preRollDamage hook called");
+  preRollDamageV2(config, dialog, message) {
+    debug("preRollDamageV2 hook called", config, dialog, message);
 
-    // damage/healing enricher doesn't have an item, skip
-    if (!item) return;
+    const activity = config.subject;
+
+    // damage/healing enricher doesn't have an activity, skip
+    if (!activity) return;
 
     const target = getTarget();
 
     if (this._doMessages(config)) {
-      new DamageMessage(item.actor, target, item).addMessage(config);
-      if (showSources) new CriticalSource(item.actor, target, item, distanceFn).updateOptions(config);
+      new DamageMessageV2(activity.actor, target, activity).addMessage(config);
+      if (showSources) new CriticalSourceV2(activity.actor, target, activity, distanceFn).updateOptions(config);
     }
     // don't use CriticalReminder here, it's done in another hook
   }
