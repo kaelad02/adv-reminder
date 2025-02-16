@@ -27,7 +27,7 @@ class BaseMessage {
   }
 
   get prefix() {
-    return "dialogOptions";
+    return "options";
   }
 
   addMessage(options) {
@@ -151,10 +151,9 @@ export class SkillMessage extends AbilityCheckMessage {
 
   /** @override */
   get messageKeys() {
-    return super.messageKeys.concat(
+    return [
       "flags.adv-reminder.message.skill.all",
-      `flags.adv-reminder.message.skill.${this.skillId}`
-    );
+      `flags.adv-reminder.message.skill.${this.skillId}`]
   }
 }
 
@@ -165,10 +164,7 @@ export class DeathSaveMessage extends AbilityBaseMessage {
 
   /** @override */
   get messageKeys() {
-    return super.messageKeys.concat(
-      "flags.adv-reminder.message.ability.save.all",
-      "flags.adv-reminder.message.deathSave"
-    );
+    return ["flags.adv-reminder.message.deathSave"]
   }
 }
 
