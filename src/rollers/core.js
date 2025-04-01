@@ -33,6 +33,11 @@ import { debug, getDistanceToTargetFn, getTarget } from "../util.js";
  */
 export default class CoreRollerHooks {
   /**
+   * Property name to indicate we've already processed this roll.
+   */
+  static PROCESSED_PROP = "adv-reminder-processed";
+
+  /**
    * If true, check armor for stealth checks.
    * @type {boolean}
    */
@@ -48,12 +53,11 @@ export default class CoreRollerHooks {
 
     // register all the dnd5e.pre hooks
     Hooks.on("dnd5e.preRollAttackV2", this.preRollAttackV2.bind(this));
-    Hooks.on("dnd5e.preRollSkillV2", this.preRollSkillV2.bind(this));
-    Hooks.on("dnd5e.preRollAbilityCheckV2", this.preRollAbilityCheckV2.bind(this));  
     Hooks.on("dnd5e.preRollSavingThrowV2", this.preRollSavingThrowV2.bind(this));
-    //Hooks.on("dnd5e.preRollToolV2", this.preRollToolV2.bind(this));
-    Hooks.on("dnd5e.preRollDeathSaveV2", this.preRollDeathSaveV2.bind(this));
     Hooks.on("dnd5e.preRollConcentrationV2", this.preRollConcentrationV2.bind(this));
+    Hooks.on("dnd5e.preRollAbilityCheckV2", this.preRollAbilityCheckV2.bind(this));
+    Hooks.on("dnd5e.preRollSkillV2", this.preRollSkillV2.bind(this));
+    Hooks.on("dnd5e.preRollDeathSaveV2", this.preRollDeathSaveV2.bind(this));
     Hooks.on("dnd5e.preRollDamageV2", this.preRollDamageV2.bind(this));
   }
 
@@ -77,68 +81,87 @@ export default class CoreRollerHooks {
     if (showSources) new AttackSourceV2(activity.actor, target, activity, distanceFn).updateOptions(dialog);
     new AttackReminderV2(activity.actor, target, activity, distanceFn).updateOptions(config.rolls[0].options);
   }
-  
+
   preRollSavingThrowV2(config, dialog, message) {
     debug("preRollSavingThrowV2 hook called");
 
-    const failChecker = new AbilitySaveFail(config.subject, config.ability);
+    // check if we've already processed this roll
+    if (config[CoreRollerHooks.PROCESSED_PROP]) return;
+    config[CoreRollerHooks.PROCESSED_PROP] = true;
+
+    const actor = config.subject;
+    const abilityId = config.ability;
+    const failChecker = new AbilitySaveFail(actor, abilityId);
     if (failChecker.fails(config)) return false;
 
     if (this.isFastForwarding(config, dialog)) return;
 
-    new AbilitySaveMessage(config.subject, config.ability).addMessage(dialog);
-    if (showSources) new AbilitySaveSource(config.subject, config.ability).updateOptions(dialog);
-    new AbilitySaveReminder(config.subject, config.ability).updateOptions(config.rolls[0].options);
+    new AbilitySaveMessage(actor, abilityId).addMessage(dialog);
+    if (showSources) new AbilitySaveSource(actor, abilityId).updateOptions(dialog);
+    new AbilitySaveReminder(actor, abilityId).updateOptions(config.rolls[0].options);
   }
-  
+
   preRollConcentrationV2(config, dialog, message) {
     debug("preRollConcentrationV2 hook called");
 
+    // check if we've already processed this roll
+    if (config[CoreRollerHooks.PROCESSED_PROP]) return;
+    config[CoreRollerHooks.PROCESSED_PROP] = true;
+
     if (this.isFastForwarding(config, dialog)) return;
 
-    new ConcentrationMessage(config.subject, config.ability).addMessage(dialog);
-    if (showSources) new ConcentrationSource(config.subject, config.ability).updateOptions(dialog);
+    const actor = config.subject;
+    new ConcentrationMessage(actor, config.ability).addMessage(dialog);
+    if (showSources) new ConcentrationSource(actor, config.ability).updateOptions(dialog);
     // don't need a reminder, the system will set advantage/disadvantage
   }
 
   preRollAbilityCheckV2(config, dialog, message) {
     debug("preRollAbilityCheckV2 hook called");
 
+    // check if we've already processed this roll
+    if (config[CoreRollerHooks.PROCESSED_PROP]) return;
+    config[CoreRollerHooks.PROCESSED_PROP] = true;
+
     if (this.isFastForwarding(config, dialog)) return;
-   
-    new AbilityCheckMessage(config.subject, config.ability).addMessage(dialog);
-    if (showSources) new AbilityCheckSource(config.subject, config.ability).updateOptions(dialog);
-    new AbilityCheckReminder(config.subject, config.ability).updateOptions(config.rolls[0].options); 
+
+    const actor = config.subject;
+    const abilityId = config.ability;
+    new AbilityCheckMessage(actor, abilityId).addMessage(dialog);
+    if (showSources) new AbilityCheckSource(actor, abilityId).updateOptions(dialog);
+    new AbilityCheckReminder(actor, abilityId).updateOptions(config.rolls[0].options);
   }
 
   preRollSkillV2(config, dialog, message) {
     debug("preRollSkillV2 hook called");
-    
+
+    // check if we've already processed this roll
+    if (config[CoreRollerHooks.PROCESSED_PROP]) return;
+    config[CoreRollerHooks.PROCESSED_PROP] = true;
+
     if (this.isFastForwarding(config, dialog)) return;
 
-    new SkillMessage(config.subject, config.ability, config.skill).addMessage(dialog);
-    if (showSources) new SkillSource(config.subject, config.ability, config.skill, true).updateOptions(dialog);
-    new SkillReminder(config.subject, config.ability, config.skill, this.checkArmorStealth).updateOptions(config.rolls[0].options);
+    const actor = config.subject;
+    const ability = config.ability;
+    const skillId = config.skill;
+    new SkillMessage(actor, ability, skillId).addMessage(dialog);
+    if (showSources) new SkillSource(actor, ability, skillId, true).updateOptions(dialog);
+    new SkillReminder(actor, ability, skillId, this.checkArmorStealth).updateOptions(config.rolls[0].options);
   }
 
-  /**preRollToolV2(config, dialog, message)  {//toDo: Missing Message for tools
-    debug("preRollToolCheck hook called");
-
-    if (this.isFastForwarding(config, dialog)) return;
-
-    new AbilityCheckMessage(config.subject, config.ability).addMessage(dialog);
-    if (showSources) new AbilityCheckSource(config.subject, config.ability).updateOptions(dialog);
-    new AbilityCheckReminder(config.subject, config.ability).updateOptions(dialog);
-  }*/
-
-  preRollDeathSaveV2(config, dialog, message)  {
+  preRollDeathSaveV2(config, dialog, message) {
     debug("preRollDeathSaveV2 hook called");
 
+    // check if we've already processed this roll
+    if (config[CoreRollerHooks.PROCESSED_PROP]) return;
+    config[CoreRollerHooks.PROCESSED_PROP] = true;
+
     if (this.isFastForwarding(config, dialog)) return;
 
-    new DeathSaveMessage(config.subject).addMessage(dialog);
-    if (showSources) new DeathSaveSource(config.subject).updateOptions(dialog);
-    new DeathSaveReminder(config.subject).updateOptions(config.rolls[0].options);
+    const actor = config.subject;
+    new DeathSaveMessage(actor).addMessage(dialog);
+    if (showSources) new DeathSaveSource(actor).updateOptions(dialog);
+    new DeathSaveReminder(actor).updateOptions(config.rolls[0].options);
   }
 
   preRollDamageV2(config, dialog, message) {

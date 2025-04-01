@@ -29,10 +29,6 @@ import { showSources } from "../settings.js";
 import { debug, getDistanceToTargetFn, getTarget } from "../util.js";
 import CoreRollerHooks from "./core.js";
 
-// disable the grants.critical.range flag since RSR can't have it's critical flag changed anyways,
-// only set by the attack roll
-const distanceFn = () => Infinity;
-
 /**
  * Setup the dnd5e.preRoll hooks for use with Ready Set Roll.
  */
@@ -40,23 +36,19 @@ export default class ReadySetRollHooks extends CoreRollerHooks {
   init() {
     // delay registering these dnd5e hooks so they run after RSR's hooks
     Hooks.once("setup", () => {
-      super.init(); 
+      super.init();
     });
   }
 
   preRollAttackV2(config, dialog, message) {
-
     debug("preRollAttackV2 hook called");
-
 
     const target = getTarget();
     const distanceFn = getDistanceToTargetFn(message.data.speaker);
     const activity = config.subject;
 
     if (this._doMessages(config)) {
-
       new AttackMessageV2(activity.actor, target, activity).addMessage(dialog);
-
       if (showSources) new AttackSourceV2(activity.actor, target, activity, distanceFn).updateOptions(dialog);
     }
 
@@ -64,91 +56,105 @@ export default class ReadySetRollHooks extends CoreRollerHooks {
       new AttackReminderV2(activity.actor, target, activity, distanceFn).updateOptions(config.rolls[0].options);
   }
 
-  preRollSavingThrowV2(config, dialog, message){
+  preRollSavingThrowV2(config, dialog, message) {
     debug("preRollSavingThrowV2 hook called");
 
-    const failChecker = new AbilitySaveFail(config.subject, config.ability);
+    // check if we've already processed this roll
+    if (config[CoreRollerHooks.PROCESSED_PROP]) return;
+    config[CoreRollerHooks.PROCESSED_PROP] = true;
+
+    const actor = config.subject;
+    const abilityId = config.ability;
+    const failChecker = new AbilitySaveFail(actor, abilityId);
     if (failChecker.fails(config)) return false;
 
     if (this._doMessages(config)) {
-      new AbilitySaveMessage(config.subject, config.ability).addMessage(dialog);
-      if (showSources) new AbilitySaveSource(config.subject, config.ability).updateOptions(dialog);
+      new AbilitySaveMessage(actor, abilityId).addMessage(dialog);
+      if (showSources) new AbilitySaveSource(actor, abilityId).updateOptions(dialog);
     }
 
-    if (this._doReminder(config)) new AbilitySaveReminder(config.subject, config.ability).updateOptions(config.rolls[0].options);
+    if (this._doReminder(config)) new AbilitySaveReminder(actor, abilityId).updateOptions(config.rolls[0].options);
   }
 
   preRollConcentrationV2(config, dialog, message) {
     debug("preRollConcentrationV2 hook called");
 
-    if (this._doMessages(options)) {
-      new ConcentrationMessage(config.subject, config.ability).addMessage(dialog);
-    if (showSources) new ConcentrationSource(config.subject, config.ability).updateOptions(dialog);
+    // check if we've already processed this roll
+    if (config[CoreRollerHooks.PROCESSED_PROP]) return;
+    config[CoreRollerHooks.PROCESSED_PROP] = true;
+
+    if (this._doMessages(config)) {
+      const actor = config.subject;
+      new ConcentrationMessage(actor, config.ability).addMessage(dialog);
+      if (showSources) new ConcentrationSource(actor, config.ability).updateOptions(dialog);
     }
     // don't need a reminder, the system will set advantage/disadvantage
   }
 
-  preRollAbilityCheckV2(config, dialog, message)  {
+  preRollAbilityCheckV2(config, dialog, message) {
     debug("preRollAbilityCheckV2 hook called");
 
+    // check if we've already processed this roll
+    if (config[CoreRollerHooks.PROCESSED_PROP]) return;
+    config[CoreRollerHooks.PROCESSED_PROP] = true;
+
+    const actor = config.subject;
+    const abilityId = config.ability;
     if (this._doMessages(config)) {
-      new AbilityCheckMessage(config.subject, config.ability).addMessage(dialog);
-      if (showSources) new AbilityCheckSource(config.subject, config.ability).updateOptions(dialog);
+      new AbilityCheckMessage(actor, abilityId).addMessage(dialog);
+      if (showSources) new AbilityCheckSource(actor, abilityId).updateOptions(dialog);
     }
 
-    if (this._doReminder(config)) new AbilityCheckReminder(config.subject, config.ability).updateOptions(config.rolls[0].options); 
+    if (this._doReminder(config)) new AbilityCheckReminder(actor, abilityId).updateOptions(config.rolls[0].options);
   }
 
   preRollSkillV2(config, dialog, message) {
     debug("preRollSkillV2 hook called");
-    
+
+    // check if we've already processed this roll
+    if (config[CoreRollerHooks.PROCESSED_PROP]) return;
+    config[CoreRollerHooks.PROCESSED_PROP] = true;
+
+    const actor = config.subject;
+    const ability = config.ability;
+    const skillId = config.skill;
     if (this._doMessages(config)) {
-      new SkillMessage(config.subject, config.ability, config.skill).addMessage(dialog);
-    if (showSources) new SkillSource(config.subject, config.ability, config.skill, true).updateOptions(dialog);
+      new SkillMessage(actor, ability, skillId).addMessage(dialog);
+      if (showSources) new SkillSource(actor, ability, skillId, true).updateOptions(dialog);
     }
 
     if (this._doReminder(config))
-      new SkillReminder(config.subject, config.ability, config.skill, this.checkArmorStealth).updateOptions(config.rolls[0].options);
+      new SkillReminder(actor, ability, skillId, this.checkArmorStealth).updateOptions(config.rolls[0].options);
   }
-
-  // preRollToolCheck(actor, config, toolId) {
-  //   debug("preRollToolCheck hook called");
-
-  //   const ability = config.data.defaultAbility;
-  //   if (this._doMessages(config)) {
-  //     new AbilityCheckMessage(actor, ability).addMessage(config);
-  //     if (showSources)
-  //       new AbilityCheckSource(actor, ability).updateOptions(config);
-  //   }
-
-  //   if (this._doReminder(config))
-  //     new AbilityCheckReminder(actor, ability).updateOptions(config);
-  // }
 
   preRollDeathSaveV2(config, dialog, message) {
     debug("preRollDeathSaveV2 hook called");
 
+    // check if we've already processed this roll
+    if (config[CoreRollerHooks.PROCESSED_PROP]) return;
+    config[CoreRollerHooks.PROCESSED_PROP] = true;
+
+    const actor = config.subject;
     if (this._doMessages(config)) {
-      new DeathSaveMessage(config.subject).addMessage(dialog);
-    if (showSources) new DeathSaveSource(config.subject).updateOptions(dialog);
+      new DeathSaveMessage(actor).addMessage(dialog);
+      if (showSources) new DeathSaveSource(actor).updateOptions(dialog);
     }
 
-    if (this._doReminder(config)) new DeathSaveReminder(config.subject).updateOptions(config.rolls[0].options);
+    if (this._doReminder(config)) new DeathSaveReminder(actor).updateOptions(config.rolls[0].options);
   }
 
   preRollDamageV2(config, dialog, message) {
-
     debug("preRollDamageV2 hook called");
 
-    // damage/healing enricher doesn't have an item, skip
-    if (!config.subject) return;
+    const activity = config.subject;
+
+    // damage/healing enricher doesn't have an activity, skip
+    if (!activity) return;
 
     const target = getTarget();
     const distanceFn = getDistanceToTargetFn(message.data.speaker);
-    const activity = config.subject;
 
     if (this._doMessages(config)) {
-
       new DamageMessageV2(activity.actor, target, activity).addMessage(dialog);
       if (showSources) new CriticalSourceV2(activity.actor, target, activity, distanceFn).updateOptions(dialog);
       const reminder = new CriticalReminderV2(activity.actor, target, activity, distanceFn);

@@ -184,6 +184,7 @@ export class CriticalSourceV2 extends SourceMixin(CriticalReminderV2) {
   get _prefix() {
     return "options";
   }
+
   _adjustRange(distanceFn, grantsCriticalRange) {
     // check if the range applies, remove flag if not
     if ("grants.critical.range" in this.targetFlags) {
@@ -195,7 +196,6 @@ export class CriticalSourceV2 extends SourceMixin(CriticalReminderV2) {
   _accumulator() {
     const criticalLabels = [];
     const normalLabels = [];
-    console.log("Here Accu Crit");
 
     return {
       add: (changes, critKeys, normalKeys) => {
@@ -206,9 +206,9 @@ export class CriticalSourceV2 extends SourceMixin(CriticalReminderV2) {
           if(changes[key]) normalLabels.push(...changes[key]);
         });
       },
-       critical: (label) => {
-         if (label) criticalLabels.push(label);
-       },
+      critical: (label) => {
+        if (label) criticalLabels.push(label);
+      },
       update: (options) => {
         debug("criticalLabels", criticalLabels, "normalLabels", normalLabels);
         const merge = (newLabels, key) => {
@@ -223,5 +223,4 @@ export class CriticalSourceV2 extends SourceMixin(CriticalReminderV2) {
       },
     };
   }
-  
 }
