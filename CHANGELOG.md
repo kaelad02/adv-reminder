@@ -1,3 +1,7 @@
+# TODO
+
+- feature: [#85](https://github.com/kaelad02/adv-reminder/pull/85) Compatibility with the 4.1.0 system, specifically the new rolls being used everywhere else now
+
 # 4.1.1
 
 - feature: [#80](https://github.com/kaelad02/adv-reminder/pull/80) Update Ready-Set-Roll compatibility
