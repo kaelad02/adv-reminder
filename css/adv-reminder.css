@@ -65,6 +65,17 @@
   flex: 3;
   border-color: var(--dnd5e-color-gold);
 }
+/* Custom colors */
+.dnd5e2.roll-configuration .dialog-buttons button[autofocus].adv-reminder-custom {
+  background-color: var(--adv-reminder-background-color);
+  border-color: var(--adv-reminder-color);
+  color: var(--adv-reminder-color);
+}
+
+.dnd5e2.roll-configuration .dialog-buttons button[autofocus].adv-reminder-custom:hover:not(:disabled),
+.dnd5e2.roll-configuration .dialog-buttons button[autofocus].adv-reminder-custom:focus {
+  box-shadow: 0 0 5px var(--adv-reminder-color);
+}
 /* Copy the system's .inline-roll styling for .dialog-roll */
 .dnd5e2.roll-configuration a.dialog-roll {
   background: transparent;
