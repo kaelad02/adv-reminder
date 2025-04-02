@@ -176,6 +176,11 @@ export default class CoreRollerHooks {
     if (showSources) new CriticalSourceV2(activity.actor, target, activity, distanceFn).updateOptions(dialog);
     const reminder = new CriticalReminderV2(activity.actor, target, activity, distanceFn);
     config.rolls.forEach(roll => reminder.updateOptions(roll.options, "isCritical"));
+    
+    // workaround for https://github.com/foundryvtt/dnd5e/issues/5455
+    if (config.rolls[0].options?.isCritical) {
+      dialog.options.defaultButton = "critical";
+    }
   }
 
   /**

@@ -83,23 +83,16 @@ Hooks.once("devModeReady", ({ registerPackageDebugFlag }) =>
 function setStyleVariables(option, customColor) {
   debug("setStyleVariables called");
 
-  // set four color variables based on the option
-  var varColor, varBackground, varButtonBorder, varButtonShadow, varMessageBorder;
+  // set color variables based on the option
+  var varColor, varBackground;
   const setColorVars = (color) => {
     varColor = color;
-    varBackground = Color.from(color).toRGBA(0.05);
-    varButtonBorder = color;
-    varButtonShadow = color;
-    varMessageBorder = color;
+    varBackground = Color.from(color).add(0.4).toString();
   };
   switch (option) {
     case "none":
-      varColor = "#191813";
-      varBackground = "rgba(0, 0, 0, 0.05)";
-      varButtonBorder = "#c9c7b8";
-      varButtonShadow = "#ff0000";
-      varMessageBorder = "#7a7971";
-      break;
+      // don't change colors
+      return;
     case "player":
       setColorVars(game.user.color);
       break;
@@ -115,9 +108,6 @@ function setStyleVariables(option, customColor) {
   const setStyle = (varName, value) => root.style.setProperty(varName, value);
   setStyle("--adv-reminder-color", varColor);
   setStyle("--adv-reminder-background-color", varBackground);
-  setStyle("--adv-reminder-button-border-color", varButtonBorder);
-  setStyle("--adv-reminder-button-shadow-color", varButtonShadow);
-  setStyle("--adv-reminder-message-border-color", varMessageBorder);
 }
 
 /**
@@ -126,7 +116,7 @@ function setStyleVariables(option, customColor) {
  */
 class MessageColorSettings extends FormApplication {
   static get defaultOptions() {
-    return mergeObject(super.defaultOptions, {
+    return foundry.utils.mergeObject(super.defaultOptions, {
       title: game.i18n.localize("adv-reminder.ColorMenu.Name"),
       template: "modules/adv-reminder/templates/color-settings.hbs",
       width: 400,
@@ -185,14 +175,12 @@ class MessageColorSettings extends FormApplication {
     debug("_onTest called");
     event.preventDefault();
 
-    const rollData = {
-      parts: ["@mod", "@prof"],
-      data: { mod: 3, prof: 2 },
-      title: "Sample Roll",
-      chatMessage: false,
-      dialogOptions: { "adv-reminder": { messages: ["Conditional bonus [[/r +2]]"] } },
+    const rollConfig = { rolls: [{ parts: ["@mod", "@prof"], data: { mod: 3, prof: 2 } }] };
+    const dialogConfig = {
+      options: { "adv-reminder": { messages: ["Conditional bonus [[/r +2]]"] } },
     };
-    dnd5e.dice.d20Roll(rollData);
+    const messageConfig = { create: false };
+    CONFIG.Dice.D20Roll.build(rollConfig, dialogConfig, messageConfig);
   }
 
   async _updateObject(event, formData) {

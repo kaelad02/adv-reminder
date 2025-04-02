@@ -179,6 +179,13 @@ Hooks.on("renderRollConfigurationDialog", async (dialog, html) => {
       });
     });
   }
+
+  // add custom button styling by adding a class
+  const defaultButtonColor = game.settings.get("adv-reminder", "defaultButtonColor");
+  if (defaultButtonColor !== "none") {
+    const button = html.querySelector(".dialog-buttons button[autofocus]");
+    button.classList.add("adv-reminder-custom");
+  }
 });
 
 async function prepareMessage(dialogOptions) {
