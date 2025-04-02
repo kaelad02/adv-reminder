@@ -1,6 +1,7 @@
 # TODO
 
 - feature: [#85](https://github.com/kaelad02/adv-reminder/pull/85) Compatibility with the 4.1.0 system, specifically the new rolls being used everywhere else now
+- bug fix: [#92](https://github.com/kaelad02/adv-reminder/pull/92) Fix the V2 dialog styling, including the player setting to customize the colors
 
 # 4.1.1
 
