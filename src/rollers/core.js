@@ -179,7 +179,6 @@ export default class CoreRollerHooks {
     
     // workaround for https://github.com/foundryvtt/dnd5e/issues/5455
     if (config.rolls[0].options?.isCritical) {
-      console.log("CRITICAL HIT");
       dialog.options.defaultButton = "critical";
     }
   }
