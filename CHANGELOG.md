@@ -1,3 +1,7 @@
+# 4.2.1
+
+- bug fix: set minimim system version to 4.1.0
+
 # 4.2.0
 
 - feature: [#85](https://github.com/kaelad02/adv-reminder/pull/85) Compatibility with the 4.1 system, specifically the new rolls being used everywhere else now
