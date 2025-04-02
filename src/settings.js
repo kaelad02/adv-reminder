@@ -126,7 +126,7 @@ function setStyleVariables(option, customColor) {
  */
 class MessageColorSettings extends FormApplication {
   static get defaultOptions() {
-    return mergeObject(super.defaultOptions, {
+    return foundry.utils.mergeObject(super.defaultOptions, {
       title: game.i18n.localize("adv-reminder.ColorMenu.Name"),
       template: "modules/adv-reminder/templates/color-settings.hbs",
       width: 400,
@@ -185,14 +185,12 @@ class MessageColorSettings extends FormApplication {
     debug("_onTest called");
     event.preventDefault();
 
-    const rollData = {
-      parts: ["@mod", "@prof"],
-      data: { mod: 3, prof: 2 },
-      title: "Sample Roll",
-      chatMessage: false,
-      dialogOptions: { "adv-reminder": { messages: ["Conditional bonus [[/r +2]]"] } },
+    const rollConfig = { rolls: [{ parts: ["@mod", "@prof"], data: { mod: 3, prof: 2 } }] };
+    const dialogConfig = {
+      options: { "adv-reminder": { messages: ["Conditional bonus [[/r +2]]"] } },
     };
-    dnd5e.dice.d20Roll(rollData);
+    const messageConfig = { create: false };
+    CONFIG.Dice.D20Roll.build(rollConfig, dialogConfig, messageConfig);
   }
 
   async _updateObject(event, formData) {
