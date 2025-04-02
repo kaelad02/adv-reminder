@@ -186,6 +186,9 @@ Hooks.on("renderRollConfigurationDialog", async (dialog, html) => {
     const button = html.querySelector(".dialog-buttons button[autofocus]");
     button.classList.add("adv-reminder-custom");
   }
+
+  // reset position in case the dialog is too tall and the buttons are off the screen
+  dialog.setPosition();
 });
 
 async function prepareMessage(dialogOptions) {
