@@ -83,23 +83,16 @@ Hooks.once("devModeReady", ({ registerPackageDebugFlag }) =>
 function setStyleVariables(option, customColor) {
   debug("setStyleVariables called");
 
-  // set four color variables based on the option
-  var varColor, varBackground, varButtonBorder, varButtonShadow, varMessageBorder;
+  // set color variables based on the option
+  var varColor, varBackground;
   const setColorVars = (color) => {
     varColor = color;
     varBackground = Color.from(color).add(0.4).toString();
-    varButtonBorder = color;
-    varButtonShadow = color;
-    varMessageBorder = color;
   };
   switch (option) {
     case "none":
-      varColor = "#191813";
-      varBackground = "rgba(0, 0, 0, 0.05)";
-      varButtonBorder = "#c9c7b8";
-      varButtonShadow = "#ff0000";
-      varMessageBorder = "#7a7971";
-      break;
+      // don't change colors
+      return;
     case "player":
       setColorVars(game.user.color);
       break;
@@ -115,9 +108,6 @@ function setStyleVariables(option, customColor) {
   const setStyle = (varName, value) => root.style.setProperty(varName, value);
   setStyle("--adv-reminder-color", varColor);
   setStyle("--adv-reminder-background-color", varBackground);
-  setStyle("--adv-reminder-button-border-color", varButtonBorder);
-  setStyle("--adv-reminder-button-shadow-color", varButtonShadow);
-  setStyle("--adv-reminder-message-border-color", varMessageBorder);
 }
 
 /**
