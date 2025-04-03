@@ -1,3 +1,7 @@
+# 4.2.4
+
+- bug fix: [#95](https://github.com/kaelad02/adv-reminder/issues/95) Default button is black when using player color
+
 # 4.2.3
 
 - bug fix: Fix the auto-fail message

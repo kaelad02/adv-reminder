@@ -3,11 +3,6 @@ import { debug } from "./util.js";
 export let showSources;
 
 export function initSettings() {
-  registerSettings();
-  applySettings();
-}
-
-function registerSettings() {
   // Roll Dialog Colors
   game.settings.registerMenu("adv-reminder", "colorMenu", {
     name: "adv-reminder.ColorMenu.Name",
@@ -78,7 +73,7 @@ function registerSettings() {
   });
 };
 
-function applySettings() {
+export function applySettings() {
   // initialize the color variables
   setStyleVariables(
     game.settings.get("adv-reminder", "defaultButtonColor"),
