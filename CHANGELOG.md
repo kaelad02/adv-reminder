@@ -1,6 +1,7 @@
 # TODO
 
 - bug fix: Fix the auto-fail message
+- feature: Remove sw5e support
 
 # 4.2.2
 

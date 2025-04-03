@@ -86,7 +86,7 @@ Hooks.once("DAE.setupComplete", () => {
   fields.push("flags.adv-reminder.message.deathSave");
   fields.push("flags.adv-reminder.message.damage.all");
 
-  const actionTypes = game.system.id === "sw5e" ? ["mwak", "rwak", "mpak", "rpak"] : ["mwak", "rwak", "msak", "rsak"];
+  const actionTypes = ["mwak", "rwak", "msak", "rsak"];
   actionTypes.forEach((actionType) => fields.push(`flags.adv-reminder.message.attack.${actionType}`));
 
   Object.keys(CONFIG.DND5E.itemActionTypes).forEach((actionType) =>
