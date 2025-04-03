@@ -4,7 +4,6 @@ import commonTestInit from "./common.js";
 
 function mockFailChecker(failChecker) {
   return [
-    jest.spyOn(failChecker, "createMessageData").mockImplementation(() => {}),
     jest.spyOn(failChecker, "toMessage").mockImplementation(() => {}),
   ];
 }
@@ -20,7 +19,7 @@ describe("AbilitySaveFail no legit active effects", () => {
     const failChecker = new AbilitySaveFail(actor, "dex");
     const spies = mockFailChecker(failChecker);
 
-    expect(await failChecker.fails()).toBe(false);
+    expect(await failChecker.fails({})).toBe(false);
     spies.forEach((spy) => expect(spy).not.toHaveBeenCalled());
   });
 });
@@ -32,7 +31,7 @@ describe("AbilitySaveFail fail flags", () => {
     const failChecker = new AbilitySaveFail(actor, "dex");
     const spies = mockFailChecker(failChecker);
 
-    expect(await failChecker.fails()).toBe(true);
+    expect(await failChecker.fails({})).toBe(true);
     spies.forEach((spy) => expect(spy).toHaveBeenCalled());
   });
 
@@ -42,7 +41,7 @@ describe("AbilitySaveFail fail flags", () => {
     const failChecker = new AbilitySaveFail(actor, "dex");
     const spies = mockFailChecker(failChecker);
 
-    expect(await failChecker.fails()).toBe(true);
+    expect(await failChecker.fails({})).toBe(true);
     spies.forEach((spy) => expect(spy).toHaveBeenCalled());
   });
 
@@ -52,7 +51,7 @@ describe("AbilitySaveFail fail flags", () => {
     const failChecker = new AbilitySaveFail(actor, "dex");
     const spies = mockFailChecker(failChecker);
 
-    expect(await failChecker.fails()).toBe(true);
+    expect(await failChecker.fails({})).toBe(true);
     spies.forEach((spy) => expect(spy).toHaveBeenCalled());
   });
 
@@ -62,7 +61,7 @@ describe("AbilitySaveFail fail flags", () => {
     const failChecker = new AbilitySaveFail(actor, "dex");
     const spies = mockFailChecker(failChecker);
 
-    expect(await failChecker.fails()).toBe(true);
+    expect(await failChecker.fails({})).toBe(true);
     spies.forEach((spy) => expect(spy).toHaveBeenCalled());
   });
 
@@ -72,7 +71,7 @@ describe("AbilitySaveFail fail flags", () => {
     const failChecker = new AbilitySaveFail(actor, "con");
     const spies = mockFailChecker(failChecker);
 
-    expect(await failChecker.fails()).toBe(false);
+    expect(await failChecker.fails({})).toBe(false);
     spies.forEach((spy) => expect(spy).not.toHaveBeenCalled());
   });
 });
