@@ -115,15 +115,9 @@ Hooks.on("renderRollConfigurationDialog", async (dialog, html) => {
 
   const message = await prepareMessage(dialog.options);
   if (message) {
-    // put messages inside their own fieldset
-    const messageFieldset = document.createElement("fieldset");
-    messageFieldset.innerHTML = message;
-    const legend = document.createElement("legend");
-    legend.innerText = game.i18n.localize("adv-reminder.Messages");
-    messageFieldset.insertBefore(legend, messageFieldset.firstChild);
     // add messages right after configuration
     const configFieldset = html.querySelector('fieldset[data-application-part="configuration"]');
-    configFieldset.after(messageFieldset);
+    configFieldset.after(message);
     // swap "inline-roll" class for "dialog-roll"
     const inlineRolls = html.querySelectorAll("a.inline-roll");
     inlineRolls.forEach(ir => {
@@ -189,6 +183,9 @@ async function prepareMessage(dialogOptions) {
     });
     debug("messages", messages, "enriched", enriched);
     opt.rendered = true;
-    return enriched;
+    // turn into HTML element
+    const t = document.createElement("template");
+    t.innerHTML = enriched;
+    return t.content.firstElementChild;
   }
 }
