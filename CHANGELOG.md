@@ -1,3 +1,21 @@
+# 4.2.2
+
+- bug fix: [#84](https://github.com/kaelad02/adv-reminder/issues/84) Adding messages could push the roll dialog off the screen
+
+# 4.2.1
+
+- bug fix: set minimim system version to 4.1.0
+
+# 4.2.0
+
+- feature: [#85](https://github.com/kaelad02/adv-reminder/pull/85) Compatibility with the 4.1 system, specifically the new rolls being used everywhere else now
+- bug fix: [#92](https://github.com/kaelad02/adv-reminder/pull/92) Fix the V2 dialog styling, including the player setting to customize the colors
+
+# 4.1.1
+
+- feature: [#80](https://github.com/kaelad02/adv-reminder/pull/80) Update Ready-Set-Roll compatibility
+- feature: [#86](https://github.com/kaelad02/adv-reminder/pull/86) Small update to pt-BR translation
+
 # 4.1.0
 
 - feature: [#77](https://github.com/kaelad02/adv-reminder/pull/77) System version 4.0 compatibility

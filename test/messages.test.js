@@ -51,7 +51,7 @@ describe("AttackMessage no legit active effects", () => {
 
     new AttackMessage(actor, undefined, item).addMessage(options);
 
-    expect(options.dialogOptions).toBeUndefined();
+    expect(options.options).toBeUndefined();
   });
 });
 
@@ -63,7 +63,7 @@ describe("AttackMessage message flags", () => {
 
     new AttackMessage(actor, undefined, item).addMessage(options);
 
-    expect(options.dialogOptions["adv-reminder"].messages).toStrictEqual(["message.all message"]);
+    expect(options.options["adv-reminder"].messages).toStrictEqual(["message.all message"]);
   });
 
   test("attack with message.attack.all flag should add the message", () => {
@@ -76,7 +76,7 @@ describe("AttackMessage message flags", () => {
 
     new AttackMessage(actor, undefined, item).addMessage(options);
 
-    expect(options.dialogOptions["adv-reminder"].messages).toStrictEqual([
+    expect(options.options["adv-reminder"].messages).toStrictEqual([
       "message.attack.all message",
     ]);
   });
@@ -91,7 +91,7 @@ describe("AttackMessage message flags", () => {
 
     new AttackMessage(actor, undefined, item).addMessage(options);
 
-    expect(options.dialogOptions["adv-reminder"].messages).toStrictEqual([
+    expect(options.options["adv-reminder"].messages).toStrictEqual([
       "message.attack.mwak message",
     ]);
   });
@@ -106,7 +106,7 @@ describe("AttackMessage message flags", () => {
 
     new AttackMessage(actor, undefined, item).addMessage(options);
 
-    expect(options.dialogOptions).toBeUndefined();
+    expect(options.options).toBeUndefined();
   });
 
   test("attack with message.attack.cha flag should add the message for Charisma Attack", () => {
@@ -119,7 +119,7 @@ describe("AttackMessage message flags", () => {
 
     new AttackMessage(actor, undefined, item).addMessage(options);
 
-    expect(options.dialogOptions["adv-reminder"].messages).toStrictEqual([
+    expect(options.options["adv-reminder"].messages).toStrictEqual([
       "message.attack.cha message",
     ]);
   });
@@ -134,7 +134,7 @@ describe("AttackMessage message flags", () => {
 
     new AttackMessage(actor, undefined, item).addMessage(options);
 
-    expect(options.dialogOptions).toBeUndefined();
+    expect(options.options).toBeUndefined();
   });
 
   test("attack with two messages should add both messages", () => {
@@ -147,7 +147,7 @@ describe("AttackMessage message flags", () => {
 
     new AttackMessage(actor, undefined, item).addMessage(options);
 
-    expect(options.dialogOptions["adv-reminder"].messages).toStrictEqual(["first", "second"]);
+    expect(options.options["adv-reminder"].messages).toStrictEqual(["first", "second"]);
   });
 });
 
@@ -163,7 +163,7 @@ describe("AttackMessage from target", () => {
 
     new AttackMessage(actor, target, item).addMessage(options);
 
-    expect(options.dialogOptions["adv-reminder"].messages).toStrictEqual([
+    expect(options.options["adv-reminder"].messages).toStrictEqual([
       "message.attack.all message",
     ]);
   });
@@ -179,7 +179,7 @@ describe("AttackMessage from target", () => {
 
     new AttackMessage(actor, target, item).addMessage(options);
 
-    expect(options.dialogOptions["adv-reminder"].messages).toStrictEqual([
+    expect(options.options["adv-reminder"].messages).toStrictEqual([
       "message.attack.mwak message",
     ]);
   });
@@ -195,7 +195,7 @@ describe("AttackMessage from target", () => {
 
     new AttackMessage(actor, target, item).addMessage(options);
 
-    expect(options.dialogOptions).toBeUndefined();
+    expect(options.options).toBeUndefined();
   });
 
   test("attack with message.attack.cha flag should add the message for Charisma Attack", () => {
@@ -209,7 +209,7 @@ describe("AttackMessage from target", () => {
 
     new AttackMessage(actor, target, item).addMessage(options);
 
-    expect(options.dialogOptions["adv-reminder"].messages).toStrictEqual([
+    expect(options.options["adv-reminder"].messages).toStrictEqual([
       "message.attack.cha message",
     ]);
   });
@@ -225,7 +225,7 @@ describe("AttackMessage from target", () => {
 
     new AttackMessage(actor, target, item).addMessage(options);
 
-    expect(options.dialogOptions).toBeUndefined();
+    expect(options.options).toBeUndefined();
   });
 
   test("attack with two messages should add both messages", () => {
@@ -239,7 +239,7 @@ describe("AttackMessage from target", () => {
 
     new AttackMessage(actor, target, item).addMessage(options);
 
-    expect(options.dialogOptions["adv-reminder"].messages).toStrictEqual(["first", "second"]);
+    expect(options.options["adv-reminder"].messages).toStrictEqual(["first", "second"]);
   });
 });
 
@@ -250,7 +250,7 @@ describe("AbilityCheckMessage no legit active effects", () => {
 
     new AbilityCheckMessage(actor, "int").addMessage(options);
 
-    expect(options.dialogOptions).toBeUndefined();
+    expect(options.options).toBeUndefined();
   });
 });
 
@@ -261,7 +261,7 @@ describe("AbilityCheckMessage message flags", () => {
 
     new AbilityCheckMessage(actor, "int").addMessage(options);
 
-    expect(options.dialogOptions["adv-reminder"].messages).toStrictEqual(["message.all message"]);
+    expect(options.options["adv-reminder"].messages).toStrictEqual(["message.all message"]);
   });
 
   test("ability check with message.ability.all flag should add the message", () => {
@@ -273,7 +273,7 @@ describe("AbilityCheckMessage message flags", () => {
 
     new AbilityCheckMessage(actor, "int").addMessage(options);
 
-    expect(options.dialogOptions["adv-reminder"].messages).toStrictEqual([
+    expect(options.options["adv-reminder"].messages).toStrictEqual([
       "message.ability.all message",
     ]);
   });
@@ -287,7 +287,7 @@ describe("AbilityCheckMessage message flags", () => {
 
     new AbilityCheckMessage(actor, "int").addMessage(options);
 
-    expect(options.dialogOptions["adv-reminder"].messages).toStrictEqual([
+    expect(options.options["adv-reminder"].messages).toStrictEqual([
       "message.ability.check.all message",
     ]);
   });
@@ -301,7 +301,7 @@ describe("AbilityCheckMessage message flags", () => {
 
     new AbilityCheckMessage(actor, "int").addMessage(options);
 
-    expect(options.dialogOptions["adv-reminder"].messages).toStrictEqual([
+    expect(options.options["adv-reminder"].messages).toStrictEqual([
       "message.ability.check.int message",
     ]);
   });
@@ -315,7 +315,7 @@ describe("AbilityCheckMessage message flags", () => {
 
     new AbilityCheckMessage(actor, "dex").addMessage(options);
 
-    expect(options.dialogOptions).toBeUndefined();
+    expect(options.options).toBeUndefined();
   });
 
   test("ability check with two messages should add both messages", () => {
@@ -327,7 +327,7 @@ describe("AbilityCheckMessage message flags", () => {
 
     new AbilityCheckMessage(actor, "dex").addMessage(options);
 
-    expect(options.dialogOptions["adv-reminder"].messages).toStrictEqual(["first", "second"]);
+    expect(options.options["adv-reminder"].messages).toStrictEqual(["first", "second"]);
   });
 });
 
@@ -338,7 +338,7 @@ describe("AbilitySaveMessage no legit active effects", () => {
 
     new AbilitySaveMessage(actor, "int").addMessage(options);
 
-    expect(options.dialogOptions).toBeUndefined();
+    expect(options.options).toBeUndefined();
   });
 });
 
@@ -349,7 +349,7 @@ describe("AbilitySaveMessage message flags", () => {
 
     new AbilitySaveMessage(actor, "int").addMessage(options);
 
-    expect(options.dialogOptions["adv-reminder"].messages).toStrictEqual(["message.all message"]);
+    expect(options.options["adv-reminder"].messages).toStrictEqual(["message.all message"]);
   });
 
   test("saving throw with message.ability.all flag should add the message", () => {
@@ -361,7 +361,7 @@ describe("AbilitySaveMessage message flags", () => {
 
     new AbilitySaveMessage(actor, "int").addMessage(options);
 
-    expect(options.dialogOptions["adv-reminder"].messages).toStrictEqual([
+    expect(options.options["adv-reminder"].messages).toStrictEqual([
       "message.ability.all message",
     ]);
   });
@@ -375,7 +375,7 @@ describe("AbilitySaveMessage message flags", () => {
 
     new AbilitySaveMessage(actor, "int").addMessage(options);
 
-    expect(options.dialogOptions["adv-reminder"].messages).toStrictEqual([
+    expect(options.options["adv-reminder"].messages).toStrictEqual([
       "message.ability.save.all message",
     ]);
   });
@@ -389,7 +389,7 @@ describe("AbilitySaveMessage message flags", () => {
 
     new AbilitySaveMessage(actor, "int").addMessage(options);
 
-    expect(options.dialogOptions["adv-reminder"].messages).toStrictEqual([
+    expect(options.options["adv-reminder"].messages).toStrictEqual([
       "message.ability.save.int message",
     ]);
   });
@@ -403,7 +403,7 @@ describe("AbilitySaveMessage message flags", () => {
 
     new AbilitySaveMessage(actor, "dex").addMessage(options);
 
-    expect(options.dialogOptions).toBeUndefined();
+    expect(options.options).toBeUndefined();
   });
 
   test("saving throw with two messages should add both messages", () => {
@@ -415,7 +415,7 @@ describe("AbilitySaveMessage message flags", () => {
 
     new AbilitySaveMessage(actor, "dex").addMessage(options);
 
-    expect(options.dialogOptions["adv-reminder"].messages).toStrictEqual(["first", "second"]);
+    expect(options.options["adv-reminder"].messages).toStrictEqual(["first", "second"]);
   });
 });
 
@@ -426,7 +426,7 @@ describe("SkillMessage no legit active effects", () => {
 
     new SkillMessage(actor, "str", "ath").addMessage(options);
 
-    expect(options.dialogOptions).toBeUndefined();
+    expect(options.options).toBeUndefined();
   });
 });
 
@@ -437,7 +437,7 @@ describe("SkillMessage message flags", () => {
 
     new SkillMessage(actor, "wis", "prc").addMessage(options);
 
-    expect(options.dialogOptions["adv-reminder"].messages).toStrictEqual(["message.all message"]);
+    expect(options.options["adv-reminder"].messages).toStrictEqual(["message.all message"]);
   });
 
   test("skill check with message.ability.all flag should add the message", () => {
@@ -449,7 +449,7 @@ describe("SkillMessage message flags", () => {
 
     new SkillMessage(actor, "wis", "prc").addMessage(options);
 
-    expect(options.dialogOptions["adv-reminder"].messages).toStrictEqual([
+    expect(options.options["adv-reminder"].messages).toStrictEqual([
       "message.ability.all message",
     ]);
   });
@@ -463,7 +463,7 @@ describe("SkillMessage message flags", () => {
 
     new SkillMessage(actor, "wis", "prc").addMessage(options);
 
-    expect(options.dialogOptions["adv-reminder"].messages).toStrictEqual([
+    expect(options.options["adv-reminder"].messages).toStrictEqual([
       "message.ability.check.all message",
     ]);
   });
@@ -477,7 +477,7 @@ describe("SkillMessage message flags", () => {
 
     new SkillMessage(actor, "wis", "prc").addMessage(options);
 
-    expect(options.dialogOptions["adv-reminder"].messages).toStrictEqual([
+    expect(options.options["adv-reminder"].messages).toStrictEqual([
       "message.ability.check.int message",
     ]);
   });
@@ -491,7 +491,7 @@ describe("SkillMessage message flags", () => {
 
     new SkillMessage(actor, "dex", "acr").addMessage(options);
 
-    expect(options.dialogOptions).toBeUndefined();
+    expect(options.options).toBeUndefined();
   });
 
   test("skill check with message.skill.all flag should add the message", () => {
@@ -503,7 +503,7 @@ describe("SkillMessage message flags", () => {
 
     new SkillMessage(actor, "wis", "prc").addMessage(options);
 
-    expect(options.dialogOptions["adv-reminder"].messages).toStrictEqual([
+    expect(options.options["adv-reminder"].messages).toStrictEqual([
       "message.skill.all message",
     ]);
   });
@@ -517,7 +517,7 @@ describe("SkillMessage message flags", () => {
 
     new SkillMessage(actor, "wis", "prc").addMessage(options);
 
-    expect(options.dialogOptions["adv-reminder"].messages).toStrictEqual([
+    expect(options.options["adv-reminder"].messages).toStrictEqual([
       "message.skill.prc message",
     ]);
   });
@@ -531,7 +531,7 @@ describe("SkillMessage message flags", () => {
 
     new SkillMessage(actor, "int", "nat").addMessage(options);
 
-    expect(options.dialogOptions).toBeUndefined();
+    expect(options.options).toBeUndefined();
   });
 
   test("skill check with two messages should add both messages", () => {
@@ -543,7 +543,7 @@ describe("SkillMessage message flags", () => {
 
     new SkillMessage(actor, "dex", "ste").addMessage(options);
 
-    expect(options.dialogOptions["adv-reminder"].messages).toStrictEqual(["first", "second"]);
+    expect(options.options["adv-reminder"].messages).toStrictEqual(["first", "second"]);
   });
 });
 
@@ -554,7 +554,7 @@ describe("DeathSaveMessage no legit active effects", () => {
 
     new DeathSaveMessage(actor).addMessage(options);
 
-    expect(options.dialogOptions).toBeUndefined();
+    expect(options.options).toBeUndefined();
   });
 });
 
@@ -565,7 +565,7 @@ describe("DeathSaveMessage message flags", () => {
 
     new DeathSaveMessage(actor).addMessage(options);
 
-    expect(options.dialogOptions["adv-reminder"].messages).toStrictEqual(["message.all message"]);
+    expect(options.options["adv-reminder"].messages).toStrictEqual(["message.all message"]);
   });
 
   test("death save with message.ability.all flag should add the message", () => {
@@ -577,7 +577,7 @@ describe("DeathSaveMessage message flags", () => {
 
     new DeathSaveMessage(actor).addMessage(options);
 
-    expect(options.dialogOptions["adv-reminder"].messages).toStrictEqual([
+    expect(options.options["adv-reminder"].messages).toStrictEqual([
       "message.ability.all message",
     ]);
   });
@@ -591,7 +591,7 @@ describe("DeathSaveMessage message flags", () => {
 
     new DeathSaveMessage(actor).addMessage(options);
 
-    expect(options.dialogOptions["adv-reminder"].messages).toStrictEqual([
+    expect(options.options["adv-reminder"].messages).toStrictEqual([
       "message.ability.save.all message",
     ]);
   });
@@ -605,7 +605,7 @@ describe("DeathSaveMessage message flags", () => {
 
     new DeathSaveMessage(actor).addMessage(options);
 
-    expect(options.dialogOptions["adv-reminder"].messages).toStrictEqual([
+    expect(options.options["adv-reminder"].messages).toStrictEqual([
       "message.deathSave message",
     ]);
   });
@@ -619,7 +619,7 @@ describe("DeathSaveMessage message flags", () => {
 
     new DeathSaveMessage(actor).addMessage(options);
 
-    expect(options.dialogOptions["adv-reminder"].messages).toStrictEqual(["first", "second"]);
+    expect(options.options["adv-reminder"].messages).toStrictEqual(["first", "second"]);
   });
 });
 
@@ -631,7 +631,7 @@ describe("DamageMessage no legit active effects", () => {
 
     new DamageMessage(actor, undefined, item).addMessage(options);
 
-    expect(options.dialogOptions).toBeUndefined();
+    expect(options.options).toBeUndefined();
   });
 });
 
@@ -643,7 +643,7 @@ describe("DamageMessage message flags", () => {
 
     new DamageMessage(actor, undefined, item).addMessage(options);
 
-    expect(options.dialogOptions["adv-reminder"].messages).toStrictEqual(["message.all message"]);
+    expect(options.options["adv-reminder"].messages).toStrictEqual(["message.all message"]);
   });
 
   test("damage with message.damage.all flag should add the message", () => {
@@ -656,7 +656,7 @@ describe("DamageMessage message flags", () => {
 
     new DamageMessage(actor, undefined, item).addMessage(options);
 
-    expect(options.dialogOptions["adv-reminder"].messages).toStrictEqual([
+    expect(options.options["adv-reminder"].messages).toStrictEqual([
       "message.damage.all message",
     ]);
   });
@@ -671,7 +671,7 @@ describe("DamageMessage message flags", () => {
 
     new DamageMessage(actor, undefined, item).addMessage(options);
 
-    expect(options.dialogOptions["adv-reminder"].messages).toStrictEqual([
+    expect(options.options["adv-reminder"].messages).toStrictEqual([
       "message.damage.mwak message",
     ]);
   });
@@ -686,7 +686,7 @@ describe("DamageMessage message flags", () => {
 
     new DamageMessage(actor, undefined, item).addMessage(options);
 
-    expect(options.dialogOptions).toBeUndefined();
+    expect(options.options).toBeUndefined();
   });
 
   test("damage with two messages should add both messages", () => {
@@ -699,7 +699,7 @@ describe("DamageMessage message flags", () => {
 
     new DamageMessage(actor, undefined, item).addMessage(options);
 
-    expect(options.dialogOptions["adv-reminder"].messages).toStrictEqual(["first", "second"]);
+    expect(options.options["adv-reminder"].messages).toStrictEqual(["first", "second"]);
   });
 });
 
@@ -715,7 +715,7 @@ describe("DamageMessage from target", () => {
 
     new DamageMessage(actor, target, item).addMessage(options);
 
-    expect(options.dialogOptions["adv-reminder"].messages).toStrictEqual([
+    expect(options.options["adv-reminder"].messages).toStrictEqual([
       "message.damage.all message",
     ]);
   });
@@ -731,7 +731,7 @@ describe("DamageMessage from target", () => {
 
     new DamageMessage(actor, target, item).addMessage(options);
 
-    expect(options.dialogOptions["adv-reminder"].messages).toStrictEqual([
+    expect(options.options["adv-reminder"].messages).toStrictEqual([
       "message.damage.mwak message",
     ]);
   });
@@ -747,7 +747,7 @@ describe("DamageMessage from target", () => {
 
     new DamageMessage(actor, target, item).addMessage(options);
 
-    expect(options.dialogOptions).toBeUndefined();
+    expect(options.options).toBeUndefined();
   });
 
   test("damage with two messages should add both messages", () => {
@@ -761,6 +761,6 @@ describe("DamageMessage from target", () => {
 
     new DamageMessage(actor, target, item).addMessage(options);
 
-    expect(options.dialogOptions["adv-reminder"].messages).toStrictEqual(["first", "second"]);
+    expect(options.options["adv-reminder"].messages).toStrictEqual(["first", "second"]);
   });
 });

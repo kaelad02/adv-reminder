@@ -27,7 +27,7 @@ class BaseMessage {
   }
 
   get prefix() {
-    return "dialogOptions";
+    return "options";
   }
 
   addMessage(options) {
