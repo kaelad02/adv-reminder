@@ -1,3 +1,8 @@
+# TODO
+
+- bug fix: Fix the auto-fail message
+- feature: Remove sw5e support
+
 # 4.2.2
 
 - bug fix: [#84](https://github.com/kaelad02/adv-reminder/issues/84) Adding messages could push the roll dialog off the screen

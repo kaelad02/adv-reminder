@@ -54,10 +54,6 @@ const SourceMixin = (superclass) =>
       );
     }
 
-    get _prefix() {
-      return "options";
-    }
-
     _accumulator() {
       const advantageLabels = [];
       const disadvantageLabels = [];
@@ -91,8 +87,8 @@ const SourceMixin = (superclass) =>
               foundry.utils.setProperty(options, key, newLabels);
             }
           };
-          merge(advantageLabels, `${this._prefix}.adv-reminder.advantageLabels`);
-          merge(disadvantageLabels, `${this._prefix}.adv-reminder.disadvantageLabels`);
+          merge(advantageLabels, "options.adv-reminder.advantageLabels");
+          merge(disadvantageLabels, "options.adv-reminder.disadvantageLabels");
         },
       };
     }
@@ -101,9 +97,6 @@ const SourceMixin = (superclass) =>
 export class AttackSource extends SourceMixin(AttackReminder) {}
 
 export class AttackSourceV2 extends SourceMixin(AttackReminderV2) {
-  get _prefix() {
-    return "options";
-  }
 }
 
 export class AbilitySaveSource extends SourceMixin(AbilitySaveReminder) {}
@@ -181,10 +174,6 @@ export class CriticalSource extends SourceMixin(CriticalReminder) {
 }
 
 export class CriticalSourceV2 extends SourceMixin(CriticalReminderV2) {
-  get _prefix() {
-    return "options";
-  }
-
   _adjustRange(distanceFn, grantsCriticalRange) {
     // check if the range applies, remove flag if not
     if ("grants.critical.range" in this.targetFlags) {
@@ -218,8 +207,8 @@ export class CriticalSourceV2 extends SourceMixin(CriticalReminderV2) {
             foundry.utils.setProperty(options, key, newLabels);
           }
         };
-        merge(criticalLabels, `${this._prefix}.adv-reminder.criticalLabels`);
-        merge(normalLabels, `${this._prefix}.adv-reminder.normalLabels`);
+        merge(criticalLabels, "options.adv-reminder.criticalLabels");
+        merge(normalLabels, "options.adv-reminder.normalLabels");
       },
     };
   }

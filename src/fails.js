@@ -26,10 +26,10 @@ class BaseFail {
 
   /**
    * Check for auto-fail flags to see if this roll should fail.
-   * @param {object} options the roll options
+   * @param {object} message the message configuration
    * @returns true if the roll should fail, false if it may continue
    */
-  fails(options) {
+  fails(message) {
     debug("checking for fail flags for the roll");
 
     // get the active effect keys that will fail
@@ -41,26 +41,25 @@ class BaseFail {
       failKeys.reduce((accum, curr) => actorFlags[curr] || accum, false) ||
       this.actor.hasConditionEffect(this.failCondition);
     if (shouldFail) {
-      const messageData = this.createMessageData(options);
-      this.toMessage(messageData);
+      this.toMessage(message.data, message.rollMode);
     }
     return shouldFail;
   }
 
-  async toMessage(messageData) {
+  async toMessage(messageData, rollMode) {
     // content that immatates a die roll
     const content = await renderTemplate("modules/adv-reminder/templates/fail-dice-roll.hbs");
     // merge basic data with child's data
     const chatData = foundry.utils.mergeObject(
       {
         user: game.user.id,
-        type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+        type: CONST.CHAT_MESSAGE_STYLES.OTHER,
         content,
       },
       messageData
     );
     // apply the roll mode to adjust message visibility
-    ChatMessage.applyRollMode(chatData, game.settings.get("core", "rollMode"));
+    ChatMessage.applyRollMode(chatData, rollMode ?? game.settings.get("core", "rollMode"));
 
     // create the chat message
     return ChatMessage.create(chatData);
@@ -88,26 +87,7 @@ export class AbilitySaveFail extends BaseFail {
   get failCondition() {
     switch (this.abilityId) {
       case "dex": return "advReminderFailDexSave";
-      case "str": return "advReminderFailDexSave";
+      case "str": return "advReminderFailStrSave";
     }
-  }
-
-  createMessageData(options = {}) {
-    // build title, probably used as chat message flavor
-    const label = CONFIG.DND5E.abilities[this.abilityId];
-    const title = `${game.i18n.format("DND5E.SavePromptTitle", {
-      ability: label,
-    })}: ${this.actor.name}`;
-
-    // build chat message data
-    const messageData = foundry.utils.mergeObject(options.messageData || {}, {
-      speaker: options.speaker || ChatMessage.getSpeaker({ actor: this.actor }),
-      "flags.dnd5e.roll": { type: "save", abilityId: this.abilityId },
-    });
-
-    // pull flavor from a few places before falling back to title
-    messageData.flavor = messageData.flavor || options.flavor || title;
-
-    return messageData;
   }
 }
