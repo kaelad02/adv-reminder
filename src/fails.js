@@ -87,7 +87,7 @@ export class AbilitySaveFail extends BaseFail {
   get failCondition() {
     switch (this.abilityId) {
       case "dex": return "advReminderFailDexSave";
-      case "str": return "advReminderFailDexSave";
+      case "str": return "advReminderFailStrSave";
     }
   }
 }
