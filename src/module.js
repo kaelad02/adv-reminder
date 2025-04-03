@@ -109,40 +109,6 @@ Hooks.once("ready", () => {
   if (debugEnabled) window.samplePack = new SamplePackBuilder();
 });
 
-// Render dialog hook
-Hooks.on("renderDialog", async (dialog, html, data) => {
-  debug("renderDialog hook called");
-
-  const message = await prepareMessage(dialog.options);
-  if (message) {
-    // add message at the end
-    const formGroups = html.find("form:first .form-group:last");
-    formGroups.after(message);
-    // swap "inline-roll" class for "dialog-roll"
-    const inlineRolls = html.find("a.inline-roll");
-    if (inlineRolls) {
-      debug("found inline-roll", inlineRolls);
-      inlineRolls.removeClass("inline-roll");
-      inlineRolls.addClass("dialog-roll");
-    }
-    // add onClick for inline rolls
-    html.on("click", "a.dialog-roll", (event) => {
-      // get the formula from the button
-      const button = event.currentTarget;
-      const formula = button.dataset.formula;
-      debug("adding to input:", formula);
-      // add the formula to the bonus input
-      const dialogContent = button.closest(".dialog-content");
-      const input = dialogContent.querySelector('input[name="bonus"]');
-      input.value = !!input.value ? `${input.value} + ${formula}` : formula;
-    });
-    // reset dialog height
-    const position = dialog.position;
-    position.height = "auto";
-    dialog.setPosition(position);
-  }
-});
-
 // New roll dialog hook, as of dnd5e v4.0
 Hooks.on("renderRollConfigurationDialog", async (dialog, html) => {
   debug("renderRollConfigurationDialog hook called");
@@ -226,14 +192,3 @@ async function prepareMessage(dialogOptions) {
     return enriched;
   }
 }
-
-// set default button on Damage Roll dialog
-Hooks.on("renderDamageRollConfigurationDialog", (dialog, html) => {
-  debug("renderDamageRollConfigurationDialog hook called", dialog);
-
-  const isCritical = dialog.rolls[0]?.options?.isCritical;
-  const selector = `.dialog-buttons button[data-action="${isCritical ? "critical" : "normal"}"]`;
-  const button = html.querySelector(selector);
-  button.classList.add("default");
-  button.focus();
-});
