@@ -92,7 +92,7 @@ export default class CoreRollerHooks {
     const actor = config.subject;
     const abilityId = config.ability;
     const failChecker = new AbilitySaveFail(actor, abilityId);
-    if (failChecker.fails(config)) return false;
+    if (failChecker.fails(message)) return false;
 
     if (this.isFastForwarding(config, dialog)) return;
 
