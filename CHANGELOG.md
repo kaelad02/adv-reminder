@@ -1,6 +1,7 @@
 # 4.2.5
 
 - bug fix: Advantage not being passed on in a few cases that the system does it (e.g. initiative)
+- bug fix: [#99](https://github.com/kaelad02/adv-reminder/issues/99) Sample roll in settings not working
 
 # 4.2.4
 
