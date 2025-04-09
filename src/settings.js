@@ -178,7 +178,9 @@ class MessageColorSettings extends FormApplication {
     debug("_onTest called");
     event.preventDefault();
 
-    const rollConfig = { rolls: [{ parts: ["@mod", "@prof"], data: { mod: 3, prof: 2 } }] };
+    const rollConfig = {
+      rolls: [{ parts: ["@mod", "@prof"], data: { mod: 3, prof: 2 }, options: {} }],
+    };
     const dialogConfig = {
       options: { "adv-reminder": { messages: ["Conditional bonus [[/r +2]]"] } },
     };
