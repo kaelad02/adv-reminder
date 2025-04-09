@@ -134,7 +134,7 @@ export class AttackReminder extends BaseReminder {
       disConditions.push("advReminderDisadvantagePhysicalRolls");
 
     // find matching keys
-    const accumulator = this._accumulator();
+    const accumulator = this._accumulator(options);
     accumulator.add(this.actorFlags, advKeys, disKeys);
     accumulator.add(this.targetFlags, grantsAdvKeys, grantsDisKeys);
     // handle status effects
@@ -194,7 +194,7 @@ class AbilityBaseReminder extends BaseReminder {
     debug("advKeys", advKeys, "disKeys", disKeys);
 
     // find matching keys, status effects, and update options
-    const accumulator = options.isConcentration ? this._accumulator(options) : this._accumulator();
+    const accumulator = this._accumulator(options);
     accumulator.add(this.actorFlags, advKeys, disKeys);
     accumulator.fromConditions(this.actor, this.advantageConditions, this.disadvantageConditions);
     accumulator.update(options);
@@ -292,7 +292,7 @@ export class SkillReminder extends AbilityCheckReminder {
     debug("advKeys", advKeys, "disKeys", disKeys);
 
     // find matching keys and update options
-    const accumulator = this._accumulator();
+    const accumulator = this._accumulator(options);
     if (this.checkArmorStealth) {
       accumulator.disadvantage(this._armorStealthDisadvantage());
     }

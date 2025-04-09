@@ -1,3 +1,7 @@
+# 4.2.5
+
+- bug fix: Advantage not being passed on in a few cases that the system does it (e.g. initiative)
+
 # 4.2.4
 
 - bug fix: [#95](https://github.com/kaelad02/adv-reminder/issues/95) Default button is black when using player color
