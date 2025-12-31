@@ -1,10 +1,31 @@
 import { debug } from "./util.js";
+const { DataModel } = foundry.abstract;
+const { ColorField, SchemaField, StringField } = foundry.data.fields;
 
 export let showSources;
 
+const STYLES = {
+  default: "adv-reminder.DefaultButtonColor.None",
+  player: "adv-reminder.DefaultButtonColor.Player",
+  green: "adv-reminder.DefaultButtonColor.Green",
+  custom: "adv-reminder.DefaultButtonColor.Custom",
+};
+
+class ButtonStyle extends DataModel {
+  static defineSchema() {
+    return {
+      style: new StringField({ required: true, initial: "default", choices: STYLES, label: "TODO" }),
+      custom: new SchemaField({
+        buttonColor: new ColorField({ label: "TODO" }),
+        textColor: new ColorField({ label: "TODO" })
+      }, { label: "TODO" })
+    };
+  }
+}
+
 export function initSettings() {
   // Roll Dialog Colors
-  game.settings.registerMenu("adv-reminder", "colorMenu", {
+  game.settings.registerMenu("adv-reminder", "buttonStyle", {
     name: "adv-reminder.ColorMenu.Name",
     hint: "adv-reminder.ColorMenu.Hint",
     label: "adv-reminder.ColorMenu.Label",
@@ -12,6 +33,17 @@ export function initSettings() {
     type: MessageColorSettings,
     restricted: false
   });
+  game.settings.register("adv-reminder", "buttonStyle", {
+    name: "Button Style",
+    scope: "client",
+    config: false,
+    type: ButtonStyle,
+    //default: { style: "default", custom: { buttonColor: "", textColor: "" }},
+    default: {},
+    //onChange: () => i++ // TODO
+  });
+
+  // TODO remove the two below
   game.settings.register("adv-reminder", "defaultButtonColor", {
     name: "adv-reminder.DefaultButtonColor.Name",
     hint: "adv-reminder.DefaultButtonColor.Hint",
@@ -71,7 +103,43 @@ export function initSettings() {
     scope: "client",
     config: false,
   });
+
+  migrateSettings();
 };
+
+/**
+ * Migrate the old settings to the new settings.
+ */
+function migrateSettings() {
+  debug("migrateSettings called");
+
+  // functions to read old settings
+  const storage = game.settings.storage.get("client");
+  const get = (key) => {
+    const item = storage.getItem(`adv-reminder.${key}`);
+    return item ? new Setting({ key: `adv-reminder.${key}`, value: item }) : undefined;
+  };
+  const remove = (key) => storage.removeItem(`adv-reminder.${key}`);
+
+  const changes = {};
+
+  const defaultButtonColor = get("defaultButtonColor");
+  if (defaultButtonColor)
+    changes["style"] = defaultButtonColor.value === "none" ? "default" : defaultButtonColor.value;
+
+  const customColor = get("customColor");
+  if (customColor)
+    changes["custom.buttonColor"] = customColor.value;
+
+  if (!foundry.utils.isEmpty(changes)) {
+    const buttonStyle = game.settings.get("adv-reminder", "buttonStyle");
+    debug("migrating buttonStyle setting", buttonStyle, changes);
+    buttonStyle.updateSource(changes);
+    game.settings.set("adv-reminder", "buttonStyle", buttonStyle);
+    remove("defaultButtonColor");
+    remove("customColor");
+  }
+}
 
 export function applySettings() {
   // initialize the color variables
