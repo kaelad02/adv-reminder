@@ -1,6 +1,7 @@
 import { debug } from "./util.js";
 const { DataModel } = foundry.abstract;
 const { ColorField, SchemaField, StringField } = foundry.data.fields;
+const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
 export let showSources;
 
@@ -30,7 +31,7 @@ export function initSettings() {
     hint: "adv-reminder.ColorMenu.Hint",
     label: "adv-reminder.ColorMenu.Label",
     icon: "fas fa-palette",
-    type: MessageColorSettings,
+    type: ButtonStyleConfig,
     restricted: false
   });
   game.settings.register("adv-reminder", "buttonStyle", {
@@ -185,66 +186,128 @@ function setStyleVariables(option, customColor) {
  * An app to change the defaultButtonColor and customColor settings.
  * Includes a test button to show a sample roll dialog to see the color changes.
  */
-class MessageColorSettings extends FormApplication {
-  static get defaultOptions() {
-    return foundry.utils.mergeObject(super.defaultOptions, {
-      title: game.i18n.localize("adv-reminder.ColorMenu.Name"),
-      template: "modules/adv-reminder/templates/color-settings.hbs",
+class ButtonStyleConfig extends HandlebarsApplicationMixin(ApplicationV2) {
+  constructor(options={}) {
+    super(options);
+    this.#setting = options.setting ?? game.settings.get("adv-reminder", "buttonStyle");
+    debug("options", options);
+  }
+
+  static DEFAULT_OPTIONS = {
+    //tag: "form",
+    window: {
+      contentClasses: ["standard-form"],
+      contentTag: "form",
+      icon: "fas fa-palette",
+      title: "adv-reminder.ColorMenu.Name"
+    },
+    position: {
       width: 400,
-      height: "auto",
+      height: "auto"
+    },
+    form: {
+      handler: this.#onSubmitForm,
       closeOnSubmit: false,
-      submitOnChange: true,
-    });
-  }
+      submitOnChange: true
+    },
+    actions: {
+      test: this.#test
+    },
+  };
 
-  getData() {
-    const defaultButtonColor = game.settings.settings.get("adv-reminder.defaultButtonColor");
-    const customColor = game.settings.settings.get("adv-reminder.customColor");
-
-    return {
-      defaultButtonColor: {
-        name: defaultButtonColor.name,
-        hint: defaultButtonColor.hint,
-        choices: defaultButtonColor.choices,
-        value: game.settings.get("adv-reminder", "defaultButtonColor"),
-      },
-      customColor: {
-        name: customColor.name,
-        hint: customColor.hint,
-        value: game.settings.get("adv-reminder", "customColor"),
-      },
-    };
-  }
-
-  activateListeners(html) {
-    super.activateListeners(html);
-
-    // set listener on select to enable/disable custom color
-    html.find('select[name="defaultButtonColor"]').change(this._onChangeSelect.bind(this));
-    // Enable or disable the custom color settings based on the current setting
-    const defaultButtonColor = game.settings.get("adv-reminder", "defaultButtonColor");
-    this._setCustomEnabled(defaultButtonColor);
-    // test button
-    html.find('button[type="test"]').click(this._onTest.bind(this));
-  }
-
-  async _onChangeSelect(event) {
-    event.preventDefault();
-    this._setCustomEnabled(event.currentTarget.value);
-  }
-
-  _setCustomEnabled(value) {
-    const section = this.element.find("div.adv-reminder-customColor");
-    if (section) {
-      const enabled = value === "custom";
-      section.css("opacity", enabled ? 1.0 : 0.5);
-      section.find("input").prop("disabled", !enabled);
+  static PARTS = {
+    form: {
+      template: "templates/generic/form-fields.hbs"
+    },
+    footer: {
+      template: "templates/generic/form-footer.hbs"
     }
   }
 
-  async _onTest(event) {
-    debug("_onTest called");
-    event.preventDefault();
+  get setting() {
+    return this.#setting;
+  }
+  #setting;
+
+  async _preparePartContext(partId, context) {
+    switch (partId) {
+      case "form":
+        context.fields = this._getFields();
+        break;
+      case "footer":
+        context.buttons = [
+          { type: "button", action: "test", icon: "fas fa-eye", label: "adv-reminder.ColorMenu.Test" }
+        ];
+        break;
+    }
+    return context;
+  }
+
+  _getFields() {
+    const setting = this.setting;
+    const source = setting._source;
+    const fields = setting.schema.fields;
+
+    return [
+      // Style
+      {
+        outer: { field: fields.style, value: source.style }
+      },
+      // Custom
+      {
+        fieldset: true,
+        legend: fields.custom.label,
+        fields: Object.values(fields.custom.fields).map(field => {
+          const value = foundry.utils.getProperty(source, `custom.${field.name}`);
+          return { field, value };
+        })
+      }
+    ];
+  }
+
+  /**
+   * Workaround for "tag: form" not working correctly, use a "contentTag: form" instead but register listeners here.
+   * TODO remove in v13
+   */
+  _attachFrameListeners() {
+    super._attachFrameListeners();
+
+    const form = this.element.querySelector(".window-content");
+    form.addEventListener("submit", this._onSubmitForm.bind(this, this.options.form));
+    form.addEventListener("change", this._onChangeForm.bind(this, this.options.form));
+  }
+
+  _onRender(context, options) {
+    super._onRender(context, options);
+
+    // set initial state of custom section
+    // TODO in v13, use this.form instead
+    const form = this.element.querySelector(".window-content");
+    this._setCustomEnabled(form);
+  }
+
+  _setCustomEnabled(form) {
+    const style = form.querySelector('select[name="style"]');
+    const disabled = style.value !== "custom";
+
+    const fieldset = form.querySelector("fieldset");
+    if (disabled) fieldset.style.opacity = 0.5;
+    else fieldset.style.removeProperty("opacity");
+    fieldset.disabled = disabled;
+  }
+
+  static async #onSubmitForm(event, form, formData){
+    debug("submitting form", form, formData);
+
+    // update state of custom section
+    this._setCustomEnabled(form);
+    // save setting changes
+    this.setting.updateSource(formData.object);
+    game.settings.set("adv-reminder", "buttonStyle", this.setting);
+  }
+
+  static async #test(event, target) {
+    debug("test", event, target);
 
     const rollConfig = {
       rolls: [{ parts: ["@mod", "@prof"], data: { mod: 3, prof: 2 }, options: {} }],
@@ -254,13 +317,5 @@ class MessageColorSettings extends FormApplication {
     };
     const messageConfig = { create: false };
     CONFIG.Dice.D20Roll.build(rollConfig, dialogConfig, messageConfig);
-  }
-
-  async _updateObject(event, formData) {
-    debug("_updateObject called with formData:", formData);
-    if (formData.defaultButtonColor)
-      await game.settings.set("adv-reminder", "defaultButtonColor", formData.defaultButtonColor);
-    if (formData.customColor)
-      await game.settings.set("adv-reminder", "customColor", formData.customColor);
   }
 }
