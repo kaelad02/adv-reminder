@@ -46,40 +46,6 @@ export function initSettings() {
     onChange: updateStyle
   });
 
-  // TODO remove the two below
-  game.settings.register("adv-reminder", "defaultButtonColor", {
-    name: "adv-reminder.DefaultButtonColor.Name",
-    hint: "adv-reminder.DefaultButtonColor.Hint",
-    scope: "client",
-    config: false,
-    type: String,
-    choices: {
-      none: "adv-reminder.DefaultButtonColor.None",
-      player: "adv-reminder.DefaultButtonColor.Player",
-      green: "adv-reminder.DefaultButtonColor.Green",
-      custom: "adv-reminder.DefaultButtonColor.Custom",
-    },
-    default: "none",
-    onChange: (option) =>
-      setStyleVariables(
-        option,
-        game.settings.get("adv-reminder", "customColor")
-      ),
-  });
-  game.settings.register("adv-reminder", "customColor", {
-    name: "adv-reminder.CustomColor.Name",
-    hint: "adv-reminder.CustomColor.Hint",
-    scope: "client",
-    config: false,
-    type: String,
-    default: "#000000",
-    onChange: (customColor) =>
-      setStyleVariables(
-        game.settings.get("adv-reminder", "defaultButtonColor"),
-        customColor
-      ),
-  });
-
   game.settings.register("adv-reminder", "showSources", {
     name: "adv-reminder.ShowSources.Name",
     hint: "adv-reminder.ShowSources.Hint",
@@ -102,7 +68,7 @@ export function initSettings() {
 
   // Hidden debugMode setting
   game.settings.register("adv-reminder", "debugMode", {
-    type: new foundry.data.fields.BooleanField({ required: true, initial: false }),
+    type: new BooleanField({ required: true, initial: false }),
     scope: "client",
     config: false,
   });
@@ -177,39 +143,9 @@ function updateStyle(buttonStyle) {
   setStyle("--adv-reminder-background-color", background ?? "inherit");
 }
 
-function setStyleVariables(option, customColor) {
-  debug("setStyleVariables called");
-
-  // set color variables based on the option
-  var varColor, varBackground;
-  const setColorVars = (color) => {
-    varColor = color;
-    varBackground = Color.from(color).add(0.4).toString();
-  };
-  switch (option) {
-    case "none":
-      // don't change colors
-      return;
-    case "player":
-      setColorVars(game.user.color);
-      break;
-    case "green":
-      setColorVars("#008000");
-      break;
-    case "custom":
-      setColorVars(customColor);
-      break;
-  }
-
-  const root = document.querySelector(":root");
-  const setStyle = (varName, value) => root.style.setProperty(varName, value);
-  setStyle("--adv-reminder-color", varColor);
-  setStyle("--adv-reminder-background-color", varBackground);
-}
-
 /**
- * An app to change the defaultButtonColor and customColor settings.
- * Includes a test button to show a sample roll dialog to see the color changes.
+ * An app to change the buttonStyle setting.
+ * Includes a test button to show a sample roll dialog to see the style changes.
  */
 class ButtonStyleConfig extends HandlebarsApplicationMixin(ApplicationV2) {
   constructor(options={}) {
