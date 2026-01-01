@@ -1,4 +1,5 @@
 import { debug } from "./util.js";
+
 const { DataModel } = foundry.abstract;
 const { BooleanField, ColorField, SchemaField, StringField } = foundry.data.fields;
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
@@ -74,7 +75,7 @@ export function initSettings() {
   });
 
   migrateSettings();
-};
+}
 
 /**
  * Migrate the old settings to the new settings.
@@ -115,7 +116,7 @@ export function applySettings() {
   updateStyle(game.settings.get("adv-reminder", "buttonStyle"));
 
   showSources = game.settings.get("adv-reminder", "showSources");
-};
+}
 
 function updateStyle(buttonStyle) {
   debug("update style called", buttonStyle);
