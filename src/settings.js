@@ -43,7 +43,7 @@ export function initSettings() {
     config: false,
     type: ButtonStyle,
     default: {},
-    //onChange: () => i++ // TODO
+    onChange: updateStyle
   });
 
   // TODO remove the two below
@@ -146,13 +146,36 @@ function migrateSettings() {
 
 export function applySettings() {
   // initialize the color variables
-  setStyleVariables(
-    game.settings.get("adv-reminder", "defaultButtonColor"),
-    game.settings.get("adv-reminder", "customColor")
-  );
+  updateStyle(game.settings.get("adv-reminder", "buttonStyle"));
 
   showSources = game.settings.get("adv-reminder", "showSources");
 };
+
+function updateStyle(buttonStyle) {
+  debug("update style called", buttonStyle);
+
+  let color, background;
+  switch (buttonStyle.color) {
+    case "default":
+      break;
+    case "player":
+      background = game.user.color;
+      break;
+    case "green":
+      background = "#008000";
+      break;
+    case "custom":
+      background = buttonStyle.custom.buttonColor;
+      color = buttonStyle.custom.textColor;
+      break;
+  }
+  debug("setStyle with", color, background);
+
+  const root = document.querySelector(":root");
+  const setStyle = (property, value) => root.style.setProperty(property, value);
+  setStyle("--adv-reminder-color", color ?? "inherit");
+  setStyle("--adv-reminder-background-color", background ?? "inherit");
+}
 
 function setStyleVariables(option, customColor) {
   debug("setStyleVariables called");
