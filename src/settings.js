@@ -1,27 +1,30 @@
 import { debug } from "./util.js";
 const { DataModel } = foundry.abstract;
-const { ColorField, SchemaField, StringField } = foundry.data.fields;
+const { BooleanField, ColorField, SchemaField, StringField } = foundry.data.fields;
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
 export let showSources;
 
-const STYLES = {
-  default: "adv-reminder.DefaultButtonColor.None",
-  player: "adv-reminder.DefaultButtonColor.Player",
-  green: "adv-reminder.DefaultButtonColor.Green",
-  custom: "adv-reminder.DefaultButtonColor.Custom",
+const COLORS = {
+  default: "adv-reminder.ButtonStyle.COLORS.default.label",
+  player: "adv-reminder.ButtonStyle.COLORS.player.label",
+  green: "adv-reminder.ButtonStyle.COLORS.green.label",
+  custom: "adv-reminder.ButtonStyle.COLORS.custom.label",
 };
 
-class ButtonStyle extends DataModel {
+export class ButtonStyle extends DataModel {
   static defineSchema() {
     return {
-      style: new StringField({ required: true, initial: "default", choices: STYLES, label: "TODO" }),
+      wide: new BooleanField({ required: true, initial: false }),
+      color: new StringField({ required: true, initial: "default", choices: COLORS }),
       custom: new SchemaField({
-        buttonColor: new ColorField({ label: "TODO" }),
-        textColor: new ColorField({ label: "TODO" })
-      }, { label: "TODO" })
+        buttonColor: new ColorField({ required: true, initial: "#000000" }),
+        textColor: new ColorField()
+      })
     };
   }
+
+  static LOCALIZATION_PREFIXES = ["adv-reminder.ButtonStyle"];
 }
 
 export function initSettings() {
@@ -39,7 +42,6 @@ export function initSettings() {
     scope: "client",
     config: false,
     type: ButtonStyle,
-    //default: { style: "default", custom: { buttonColor: "", textColor: "" }},
     default: {},
     //onChange: () => i++ // TODO
   });
@@ -126,7 +128,7 @@ function migrateSettings() {
 
   const defaultButtonColor = get("defaultButtonColor");
   if (defaultButtonColor)
-    changes["style"] = defaultButtonColor.value === "none" ? "default" : defaultButtonColor.value;
+    changes["color"] = defaultButtonColor.value === "none" ? "default" : defaultButtonColor.value;
 
   const customColor = get("customColor");
   if (customColor)
@@ -199,10 +201,10 @@ class ButtonStyleConfig extends HandlebarsApplicationMixin(ApplicationV2) {
       contentClasses: ["standard-form"],
       contentTag: "form",
       icon: "fas fa-palette",
-      title: "adv-reminder.ColorMenu.Name"
+      title: "adv-reminder.ColorMenu.Label"
     },
     position: {
-      width: 400,
+      width: 480,
       height: "auto"
     },
     form: {
@@ -249,9 +251,13 @@ class ButtonStyleConfig extends HandlebarsApplicationMixin(ApplicationV2) {
     const fields = setting.schema.fields;
 
     return [
+      // Widen
+      {
+        outer: { field: fields.wide, value: source.wide }
+      },
       // Style
       {
-        outer: { field: fields.style, value: source.style }
+        outer: { field: fields.color, value: source.color }
       },
       // Custom
       {
@@ -287,8 +293,8 @@ class ButtonStyleConfig extends HandlebarsApplicationMixin(ApplicationV2) {
   }
 
   _setCustomEnabled(form) {
-    const style = form.querySelector('select[name="style"]');
-    const disabled = style.value !== "custom";
+    const color = form.querySelector('select[name="color"]');
+    const disabled = color.value !== "custom";
 
     const fieldset = form.querySelector("fieldset");
     if (disabled) fieldset.style.opacity = 0.5;

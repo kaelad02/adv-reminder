@@ -7,6 +7,43 @@
     "Label": "Configure Colors",
     "Test": "Show Sample Roll"
   },
+  "adv-reminder.ButtonStyle": {
+    "FIELDS": {
+      "wide": {
+        "label": "Widen Default Button",
+        "hint": "Make the default button wider to emphasize which button to click."
+      },
+      "color": {
+        "label": "Default Button Color",
+        "hint": "Changes the color of the default button on roll dialogs."
+      },
+      "custom": {
+        "label": "Custom Colors",
+        "buttonColor": {
+          "label": "Button Color",
+          "hint": "The background color of the default button."
+        },
+        "textColor": {
+          "label": "Text Color",
+          "hint": "The text color of the default button. Leave blank to not change it."
+        }
+      }
+    },
+    "COLORS": {
+      "default": {
+        "label": "Default"
+      },
+      "player": {
+        "label": "Player Color"
+      },
+      "green": {
+        "label": "Green"
+      },
+      "custom": {
+        "label": "Custom Color"
+      }
+    }
+  },
   "adv-reminder.DefaultButtonColor": {
     "Name": "Default button color",
     "Hint": "Colors the text and tints the background of the buttons and messages.",

@@ -2,7 +2,7 @@ import CoreRollerHooks from "./rollers/core.js";
 import MidiRollerHooks from "./rollers/midi.js";
 import ReadySetRollHooks from "./rollers/rsr.js";
 import SamplePackBuilder from "./sample-pack.js";
-import { applySettings, initSettings } from "./settings.js";
+import { applySettings, ButtonStyle, initSettings } from "./settings.js";
 import { debug, debugEnabled, log } from "./util.js";
 
 const CIRCLE_INFO = `<i class="fa-solid fa-circle-info"></i> `;
@@ -41,6 +41,10 @@ function applyMidiCustom(actor, change) {
     else foundry.utils.setProperty(actor, change.key, change.value);
   }
 }
+
+Hooks.once("i18nInit", () => {
+  Localization.localizeDataModel(ButtonStyle);
+});
 
 Hooks.once("setup", () => {
   applySettings();
