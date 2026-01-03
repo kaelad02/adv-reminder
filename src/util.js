@@ -45,7 +45,7 @@ export function getDistanceToTargetFn(speaker) {
     const distances = canvas.grid
       .measureDistances(rays, { gridSpaces: true })
       .map((d) => Math.round(d / dist) * dist);
-    const horizDistance = Math.min(distances);
+    const horizDistance = Math.min(...distances);
 
     // compute vertical distance: diff in elevation
     const verticalDistance = Math.abs(controlledTokenDoc.elevation - targetTokenDoc.elevation);

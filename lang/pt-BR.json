@@ -7,17 +7,42 @@
     "Label": "Configurar Cores",
     "Test": "Mostrar Amostra de Rolagem"
   },
-  "adv-reminder.DefaultButtonColor": {
-    "Name": "Cor Padrão do Botão",
-    "Hint": "Colore o texto e tinge o fundo dos botões e mensagens.",
-    "None": "Sem mudança de cor",
-    "Player": "Cor do jogador",
-    "Green": "Verde",
-    "Custom": "Cor personalizada"
-  },
-  "adv-reminder.CustomColor": {
-    "Name": "Cor Personalizada",
-    "Hint": "Cores escuras funcionam melhor do que cores claras."
+  "adv-reminder.ButtonStyle": {
+    "FIELDS": {
+      "wide": {
+        "label": "Ampliar botão padrão",
+        "hint": "Aumente a largura do botão padrão para enfatizar qual botão deve ser clicado."
+      },
+      "color": {
+        "label": "Cor Padrão do Botão",
+        "hint": "Altera a cor do botão padrão nas caixas de diálogo de rolagem."
+      },
+      "custom": {
+        "label": "Cores Personalizadas",
+        "buttonColor": {
+          "label": "Cor do botão",
+          "hint": "A cor de fundo do botão padrão."
+        },
+        "textColor": {
+          "label": "Cor do texto",
+          "hint": "A cor do texto do botão padrão. Deixe em branco para não alterá-la."
+        }
+      }
+    },
+    "COLORS": {
+      "default": {
+        "label": "Padrão"
+      },
+      "player": {
+        "label": "Cor do jogador"
+      },
+      "green": {
+        "label": "Verde"
+      },
+      "custom": {
+        "label": "Cor Personalizada"
+      }
+    }
   },
   "adv-reminder.ShowSources": {
     "Name": "Mostrar fonte de Vant/Desv/Crít",
