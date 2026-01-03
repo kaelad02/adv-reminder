@@ -316,6 +316,16 @@ export class SkillReminder extends AbilityCheckReminder {
   }
 }
 
+export class InitiativeReminder extends AbilityCheckReminder {
+  get advantageConditions() {
+    return super.advantageConditions.concat("advReminderAdvantageInitiative");
+  }
+
+  get disadvantageConditions() {
+    return super.disadvantageConditions.concat("advReminderDisadvantageInitiative");
+  }
+}
+
 export class DeathSaveReminder extends AbilityBaseReminder {
   constructor(actor) {
     super(actor, null);

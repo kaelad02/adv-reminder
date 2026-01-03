@@ -6,6 +6,7 @@ import {
   ConcentrationMessage,
   DamageMessageV2,
   DeathSaveMessage,
+  InitiativeMessage,
   SkillMessage,
 } from "../messages.js";
 import {
@@ -15,6 +16,7 @@ import {
   CriticalReminderV2,
   DeathSaveReminder,
   SkillReminder,
+  InitiativeReminder,
 } from "../reminders.js";
 import {
   AbilityCheckSource,
@@ -23,6 +25,7 @@ import {
   ConcentrationSource,
   CriticalSourceV2,
   DeathSaveSource,
+  InitiativeSource,
   SkillSource,
 } from "../sources.js";
 import { showSources } from "../settings.js";
@@ -57,6 +60,7 @@ export default class CoreRollerHooks {
     Hooks.on("dnd5e.preRollConcentrationV2", this.preRollConcentrationV2.bind(this));
     Hooks.on("dnd5e.preRollAbilityCheckV2", this.preRollAbilityCheckV2.bind(this));
     Hooks.on("dnd5e.preRollSkillV2", this.preRollSkillV2.bind(this));
+    Hooks.on("dnd5e.preRollInitiativeDialogV2", this.preRollInitiativeDialogV2.bind(this));
     Hooks.on("dnd5e.preRollDeathSaveV2", this.preRollDeathSaveV2.bind(this));
     Hooks.on("dnd5e.preRollDamageV2", this.preRollDamageV2.bind(this));
   }
@@ -147,6 +151,22 @@ export default class CoreRollerHooks {
     new SkillMessage(actor, ability, skillId).addMessage(dialog);
     if (showSources) new SkillSource(actor, ability, skillId, true).updateOptions(dialog);
     new SkillReminder(actor, ability, skillId, this.checkArmorStealth).updateOptions(config.rolls[0].options);
+  }
+
+  preRollInitiativeDialogV2(config, dialog, message) {
+    debug("preRollInitiativeDialogV2 hook called");
+
+    // check if we've already processed this roll
+    if (config[CoreRollerHooks.PROCESSED_PROP]) return;
+    config[CoreRollerHooks.PROCESSED_PROP] = true;
+
+    if (this.isFastForwarding(config, dialog)) return;
+
+    const actor = config.subject;
+    const abilityId = actor.system.attributes?.init?.ability || CONFIG.DND5E.defaultAbilities.initiative;
+    new InitiativeMessage(actor, abilityId).addMessage(dialog);
+    if (showSources) new InitiativeSource(actor, abilityId).updateOptions(dialog);
+    new InitiativeReminder(actor, abilityId).updateOptions(config.rolls[0].options);
   }
 
   preRollDeathSaveV2(config, dialog, message) {

@@ -150,6 +150,13 @@ export class SkillMessage extends AbilityCheckMessage {
   }
 }
 
+export class InitiativeMessage extends AbilityBaseMessage {
+  /** @override */
+  get messageKeys() {
+    return super.messageKeys.concat("flags.adv-reminder.message.initiative");
+  }
+}
+
 export class DeathSaveMessage extends AbilityBaseMessage {
   constructor(actor) {
     super(actor, null);
