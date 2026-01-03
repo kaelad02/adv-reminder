@@ -101,27 +101,25 @@ export class AttackSourceV2 extends SourceMixin(AttackReminderV2) {
 
 export class AbilitySaveSource extends SourceMixin(AbilitySaveReminder) {}
 
-export class ConcentrationSource extends SourceMixin(Object) {
-  constructor(actor, abilityId) {
-    super();
-
-    /** @type {Actor5e*} */
-    this.actor = actor;
-    /** @type {string} */
-    this.abilityId = abilityId;
-  }
-
+export class ConcentrationSource extends SourceMixin(AbilitySaveReminder) {
   updateOptions(options) {
     this._message();
 
+    // get the active effect keys applicable for this roll
+    const advKeys = this.advantageKeys;
+    const disKeys = this.disadvantageKeys;
+    debug("advKeys", advKeys, "disKeys", disKeys);
     const rollModes = {
       "system.attributes.concentration.roll.mode": ["DND5E.Concentration"]
     };
 
-    // check Concentration's roll mode to look for advantage/disadvantage
     const accumulator = this._accumulator();
+    // check Concentration's roll mode to look for advantage/disadvantage
     this._applyRollModes(accumulator, rollModes);
     this._applyRollModeEffects(accumulator, rollModes);
+    // normal checks
+    accumulator.add(this.actorFlags, advKeys, disKeys);
+    accumulator.fromConditions(this.actor, this.advantageConditions, this.disadvantageConditions);
     accumulator.update(options);
   }
 

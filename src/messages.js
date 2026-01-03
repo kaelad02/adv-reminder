@@ -125,11 +125,10 @@ export class AbilitySaveMessage extends AbilityBaseMessage {
   }
 }
 
-export class ConcentrationMessage extends AbilityBaseMessage {
+export class ConcentrationMessage extends AbilitySaveMessage {
   /** @override */
   get messageKeys() {
-    // don't call super since the system will trigger a saving throw
-    return ["flags.adv-reminder.message.ability.concentration"];
+    return super.messageKeys.concat("flags.adv-reminder.message.ability.concentration");
   }
 }
 

@@ -111,9 +111,10 @@ export default class CoreRollerHooks {
     if (this.isFastForwarding(config, dialog)) return;
 
     const actor = config.subject;
-    new ConcentrationMessage(actor, config.ability).addMessage(dialog);
-    if (showSources) new ConcentrationSource(actor, config.ability).updateOptions(dialog);
-    // don't need a reminder, the system will set advantage/disadvantage
+    let abilityId = config.ability;
+    new ConcentrationMessage(actor, abilityId).addMessage(dialog);
+    if (showSources) new ConcentrationSource(actor, abilityId).updateOptions(dialog);
+    new AbilitySaveReminder(actor, abilityId).updateOptions(config.rolls[0].options);
   }
 
   preRollAbilityCheckV2(config, dialog, message) {
