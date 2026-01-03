@@ -6,6 +6,7 @@ import {
   ConcentrationMessage,
   DamageMessageV2,
   DeathSaveMessage,
+  InitiativeMessage,
   SkillMessage,
 } from "../messages.js";
 import {
@@ -15,6 +16,7 @@ import {
   CriticalReminderV2,
   DeathSaveReminder,
   SkillReminder,
+  InitiativeReminder,
 } from "../reminders.js";
 import {
   AbilityCheckSource,
@@ -23,6 +25,7 @@ import {
   ConcentrationSource,
   CriticalSourceV2,
   DeathSaveSource,
+  InitiativeSource,
   SkillSource,
 } from "../sources.js";
 import { showSources } from "../settings.js";
@@ -125,6 +128,24 @@ export default class ReadySetRollHooks extends CoreRollerHooks {
 
     if (this._doReminder(config))
       new SkillReminder(actor, ability, skillId, this.checkArmorStealth).updateOptions(config.rolls[0].options);
+  }
+
+  preRollInitiativeDialogV2(config, dialog, message) {
+    debug("preRollInitiativeDialogV2 hook called");
+
+    // check if we've already processed this roll
+    if (config[CoreRollerHooks.PROCESSED_PROP]) return;
+    config[CoreRollerHooks.PROCESSED_PROP] = true;
+
+    const actor = config.subject;
+    const abilityId = actor.system.attributes?.init?.ability || CONFIG.DND5E.defaultAbilities.initiative;
+    if (this._doMessages(config)) {
+      new InitiativeMessage(actor, abilityId).addMessage(dialog);
+      if (showSources) new InitiativeSource(actor, abilityId).updateOptions(dialog);
+    }
+
+    if (this._doReminder(config))
+      new InitiativeReminder(actor, abilityId).updateOptions(config.rolls[0].options);
   }
 
   preRollDeathSaveV2(config, dialog, message) {
