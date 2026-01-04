@@ -102,28 +102,68 @@ export class AttackSourceV2 extends SourceMixin(AttackReminderV2) {
 
 export class AbilitySaveSource extends SourceMixin(AbilitySaveReminder) {}
 
-export class ConcentrationSource extends SourceMixin(Object) {
-  constructor(actor, abilityId) {
-    super();
-    
-    /** @type {object} */
-    this.conc = actor.system.attributes?.concentration;
-    /** @type {string} */
-    this.abilityId = abilityId;
-  }
-
+export class ConcentrationSource extends SourceMixin(AbilitySaveReminder) {
   updateOptions(options) {
     this._message();
 
-    const modes = CONFIG.Dice.D20Roll.ADV_MODE;
-    const source = () =>
-      game.i18n.localize("DND5E.Concentration") + " " + game.i18n.localize("DND5E.AdvantageMode");
+    // get the active effect keys applicable for this roll
+    const advKeys = this.advantageKeys;
+    const disKeys = this.disadvantageKeys;
+    debug("advKeys", advKeys, "disKeys", disKeys);
+    const rollModes = {
+      "system.attributes.concentration.roll.mode": ["DND5E.Concentration"]
+    };
 
-    // check Concentration's roll mode to look for advantage/disadvantage
     const accumulator = this._accumulator();
-    if (this.conc.roll.mode === modes.ADVANTAGE) accumulator.advantage(source());
-    else if (this.conc.roll.mode === modes.DISADVANTAGE) accumulator.disadvantage(source());
+    // check Concentration's roll mode to look for advantage/disadvantage
+    this._applyRollModes(accumulator, rollModes);
+    this._applyRollModeEffects(accumulator, rollModes);
+    // normal checks
+    accumulator.add(this.actorFlags, advKeys, disKeys);
+    accumulator.fromConditions(this.actor, this.advantageConditions, this.disadvantageConditions);
     accumulator.update(options);
+  }
+
+  _applyRollModes(accumulator, rollModes) {
+    const source = this.actor._source;
+    Object.entries(rollModes).forEach(([key, labels]) => {
+      const mode = foundry.utils.getProperty(source, key);
+      if (mode === 1) {
+        const label = this._rollModeLabel(...labels, "DND5E.AdvantageMode");
+        accumulator.advantage(label);
+      } else if (mode === -1) {
+        const label = this._rollModeLabel(...labels, "DND5E.AdvantageMode");
+        accumulator.disadvantage(label);
+      }
+    });
+  }
+
+  _rollModeLabel(...labels) {
+    return labels
+      .map(l => game.i18n.localize(l))
+      .join(" ");
+  }
+
+  _applyRollModeEffects(accumulator, rollModes) {
+    // find the active effects that set roll modes
+    const rollModeKeys = Object.keys(rollModes);
+    const effects = this.actor.appliedEffects
+      .flatMap((effect) =>
+        effect.changes
+          .filter((change) => rollModeKeys.includes(change.key))
+          .map((change) => ({
+            name: effect.name,
+            value: change.value,
+          }))
+      )
+      .reduce((accum, curr) => {
+        if (!accum[curr.value]) accum[curr.value] = [];
+        accum[curr.value].push(curr.name);
+        return accum;
+      }, {});
+
+    if (effects["1"]) effects["1"].forEach(label => accumulator.advantage(label));
+    if (effects["-1"]) effects["-1"].forEach(label => accumulator.disadvantage(label));
   }
 }
 
