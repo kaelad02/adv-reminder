@@ -6,6 +6,7 @@ import {
   CriticalReminder,
   CriticalReminderV2,
   DeathSaveReminder,
+  InitiativeReminder,
   SkillReminder,
 } from "./reminders.js";
 import { debug } from "./util.js";
@@ -169,6 +170,51 @@ export class ConcentrationSource extends SourceMixin(AbilitySaveReminder) {
 export class AbilityCheckSource extends SourceMixin(AbilityCheckReminder) {}
 
 export class SkillSource extends SourceMixin(SkillReminder) {}
+
+export class InitiativeSource extends SourceMixin(InitiativeReminder) {
+  updateOptions(options) {
+    this._message();
+    debug("InitiativeSource updateOptions, this.actorFlags", this.actorFlags);
+
+    // get the active effect keys applicable for this roll
+    const advKeys = this.advantageKeys;
+    const disKeys = this.disadvantageKeys;
+    const flags = ["initiativeAdv"];
+    if (game.settings.get("dnd5e", "rulesVersion") === "modern") flags.push("remarkableAthlete");
+    debug("advKeys, disKeys, flags", advKeys, disKeys, flags);
+
+    // find matching keys, status effects, and update options
+    const accumulator = this._accumulator(options);
+    this._applyFlagSource(accumulator, flags);
+    this._applyFlagEffects(accumulator, flags);
+    accumulator.add(this.actorFlags, advKeys, disKeys);
+    accumulator.fromConditions(this.actor, this.advantageConditions, this.disadvantageConditions);
+    accumulator.update(options);
+  }
+
+  /**
+   * Check _source to see if some initiative advantage flags are set directly on the actor.
+   */
+  _applyFlagSource(accumulator, flags) {
+    flags
+      .filter(flag => foundry.utils.getProperty(this.actor._source, `flags.dnd5e.${flag}`))
+      .forEach(flag => accumulator.advantage(CONFIG.DND5E.characterFlags[flag]?.name));
+  }
+
+  /**
+   * Check active effects for any initiative advantage flags.
+   */
+  _applyFlagEffects(accumulator, flags) {
+    const flagKeys = flags.map(flag => `flags.dnd5e.${flag}`);
+    this.actor.appliedEffects
+      .forEach((effect) => {
+        const hasFlag = effect.changes
+          .map(change => change.key)
+          .some(key => flagKeys.includes(key));
+        if (hasFlag) accumulator.advantage(effect.name);
+      });
+  }
+}
 
 export class DeathSaveSource extends SourceMixin(DeathSaveReminder) {}
 

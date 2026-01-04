@@ -77,6 +77,9 @@ function updateConditionEffects() {
     ce.advReminderDisadvantageAbility.add("exhaustion-1");
     ce.advReminderDisadvantageSave.add("exhaustion-3");
     ce.advReminderGrantDisadvantageAttack.add("exhaustion-3");
+  } else {
+    ce.advReminderAdvantageInitiative = new Set(["invisible"]);
+    ce.advReminderDisadvantageInitiative = new Set(["incapacitated", "surprised"]);
   }
 }
 
