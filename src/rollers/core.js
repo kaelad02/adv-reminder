@@ -111,7 +111,7 @@ export default class CoreRollerHooks {
     if (this.isFastForwarding(config, dialog)) return;
 
     const actor = config.subject;
-    let abilityId = config.ability;
+    const abilityId = config.ability;
     new ConcentrationMessage(actor, abilityId).addMessage(dialog);
     if (showSources) new ConcentrationSource(actor, abilityId).updateOptions(dialog);
     new AbilitySaveReminder(actor, abilityId).updateOptions(config.rolls[0].options);
