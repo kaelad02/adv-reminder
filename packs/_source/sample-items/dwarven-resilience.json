@@ -7,83 +7,49 @@
   "system": {
     "description": {
       "value": "<p>You have advantage on saving throws against poison, and you have resistance against poison damage.</p>",
-      "chat": "",
-      "unidentified": ""
+      "chat": ""
     },
     "source": {
-      "custom": "PHB pg. 20"
-    },
-    "activation": {
-      "type": "",
-      "cost": null,
-      "condition": ""
-    },
-    "duration": {
-      "value": null,
-      "units": ""
-    },
-    "target": {
-      "value": null,
-      "width": null,
-      "units": "",
-      "type": ""
-    },
-    "range": {
-      "value": null,
-      "long": null,
-      "units": ""
+      "custom": "",
+      "book": "SRD 5.1",
+      "page": "",
+      "license": "CC-BY-4.0",
+      "rules": "2014",
+      "revision": 1
     },
     "uses": {
-      "value": null,
       "max": "",
-      "per": null,
-      "recovery": ""
+      "spent": 0,
+      "recovery": []
     },
-    "consume": {
-      "type": "",
-      "target": null,
-      "amount": null
-    },
-    "ability": "",
-    "actionType": "",
-    "attackBonus": 0,
-    "chatFlavor": "",
-    "critical": {
-      "threshold": null,
-      "damage": ""
-    },
-    "damage": {
-      "parts": [],
-      "versatile": ""
-    },
-    "formula": "",
-    "save": {
-      "ability": "",
-      "dc": null,
-      "scaling": "spell"
+    "type": {
+      "value": "race",
+      "subtype": ""
     },
     "requirements": "Dwarf",
-    "recharge": {
-      "value": null,
-      "charged": false
-    }
+    "properties": [],
+    "activities": {},
+    "enchant": {},
+    "prerequisites": {
+      "level": null
+    },
+    "identifier": "dwarven-resilience"
   },
   "flags": {},
   "img": "icons/creatures/abilities/stinger-poison-green.webp",
   "effects": [
     {
-      "_id": "hIaIpLxcMZSY3qXi",
+      "name": "Dwarven Resilience",
+      "img": "icons/creatures/abilities/stinger-poison-green.webp",
+      "origin": "Compendium.adv-reminder.sample-items.Item.KorFNiDGLyzTu83L",
+      "_id": "o5gAIDcSxkDCtouq",
+      "type": "base",
+      "system": {},
       "changes": [
-        {
-          "key": "system.traits.dr.value",
-          "value": "poison",
-          "mode": 2,
-          "priority": null
-        },
         {
           "key": "flags.adv-reminder.message.ability.save.con",
           "mode": 0,
-          "value": "Advantage against poison",
+          "value": "flags.adv-reminder.message.ability.save.con",
           "priority": null
         }
       ],
@@ -97,27 +63,36 @@
         "startRound": null,
         "startTurn": null
       },
-      "icon": "icons/creatures/abilities/stinger-poison-green.webp",
-      "origin": "Item.ufysTkqet2Ctmtyi",
-      "transfer": true,
-      "flags": {},
-      "tint": null,
-      "name": "Dwarven Resilience",
       "description": "",
+      "tint": "#ffffff",
+      "transfer": true,
       "statuses": [],
-      "_key": "!items.effects!hBhQ4hKPvKhIFNED.hIaIpLxcMZSY3qXi"
+      "sort": 0,
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "coreVersion": "12.331",
+        "systemId": "dnd5e",
+        "systemVersion": "4.1.0",
+        "createdTime": 1767606093513,
+        "modifiedTime": 1767606106919,
+        "lastModifiedBy": "dnd5ebuilder0000"
+      },
+      "_key": "!items.effects!KorFNiDGLyzTu83L.o5gAIDcSxkDCtouq"
     }
   ],
+  "folder": null,
   "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
     "systemId": "dnd5e",
-    "systemVersion": "3.0.0",
-    "coreVersion": "11.315",
-    "createdTime": 1661787234474,
-    "modifiedTime": 1726183385573,
+    "systemVersion": "4.1.0",
+    "createdTime": 1767606088641,
+    "modifiedTime": 1767607101637,
     "lastModifiedBy": "dnd5ebuilder0000"
   },
-  "folder": null,
-  "sort": 0,
-  "_id": "hBhQ4hKPvKhIFNED",
-  "_key": "!items!hBhQ4hKPvKhIFNED"
+  "_id": "KorFNiDGLyzTu83L",
+  "sort": 600000,
+  "_key": "!items!KorFNiDGLyzTu83L"
 }

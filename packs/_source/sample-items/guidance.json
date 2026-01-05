@@ -7,76 +7,49 @@
   "system": {
     "description": {
       "value": "<p>You touch one willing creature. Once before the spell ends, the target can roll a d4 and add the number rolled to one ability check of its choice. It can roll the die before or after making the ability check. The spell then ends.</p>",
-      "chat": "",
-      "unidentified": ""
+      "chat": ""
     },
     "source": {
-      "custom": "PHB pg. 248"
+      "custom": "",
+      "book": "SRD 5.1",
+      "page": "",
+      "license": "CC-BY-4.0",
+      "rules": "2014",
+      "revision": 1
     },
     "activation": {
       "type": "action",
-      "cost": 1,
-      "condition": ""
+      "condition": "",
+      "value": 1
     },
     "duration": {
       "value": "1",
       "units": "minute"
     },
     "target": {
-      "value": 1,
-      "width": null,
-      "units": "",
-      "type": "creature",
-      "prompt": true
+      "affects": {
+        "type": "creature",
+        "count": "1",
+        "choice": false,
+        "special": ""
+      },
+      "template": {
+        "units": "",
+        "contiguous": false,
+        "type": ""
+      }
     },
     "range": {
-      "value": null,
-      "long": null,
-      "units": "touch"
+      "units": "touch",
+      "special": ""
     },
     "uses": {
-      "value": null,
       "max": "",
-      "per": null,
-      "recovery": "",
-      "prompt": true
-    },
-    "consume": {
-      "type": "",
-      "target": null,
-      "amount": null,
-      "scale": false
-    },
-    "ability": "",
-    "actionType": "util",
-    "attackBonus": "",
-    "chatFlavor": "",
-    "critical": {
-      "threshold": null,
-      "damage": ""
-    },
-    "damage": {
-      "parts": [],
-      "versatile": "",
-      "value": ""
-    },
-    "formula": "1d4",
-    "save": {
-      "ability": "",
-      "dc": null,
-      "scaling": "spell",
-      "value": ""
+      "recovery": [],
+      "spent": 0
     },
     "level": 0,
     "school": "div",
-    "components": {
-      "value": "",
-      "vocal": true,
-      "somatic": true,
-      "material": false,
-      "ritual": false,
-      "concentration": true
-    },
     "materials": {
       "value": "",
       "consumed": false,
@@ -87,36 +60,93 @@
       "mode": "prepared",
       "prepared": false
     },
-    "scaling": {
-      "mode": "none",
-      "formula": ""
-    },
-    "cover": null,
-    "crewed": false,
     "properties": [
       "vocal",
       "somatic",
       "concentration"
-    ]
+    ],
+    "activities": {
+      "dnd5eactivity000": {
+        "_id": "dnd5eactivity000",
+        "type": "utility",
+        "activation": {
+          "type": "action",
+          "value": null,
+          "override": false
+        },
+        "consumption": {
+          "targets": [],
+          "scaling": {
+            "allowed": false,
+            "max": ""
+          },
+          "spellSlot": true
+        },
+        "description": {
+          "chatFlavor": ""
+        },
+        "duration": {
+          "units": "inst",
+          "concentration": false,
+          "override": false
+        },
+        "effects": [
+          {
+            "_id": "fVfo8E1a8ENCgAhv"
+          }
+        ],
+        "range": {
+          "override": false
+        },
+        "target": {
+          "prompt": true,
+          "template": {
+            "contiguous": false,
+            "units": "ft"
+          },
+          "affects": {
+            "choice": false
+          },
+          "override": false
+        },
+        "roll": {
+          "formula": "1d4",
+          "name": "",
+          "prompt": false,
+          "visible": false
+        },
+        "uses": {
+          "spent": 0,
+          "recovery": [],
+          "max": ""
+        },
+        "sort": 0,
+        "name": "",
+        "img": "",
+        "appliedEffects": [
+          "fVfo8E1a8ENCgAhv"
+        ]
+      }
+    },
+    "identifier": "guidance"
   },
-  "flags": {},
+  "flags": {
+    "dnd5e": {
+      "riders": {
+        "activity": [],
+        "effect": []
+      }
+    }
+  },
   "img": "icons/magic/control/buff-flight-wings-blue.webp",
   "effects": [
     {
-      "disabled": true,
-      "duration": {
-        "startTime": null,
-        "seconds": 60,
-        "rounds": 10,
-        "turns": null,
-        "startRound": null,
-        "startTurn": null,
-        "combat": null
-      },
-      "icon": "icons/magic/control/buff-flight-wings-blue.webp",
-      "origin": "Compendium.adv-reminder.sample-items.5UAa8jcIguGkF1qJ",
-      "tint": null,
-      "transfer": true,
+      "name": "Guidance",
+      "img": "icons/magic/control/buff-flight-wings-blue.webp",
+      "origin": "Compendium.adv-reminder.sample-items.Item.UVBfHzIpTpXcg0Rn",
+      "_id": "fVfo8E1a8ENCgAhv",
+      "type": "base",
+      "system": {},
       "changes": [
         {
           "key": "flags.adv-reminder.message.ability.check.all",
@@ -125,24 +155,46 @@
           "priority": null
         }
       ],
-      "_id": "SkoYMd0RXtSiQZD2",
-      "flags": {},
-      "name": "Guidance",
+      "disabled": false,
+      "duration": {
+        "startTime": null,
+        "seconds": 60,
+        "combat": null,
+        "rounds": null,
+        "turns": null,
+        "startRound": null,
+        "startTurn": null
+      },
       "description": "",
+      "tint": "#ffffff",
+      "transfer": true,
       "statuses": [],
-      "_key": "!items.effects!5UAa8jcIguGkF1qJ.SkoYMd0RXtSiQZD2"
+      "sort": 0,
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "coreVersion": "12.331",
+        "systemId": "dnd5e",
+        "systemVersion": "4.1.0",
+        "createdTime": 1767607105193,
+        "modifiedTime": 1767607130070,
+        "lastModifiedBy": "dnd5ebuilder0000"
+      },
+      "_key": "!items.effects!UVBfHzIpTpXcg0Rn.fVfo8E1a8ENCgAhv"
     }
   ],
+  "folder": null,
   "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
     "systemId": "dnd5e",
-    "systemVersion": "3.0.0",
-    "coreVersion": "11.315",
-    "createdTime": 1661787234132,
-    "modifiedTime": 1726183385625,
+    "systemVersion": "4.1.0",
+    "createdTime": 1767607101626,
+    "modifiedTime": 1767607139035,
     "lastModifiedBy": "dnd5ebuilder0000"
   },
-  "folder": null,
-  "sort": 0,
-  "_id": "5UAa8jcIguGkF1qJ",
-  "_key": "!items!5UAa8jcIguGkF1qJ"
+  "_id": "UVBfHzIpTpXcg0Rn",
+  "sort": 200000,
+  "_key": "!items!UVBfHzIpTpXcg0Rn"
 }

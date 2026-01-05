@@ -1,3 +1,10 @@
+# 4.2.6
+
+- feature: [#104](https://github.com/kaelad02/adv-reminder/pull/104) improve the button style configuration with separate custom background and text colors
+- feature: [#105](https://github.com/kaelad02/adv-reminder/pull/105) add support for Initiative rolls with the system's new `preRollInitiativeDialogV2` hook
+- bug fix: [#102](https://github.com/kaelad02/adv-reminder/issues/102) Concentration rolls now include CON saving throw things (adv/dis, messages) and improved source detection
+- feature: update sample items with copies from the system version 4.1.0 and remove Enhance Ability and Enlarge/Reduce spells (better w/ advantage AEs, not messages)
+
 # 4.2.5
 
 - bug fix: Advantage not being passed on in a few cases that the system does it (e.g. initiative)

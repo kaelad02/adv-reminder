@@ -7,90 +7,126 @@
   "system": {
     "description": {
       "value": "<p>Beginning at 1st level, you know how to strike subtly and exploit a foe's distraction. Once per turn, you can deal an extra 1d6 damage to one creature you hit with an attack if you have advantage on the attack roll. The attack must use a finesse or a ranged weapon.</p><p>You don't need advantage on the attack roll if another enemy of the target is within 5 feet of it, that enemy isn't incapacitated, and you don't have disadvantage on the attack roll.</p>",
-      "chat": "",
-      "unidentified": ""
+      "chat": ""
     },
     "source": {
-      "custom": "PHB pg. 96"
-    },
-    "activation": {
-      "type": "",
-      "cost": null,
-      "condition": ""
-    },
-    "duration": {
-      "value": "",
-      "units": ""
-    },
-    "target": {
-      "value": "",
-      "width": null,
-      "units": "",
-      "type": ""
-    },
-    "range": {
-      "value": "",
-      "long": null,
-      "units": ""
+      "custom": "",
+      "book": "SRD 5.1",
+      "page": "",
+      "license": "CC-BY-4.0",
+      "rules": "2014",
+      "revision": 1
     },
     "uses": {
-      "value": null,
       "max": "",
-      "per": null,
-      "recovery": ""
+      "recovery": [],
+      "spent": 0
     },
-    "consume": {
-      "type": "",
-      "target": "",
-      "amount": null
-    },
-    "ability": "",
-    "actionType": "other",
-    "attackBonus": 0,
-    "chatFlavor": "",
-    "critical": {
-      "threshold": null,
-      "damage": ""
-    },
-    "damage": {
-      "parts": [
-        [
-          "@scale.rogue.sneak-attack",
-          ""
-        ]
-      ],
-      "versatile": ""
-    },
-    "formula": "",
-    "save": {
-      "ability": "",
-      "dc": null,
-      "scaling": "spell"
+    "type": {
+      "value": "class",
+      "subtype": ""
     },
     "requirements": "Rogue 1",
-    "recharge": {
-      "value": null,
-      "charged": false
-    }
+    "properties": [],
+    "activities": {
+      "dnd5eactivity000": {
+        "_id": "dnd5eactivity000",
+        "type": "damage",
+        "activation": {
+          "type": "",
+          "value": null,
+          "condition": "",
+          "override": false
+        },
+        "consumption": {
+          "targets": [],
+          "scaling": {
+            "allowed": false,
+            "max": ""
+          },
+          "spellSlot": true
+        },
+        "description": {
+          "chatFlavor": ""
+        },
+        "duration": {
+          "concentration": false,
+          "value": "",
+          "units": "",
+          "special": "",
+          "override": false
+        },
+        "effects": [],
+        "range": {
+          "units": "",
+          "special": "",
+          "override": false
+        },
+        "target": {
+          "template": {
+            "count": "",
+            "contiguous": false,
+            "type": "",
+            "size": "",
+            "width": "",
+            "height": "",
+            "units": ""
+          },
+          "affects": {
+            "count": "",
+            "type": "",
+            "choice": false,
+            "special": ""
+          },
+          "prompt": true,
+          "override": false
+        },
+        "damage": {
+          "critical": {
+            "allow": false,
+            "bonus": ""
+          },
+          "parts": [
+            {
+              "number": null,
+              "denomination": null,
+              "bonus": "",
+              "types": [],
+              "custom": {
+                "enabled": true,
+                "formula": "@scale.rogue.sneak-attack"
+              },
+              "scaling": {
+                "mode": "whole",
+                "number": null,
+                "formula": ""
+              }
+            }
+          ]
+        },
+        "uses": {
+          "spent": 0,
+          "recovery": []
+        },
+        "sort": 0
+      }
+    },
+    "enchant": {},
+    "prerequisites": {
+      "level": null
+    },
+    "identifier": "sneak-attack"
   },
   "flags": {},
   "img": "icons/skills/melee/strike-dagger-arcane-pink.webp",
   "effects": [
     {
-      "disabled": false,
-      "duration": {
-        "startTime": 0,
-        "seconds": null,
-        "rounds": null,
-        "turns": null,
-        "startRound": 1,
-        "startTurn": 0,
-        "combat": null
-      },
-      "icon": "icons/skills/melee/strike-dagger-arcane-pink.webp",
-      "origin": "Compendium.adv-reminder.sample-items.3hOXS0gA0zia6vgU",
-      "tint": null,
-      "transfer": true,
+      "name": "Sneak Attack",
+      "img": "icons/skills/melee/strike-dagger-arcane-pink.webp",
+      "origin": "Compendium.adv-reminder.sample-items.Item.CZ8B0DUT9X0BMnIP",
+      "_id": "Sia8JxBunastZxpp",
+      "type": "base",
+      "system": {},
       "changes": [
         {
           "key": "flags.adv-reminder.message.damage.mwak",
@@ -100,29 +136,51 @@
         },
         {
           "key": "flags.adv-reminder.message.damage.rwak",
-          "mode": 0,
+          "mode": 2,
           "value": "[[/r @scale.rogue.sneak-attack]]{Sneak Attack} once per turn",
           "priority": null
         }
       ],
-      "_id": "7jUy2bl0IGt1f7dt",
-      "flags": {},
-      "name": "Sneak Attack",
+      "disabled": false,
+      "duration": {
+        "startTime": null,
+        "seconds": null,
+        "combat": null,
+        "rounds": null,
+        "turns": null,
+        "startRound": null,
+        "startTurn": null
+      },
       "description": "",
+      "tint": "#ffffff",
+      "transfer": true,
       "statuses": [],
-      "_key": "!items.effects!3hOXS0gA0zia6vgU.7jUy2bl0IGt1f7dt"
+      "sort": 0,
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "coreVersion": "12.331",
+        "systemId": "dnd5e",
+        "systemVersion": "4.1.0",
+        "createdTime": 1767606039516,
+        "modifiedTime": 1767606071508,
+        "lastModifiedBy": "dnd5ebuilder0000"
+      },
+      "_key": "!items.effects!CZ8B0DUT9X0BMnIP.Sia8JxBunastZxpp"
     }
   ],
+  "folder": null,
   "_stats": {
+    "duplicateSource": null,
+    "coreVersion": "12.331",
     "systemId": "dnd5e",
-    "systemVersion": "3.0.0",
-    "coreVersion": "11.315",
-    "createdTime": 1661787234348,
-    "modifiedTime": 1726183385571,
+    "systemVersion": "4.1.0",
+    "createdTime": 1767606033071,
+    "modifiedTime": 1767607101637,
     "lastModifiedBy": "dnd5ebuilder0000"
   },
-  "folder": null,
-  "sort": 0,
-  "_id": "3hOXS0gA0zia6vgU",
-  "_key": "!items!3hOXS0gA0zia6vgU"
+  "_id": "CZ8B0DUT9X0BMnIP",
+  "sort": 400000,
+  "_key": "!items!CZ8B0DUT9X0BMnIP"
 }
