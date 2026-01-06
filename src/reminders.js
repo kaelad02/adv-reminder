@@ -100,11 +100,6 @@ class BaseReminder {
 
   static UpdateMessage = "checking for adv/dis effects for the roll";
 
-  // TODO delete me
-  _message() {
-    debug("checking for adv/dis effects for the roll");
-  }
-
   updateOptions(options) {
     debug(this.constructor.UpdateMessage);
 

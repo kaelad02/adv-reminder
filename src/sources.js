@@ -146,11 +146,6 @@ const SourceMixin = (superclass) =>
 
     static UpdateMessage = "checking for adv/dis effects to display their source";
 
-    // TODO delete me
-    _message() {
-      debug("checking for adv/dis effects to display their source");
-    }
-
     _customUpdateOptions(accumulator) {
       super._customUpdateOptions(accumulator);
 
