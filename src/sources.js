@@ -217,7 +217,13 @@ export class InitiativeSource extends SourceMixin(InitiativeReminder) {
   }
 }
 
-export class DeathSaveSource extends SourceMixin(DeathSaveReminder) {}
+export class DeathSaveSource extends SourceMixin(DeathSaveReminder) {
+  get rollModes() {
+    return {
+      "system.attributes.death.roll.mode": ["DND5E.DeathSave"]
+    };
+  }
+}
 
 export class CriticalSource extends SourceMixin(CriticalReminder) {
   _adjustRange(distanceFn, grantsCriticalRange) {
