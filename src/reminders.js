@@ -232,21 +232,6 @@ class AbilityBaseReminder extends BaseReminder {
       return ["advReminderDisadvantagePhysicalRolls"];
     return [];
   }
-
-  updateOptions(options) {
-    this._message();
-
-    // get the active effect keys applicable for this roll
-    const advKeys = this.advantageKeys;
-    const disKeys = this.disadvantageKeys;
-    debug("advKeys", advKeys, "disKeys", disKeys);
-
-    // find matching keys, status effects, and update options
-    const accumulator = this._accumulator(options);
-    accumulator.add(this.actorFlags, advKeys, disKeys);
-    accumulator.fromConditions(this.actor, this.advantageConditions, this.disadvantageConditions);
-    accumulator.update(options);
-  }
 }
 
 export class AbilityCheckReminder extends AbilityBaseReminder {
@@ -330,36 +315,16 @@ export class SkillReminder extends AbilityCheckReminder {
     ]);
   }
 
-  /** @override */
-  updateOptions(options) {
-    this._message();
+  _customUpdateOptions(accumulator) {
+    super._customUpdateOptions(accumulator);
 
-    // get the active effect keys applicable for this roll
-    const advKeys = this.advantageKeys;
-    const disKeys = this.disadvantageKeys;
-    debug("advKeys", advKeys, "disKeys", disKeys);
-
-    // find matching keys and update options
-    const accumulator = this._accumulator(options);
-    if (this.checkArmorStealth) {
-      accumulator.disadvantage(this._armorStealthDisadvantage());
-    }
-    accumulator.add(this.actorFlags, advKeys, disKeys);
-    accumulator.fromConditions(this.actor, this.advantageConditions, this.disadvantageConditions);
-    accumulator.update(options);
-  }
-
-  /**
-   * Check if the actor is wearing armor that imposes stealth disadvantage.
-   * @returns true if they are wearing armor that imposes stealth disadvantage, false otherwise
-   */
-  _armorStealthDisadvantage() {
-    if (this.skillId === "ste") {
+    // Check if the actor is wearing armor that imposes stealth disadvantage
+    if (this.checkArmorStealth && this.skillId === "ste") {
       const item = this.items.find(
         (item) => item.type === "equipment" && item.system.equipped && item.system.properties.has("stealthDisadvantage")
       );
       debug("equiped item that imposes stealth disadvantage", item?.name);
-      return item?.name;
+      accumulator.disadvantageIf(item?.name);
     }
   }
 }

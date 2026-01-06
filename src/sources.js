@@ -150,6 +150,18 @@ const SourceMixin = (superclass) =>
     _message() {
       debug("checking for adv/dis effects to display their source");
     }
+
+    _customUpdateOptions(accumulator) {
+      super._customUpdateOptions(accumulator);
+
+      // apply roll modes if they exist
+      const rollModes = this.rollModes;
+      debug("rollModes", rollModes);
+      if (!foundry.utils.isEmpty(rollModes)) {
+        accumulator.applyRollModes(this.actor, rollModes);
+        accumulator.applyRollModeEffects(this.actor, rollModes);
+      }
+    }
   };
 
 export class AttackSource extends SourceMixin(AttackReminder) {}
@@ -159,67 +171,10 @@ export class AttackSourceV2 extends SourceMixin(AttackReminderV2) {}
 export class AbilitySaveSource extends SourceMixin(AbilitySaveReminder) {}
 
 export class ConcentrationSource extends SourceMixin(AbilitySaveReminder) {
-  updateOptions(options) {
-    this._message();
-
-    // get the active effect keys applicable for this roll
-    const advKeys = this.advantageKeys;
-    const disKeys = this.disadvantageKeys;
-    debug("advKeys", advKeys, "disKeys", disKeys);
-    const rollModes = {
+  get rollModes() {
+    return {
       "system.attributes.concentration.roll.mode": ["DND5E.Concentration"]
     };
-
-    const accumulator = this._accumulator();
-    // check Concentration's roll mode to look for advantage/disadvantage
-    this._applyRollModes(accumulator, rollModes);
-    this._applyRollModeEffects(accumulator, rollModes);
-    // normal checks
-    accumulator.add(this.actorFlags, advKeys, disKeys);
-    accumulator.fromConditions(this.actor, this.advantageConditions, this.disadvantageConditions);
-    accumulator.update(options);
-  }
-
-  _applyRollModes(accumulator, rollModes) {
-    const source = this.actor._source;
-    Object.entries(rollModes).forEach(([key, labels]) => {
-      const mode = foundry.utils.getProperty(source, key);
-      if (mode === 1) {
-        const label = this._rollModeLabel(...labels, "DND5E.AdvantageMode");
-        accumulator.advantage(label);
-      } else if (mode === -1) {
-        const label = this._rollModeLabel(...labels, "DND5E.AdvantageMode");
-        accumulator.disadvantage(label);
-      }
-    });
-  }
-
-  _rollModeLabel(...labels) {
-    return labels
-      .map(l => game.i18n.localize(l))
-      .join(" ");
-  }
-
-  _applyRollModeEffects(accumulator, rollModes) {
-    // find the active effects that set roll modes
-    const rollModeKeys = Object.keys(rollModes);
-    const effects = this.actor.appliedEffects
-      .flatMap((effect) =>
-        effect.changes
-          .filter((change) => rollModeKeys.includes(change.key))
-          .map((change) => ({
-            name: effect.name,
-            value: change.value,
-          }))
-      )
-      .reduce((accum, curr) => {
-        if (!accum[curr.value]) accum[curr.value] = [];
-        accum[curr.value].push(curr.name);
-        return accum;
-      }, {});
-
-    if (effects["1"]) effects["1"].forEach(label => accumulator.advantage(label));
-    if (effects["-1"]) effects["-1"].forEach(label => accumulator.disadvantage(label));
   }
 }
 
@@ -228,24 +183,14 @@ export class AbilityCheckSource extends SourceMixin(AbilityCheckReminder) {}
 export class SkillSource extends SourceMixin(SkillReminder) {}
 
 export class InitiativeSource extends SourceMixin(InitiativeReminder) {
-  updateOptions(options) {
-    this._message();
-    debug("InitiativeSource updateOptions, this.actorFlags", this.actorFlags);
+  _customUpdateOptions(accumulator) {
+    super._customUpdateOptions(accumulator);
 
-    // get the active effect keys applicable for this roll
-    const advKeys = this.advantageKeys;
-    const disKeys = this.disadvantageKeys;
+    // Handle system-defined flags (i.e. Special Traits) that give advantage to initiative
     const flags = ["initiativeAdv"];
     if (game.settings.get("dnd5e", "rulesVersion") === "modern") flags.push("remarkableAthlete");
-    debug("advKeys, disKeys, flags", advKeys, disKeys, flags);
-
-    // find matching keys, status effects, and update options
-    const accumulator = this._accumulator(options);
     this._applyFlagSource(accumulator, flags);
     this._applyFlagEffects(accumulator, flags);
-    accumulator.add(this.actorFlags, advKeys, disKeys);
-    accumulator.fromConditions(this.actor, this.advantageConditions, this.disadvantageConditions);
-    accumulator.update(options);
   }
 
   /**
@@ -254,7 +199,7 @@ export class InitiativeSource extends SourceMixin(InitiativeReminder) {
   _applyFlagSource(accumulator, flags) {
     flags
       .filter(flag => foundry.utils.getProperty(this.actor._source, `flags.dnd5e.${flag}`))
-      .forEach(flag => accumulator.advantage(CONFIG.DND5E.characterFlags[flag]?.name));
+      .forEach(flag => accumulator.advantageIf(CONFIG.DND5E.characterFlags[flag]?.name));
   }
 
   /**
@@ -267,7 +212,7 @@ export class InitiativeSource extends SourceMixin(InitiativeReminder) {
         const hasFlag = effect.changes
           .map(change => change.key)
           .some(key => flagKeys.includes(key));
-        if (hasFlag) accumulator.advantage(effect.name);
+        if (hasFlag) accumulator.advantageIf(effect.name);
       });
   }
 }
