@@ -1,6 +1,6 @@
 import { debug } from "./util.js";
 
-class AdvantageAccumulator {
+export class AdvantageAccumulator {
   /** @type {boolean} */
   advantage;
   /** @type {boolean} */

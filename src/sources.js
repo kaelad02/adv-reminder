@@ -1,6 +1,7 @@
 import {
   AbilityCheckReminder,
   AbilitySaveReminder,
+  AdvantageAccumulator,
   AttackReminder,
   AttackReminderV2,
   CriticalReminder,
@@ -11,7 +12,7 @@ import {
 } from "./reminders.js";
 import { debug } from "./util.js";
 
-class LabelAccumulator {
+class LabelAccumulator extends AdvantageAccumulator {
   /** @type {string[]} */
   advantageLabels = [];
   /** @type {string[]} */
@@ -69,23 +70,11 @@ class LabelAccumulator {
     this.disadvantageLabels.push(...(effects["-1"] ?? []));
   }
 
-  /**
-   * Apply labels from active effects that use the Midi flags.
-   * @param actorFlags
-   * @param advKeys
-   * @param disKeys
-   */
   applyFlags(actorFlags, advKeys, disKeys) {
     advKeys.forEach((key) => this.advantageLabels.push(...(actorFlags[key] ?? [])));
     disKeys.forEach((key) => this.disadvantageLabels.push(...(actorFlags[key] ?? [])));
   }
 
-  /**
-   * Apply labels from conditions the actor has.
-   * @param actor
-   * @param advConditions
-   * @param disConditions
-   */
   applyConditions(actor, advConditions, disConditions) {
     if (!actor) return;
     const advLabels = advConditions.flatMap(c => this._getConditionForEffect(actor, c));
@@ -94,21 +83,9 @@ class LabelAccumulator {
     this.disadvantageLabels.push(...disLabels);
   }
 
-  // Original function from SourceMixin/BaseReminder
   _getConditionForEffect(actor, key) {
-    // TODO from BaseReminder
-    const props = CONFIG.DND5E.conditionEffects[key] ?? new Set();
-    const level = actor.system.attributes?.exhaustion ?? null;
-    const imms = actor.system.traits?.ci?.value ?? new Set();
-    const statuses = actor.statuses;
+    const props = super._getConditionForEffect(actor, key);
     return props
-      .filter(k => {
-        const l = Number(k.split("-").pop());
-        return (statuses.has(k) && !imms.has(k))
-          || (!imms.has("exhaustion") && (level !== null) && Number.isInteger(l) && (level >= l));
-      })
-      .toObject()
-      // TODO from SourceMixin
       // remove the number after exhaustion
       .map((k) => k.split("-").shift())
       .flatMap((k) => {
@@ -122,18 +99,10 @@ class LabelAccumulator {
       });
   }
 
-  /**
-   * Set advantage if the label exists.
-   * @param {string} label
-   */
   advantageIf(label) {
     if (label) this.advantageLabels.push(label);
   }
 
-  /**
-   * Set disadvantage if the label exists.
-   * @param label
-   */
   disadvantageIf(label) {
     if (label) this.disadvantageLabels.push(label);
   }
