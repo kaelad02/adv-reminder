@@ -11,6 +11,146 @@ import {
 } from "./reminders.js";
 import { debug } from "./util.js";
 
+class LabelAccumulator {
+  /** @type {string[]} */
+  advantageLabels = [];
+  /** @type {string[]} */
+  disadvantageLabels = [];
+
+  /**
+   * Apply labels from directly setting roll modes on the actor.
+   * @param actor
+   * @param rollModes
+   */
+  applyRollModes(actor, rollModes) {
+    const source = actor._source;
+    Object.entries(rollModes).forEach(([key, labels]) => {
+      const mode = foundry.utils.getProperty(source, key);
+      if (mode === 1) {
+        const label = this._rollModeLabel(...labels, "DND5E.AdvantageMode");
+        this.advantageLabels.push(label);
+      } else if (mode === -1) {
+        const label = this._rollModeLabel(...labels, "DND5E.AdvantageMode");
+        this.disadvantageLabels.push(label);
+      }
+    });
+  }
+
+  _rollModeLabel(...labels) {
+    return labels
+      .map(l => game.i18n.localize(l))
+      .join(" ");
+  }
+
+  /**
+   * Apply labels from active effects setting roll modes.
+   * @param actor
+   * @param rollModes
+   */
+  applyRollModeEffects(actor, rollModes) {
+    // find the active effects that set roll modes
+    const rollModeKeys = Object.keys(rollModes);
+    const effects = actor.appliedEffects
+      .flatMap((effect) =>
+        effect.changes
+          .filter((change) => rollModeKeys.includes(change.key))
+          .map((change) => ({
+            name: effect.name,
+            value: change.value,
+          }))
+      )
+      .reduce((accum, curr) => {
+        if (!accum[curr.value]) accum[curr.value] = [];
+        accum[curr.value].push(curr.name);
+        return accum;
+      }, {});
+
+    this.advantageLabels.push(...(effects["1"] ?? []));
+    this.disadvantageLabels.push(...(effects["-1"] ?? []));
+  }
+
+  /**
+   * Apply labels from active effects that use the Midi flags.
+   * @param actorFlags
+   * @param advKeys
+   * @param disKeys
+   */
+  applyFlags(actorFlags, advKeys, disKeys) {
+    advKeys.forEach((key) => this.advantageLabels.push(...(actorFlags[key] ?? [])));
+    disKeys.forEach((key) => this.disadvantageLabels.push(...(actorFlags[key] ?? [])));
+  }
+
+  /**
+   * Apply labels from conditions the actor has.
+   * @param actor
+   * @param advConditions
+   * @param disConditions
+   */
+  applyConditions(actor, advConditions, disConditions) {
+    if (!actor) return;
+    const advLabels = advConditions.flatMap(c => this._getConditionForEffect(actor, c));
+    this.advantageLabels.push(...advLabels);
+    const disLabels = disConditions.flatMap(c => this._getConditionForEffect(actor, c));
+    this.disadvantageLabels.push(...disLabels);
+  }
+
+  // Original function from SourceMixin/BaseReminder
+  _getConditionForEffect(actor, key) {
+    // TODO from BaseReminder
+    const props = CONFIG.DND5E.conditionEffects[key] ?? new Set();
+    const level = actor.system.attributes?.exhaustion ?? null;
+    const imms = actor.system.traits?.ci?.value ?? new Set();
+    const statuses = actor.statuses;
+    return props
+      .filter(k => {
+        const l = Number(k.split("-").pop());
+        return (statuses.has(k) && !imms.has(k))
+          || (!imms.has("exhaustion") && (level !== null) && Number.isInteger(l) && (level >= l));
+      })
+      .toObject()
+      // TODO from SourceMixin
+      // remove the number after exhaustion
+      .map((k) => k.split("-").shift())
+      .flatMap((k) => {
+        // look for active effects with this status in it, get their names
+        const activeEffectNames = actor.appliedEffects
+          .filter((e) => e.statuses.some((s) => s === k))
+          .map((e) => e.name);
+        if (activeEffectNames.length) return activeEffectNames;
+        // fallback to the status effect's name (mostly for exhaustion)
+        return CONFIG.statusEffects.filter((s) => s.id === k).map((s) => s.name);
+      });
+  }
+
+  /**
+   * Set advantage if the label exists.
+   * @param {string} label
+   */
+  advantageIf(label) {
+    if (label) this.advantageLabels.push(label);
+  }
+
+  /**
+   * Set disadvantage if the label exists.
+   * @param label
+   */
+  disadvantageIf(label) {
+    if (label) this.disadvantageLabels.push(label);
+  }
+
+  /**
+   * Update the dialog options with the labels.
+   * @param dialog
+   */
+  update(dialog) {
+    debug("advantageLabels", this.advantageLabels, "disadvantageLabels", this.disadvantageLabels);
+    if (this.advantageLabels.length)
+      foundry.utils.setProperty(dialog, "options.adv-reminder.advantageLabels", this.advantageLabels);
+    if (this.disadvantageLabels.length)
+      foundry.utils.setProperty(dialog, "options.adv-reminder.disadvantageLabels", this.disadvantageLabels);
+  }
+}
+
 const SourceMixin = (superclass) =>
   class extends superclass {
     _getFlags(actor) {
@@ -33,72 +173,19 @@ const SourceMixin = (superclass) =>
       }, {});
     }
 
+    static AccumulatorClass = LabelAccumulator;
+
+    static UpdateMessage = "checking for adv/dis effects to display their source";
+
+    // TODO delete me
     _message() {
       debug("checking for adv/dis effects to display their source");
-    }
-
-    _getConditionForEffect(actor, key) {
-      const props = super._getConditionForEffect(actor, key);
-      return (
-        props
-          // remove the number after exhaustion
-          .map((k) => k.split("-").shift())
-          .flatMap((k) => {
-            // look for active effects with this status in it, get their names
-            const activeEffectNames = actor.appliedEffects
-              .filter((e) => e.statuses.some((s) => s === k))
-              .map((e) => e.name);
-            if (activeEffectNames.length) return activeEffectNames;
-            // fallback to the status effect's name (mostly for exhaustion)
-            return CONFIG.statusEffects.filter((s) => s.id === k).map((s) => s.name);
-          })
-      );
-    }
-
-    _accumulator() {
-      const advantageLabels = [];
-      const disadvantageLabels = [];
-
-      return {
-        add: (changes, advKeys, disKeys) => {
-          advKeys.forEach((key) => {
-            if (changes[key]) advantageLabels.push(...changes[key]);
-          });
-          disKeys.forEach((key) => {
-            if (changes[key]) disadvantageLabels.push(...changes[key]);
-          });
-        },
-        fromConditions: (actor, advConditions, disConditions) => {
-          if (!actor) return;
-          advantageLabels.push(...advConditions.flatMap(c => this._getConditionForEffect(actor, c)));
-          disadvantageLabels.push(...disConditions.flatMap(c => this._getConditionForEffect(actor, c)));
-        },
-        advantage: (label) => {
-          if (label) advantageLabels.push(label);
-        },
-        disadvantage: (label) => {
-          if (label) disadvantageLabels.push(label);
-        },
-        update: (options) => {
-          debug("advantageLabels", advantageLabels, "disadvantageLabels", disadvantageLabels);
-          const merge = (newLabels, key) => {
-            if (newLabels.length) {
-              const labels = foundry.utils.getProperty(options, key);
-              if (labels) newLabels.push(...labels);
-              foundry.utils.setProperty(options, key, newLabels);
-            }
-          };
-          merge(advantageLabels, "options.adv-reminder.advantageLabels");
-          merge(disadvantageLabels, "options.adv-reminder.disadvantageLabels");
-        },
-      };
     }
   };
 
 export class AttackSource extends SourceMixin(AttackReminder) {}
 
-export class AttackSourceV2 extends SourceMixin(AttackReminderV2) {
-}
+export class AttackSourceV2 extends SourceMixin(AttackReminderV2) {}
 
 export class AbilitySaveSource extends SourceMixin(AbilitySaveReminder) {}
 

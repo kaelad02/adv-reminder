@@ -1,5 +1,83 @@
 import { debug } from "./util.js";
 
+class AdvantageAccumulator {
+  /** @type {boolean} */
+  advantage;
+  /** @type {boolean} */
+  disadvantage;
+
+  /**
+   * Apply labels from active effects that use the Midi flags.
+   * @param {Object.<string, boolean>} actorFlags
+   * @param {string[]} advKeys
+   * @param {string[]} disKeys
+   */
+  applyFlags(actorFlags, advKeys, disKeys) {
+    this.advantage = advKeys.reduce((accum, curr) => accum || actorFlags[curr], this.advantage);
+    this.disadvantage = disKeys.reduce((accum, curr) => accum || actorFlags[curr], this.disadvantage);
+  }
+
+  /**
+   * Apply labels from conditions the actor has.
+   * @param {Actor5e} actor
+   * @param {string[]} advConditions
+   * @param {string[]} disConditions
+   */
+  applyConditions(actor, advConditions, disConditions) {
+    if (!actor) return;
+    if (advConditions.flatMap(c => this._getConditionForEffect(actor, c)).length) this.advantage = true;
+    if (disConditions.flatMap(c => this._getConditionForEffect(actor, c)).length) this.disadvantage = true;
+  }
+
+  /**
+   * Modeled after Actor5e#hasConditionEffect, check to see if the actor is under the effect of
+   * this property from some status or due to its level of exhaustion. But instead of a true/false,
+   * it returns the ID of the condition.
+   * @param {Actor5e} actor
+   * @param {string} key
+   * @returns {string[]}
+   */
+  _getConditionForEffect(actor, key) {
+    const props = CONFIG.DND5E.conditionEffects[key] ?? new Set();
+    const level = actor.system.attributes?.exhaustion ?? null;
+    const imms = actor.system.traits?.ci?.value ?? new Set();
+    const statuses = actor.statuses;
+    return props
+      .filter(k => {
+        const l = Number(k.split("-").pop());
+        return (statuses.has(k) && !imms.has(k))
+          || (!imms.has("exhaustion") && (level !== null) && Number.isInteger(l) && (level >= l));
+      })
+      .toObject();
+  }
+
+  /**
+   * Set advantage if the label exists.
+   * @param {string} label
+   */
+  advantageIf(label) {
+    if (label) this.advantage = true;
+  }
+
+  /**
+   * Set disadvantage if the label exists.
+   * @param {string} label
+   */
+  disadvantageIf(label) {
+    if (label) this.disadvantage = true;
+  }
+
+  /**
+   * Update the options with the advantage and disadvantage properties
+   * @param {Object} options
+   */
+  update(options) {
+    debug(`updating options with {advantage: ${this.advantage}, disadvantage: ${this.disadvantage}}`);
+    if (this.advantage) options.advantage = true;
+    if (this.disadvantage) options.disadvantage = true;
+  }
+}
+
 class BaseReminder {
   constructor(actor) {
     /** @type {Actor5e*} */
@@ -18,71 +96,35 @@ class BaseReminder {
     return foundry.utils.flattenObject(midiFlags);
   }
 
+  static AccumulatorClass = AdvantageAccumulator;
+
+  static UpdateMessage = "checking for adv/dis effects for the roll";
+
+  // TODO delete me
   _message() {
     debug("checking for adv/dis effects for the roll");
   }
 
-  /**
-   * Modeled after Actor5e#hasConditionEffect, check to see if the actor is under the effect of
-   * this property from some status or due to its level of exhaustion. But instead of a true/false,
-   * it returns the ID of the condition.
-   * @param {Actor5e} actor the actor
-   * @param {string} key the effect key
-   * @returns {Set} a set of the condition IDs the actor has for the effect
-   */
-  _getConditionForEffect(actor, key) {
-    const props = CONFIG.DND5E.conditionEffects[key] ?? new Set();
-    const level = actor.system.attributes?.exhaustion ?? null;
-    const imms = actor.system.traits?.ci?.value ?? new Set();
-    const statuses = actor.statuses;
-    return props.filter(k => {
-      const l = Number(k.split("-").pop());
-      return (statuses.has(k) && !imms.has(k))
-        || (!imms.has("exhaustion") && (level !== null) && Number.isInteger(l) && (level >= l));
-    }).toObject();
+  updateOptions(options) {
+    debug(this.constructor.UpdateMessage);
+
+    // get the active effect keys applicable for this roll
+    const advKeys = this.advantageKeys;
+    const disKeys = this.disadvantageKeys;
+    debug("advKeys", advKeys, "disKeys", disKeys);
+    const advConditions = this.advantageConditions;
+    const disConditions = this.disadvantageConditions;
+    debug("advConditions", advConditions, "disConditions", disConditions);
+
+    // find matching keys, status effects, and update options
+    const accumulator = new this.constructor.AccumulatorClass();
+    accumulator.applyFlags(this.actorFlags, advKeys, disKeys);
+    accumulator.applyConditions(this.actor, advConditions, disConditions);
+    this._customUpdateOptions(accumulator);
+    accumulator.update(options);
   }
 
-  /**
-   * An accumulator that looks for matching keys and tracks advantage/disadvantage.
-   * @param {Object} options
-   * @param {boolean} options.advantage initial value for advantage
-   * @param {boolean} options.disadvantage initial value for disadvantage
-   */
-  _accumulator({advantage, disadvantage} = {}) {
-    return {
-      advantage,
-      disadvantage,
-      add: (actorFlags, advKeys, disKeys) => {
-        advantage = advKeys.reduce((accum, curr) => accum || actorFlags[curr], advantage);
-        disadvantage = disKeys.reduce((accum, curr) => accum || actorFlags[curr], disadvantage);
-      },
-      fromConditions: (actor, advConditions, disConditions) => {
-        if (!actor) return;
-        if (advConditions.flatMap(c => this._getConditionForEffect(actor, c)).length) advantage = true;
-        if (disConditions.flatMap(c => this._getConditionForEffect(actor, c)).length) disadvantage = true;
-      },
-      advantage: (label) => {
-        if (label) advantage = true;
-      },
-      disadvantage: (label) => {
-        if (label) disadvantage = true;
-      },
-      update: (options) => {
-        debug(`updating options with {advantage: ${advantage}, disadvantage: ${disadvantage}}`);
-        // only set if adv or dis, the die roller doesn't handle when both are true correctly
-        if (advantage && !disadvantage) {
-          options.advantage = true;
-          if (options.disadvantage) options.disadvantage = false;
-        } else if (!advantage && disadvantage) {
-          if (options.advantage) options.advantage = false;
-          options.disadvantage = true;
-        } else {
-          if (options.advantage) options.advantage = false;
-          if (options.disadvantage) options.disadvantage = false;
-        }
-      },
-    };
-  }
+  _customUpdateOptions(accumulator) {}
 }
 
 export class AttackReminder extends BaseReminder {
@@ -101,22 +143,37 @@ export class AttackReminder extends BaseReminder {
     this.distanceFn = distanceFn;
   }
 
-  updateOptions(options) {
-    this._message();
-
-    // build the active effect keys applicable for this roll
-    const advKeys = [
+  get advantageKeys() {
+    return [
       "advantage.all",
       "advantage.attack.all",
       `advantage.attack.${this.actionType}`,
       `advantage.attack.${this.abilityId}`,
     ];
-    const disKeys = [
+  }
+
+  get disadvantageKeys() {
+    return [
       "disadvantage.all",
       "disadvantage.attack.all",
       `disadvantage.attack.${this.actionType}`,
       `disadvantage.attack.${this.abilityId}`,
     ];
+  }
+
+  get advantageConditions() {
+    return ["advReminderAdvantageAttack"];
+  }
+
+  get disadvantageConditions() {
+    const conditions = ["advReminderDisadvantageAttack"];
+    if (this.abilityId === "str" || this.abilityId === "dex" || this.abilityId === "con")
+      conditions.push("advReminderDisadvantagePhysicalRolls");
+    return conditions;
+  }
+
+  _customUpdateOptions(accumulator) {
+    // process target flags
     const grantsAdvKeys = [
       "grants.advantage.attack.all",
       `grants.advantage.attack.${this.actionType}`,
@@ -125,31 +182,22 @@ export class AttackReminder extends BaseReminder {
       "grants.disadvantage.attack.all",
       `grants.disadvantage.attack.${this.actionType}`,
     ];
-    // build the condition effect keys for this roll
-    const advConditions = ["advReminderAdvantageAttack"];
-    const disConditions = ["advReminderDisadvantageAttack"];
+    accumulator.applyFlags(this.targetFlags, grantsAdvKeys, grantsDisKeys);
+
+    // process target's conditions
     const grantsAdvConditions = ["advReminderGrantAdvantageAttack"];
     const grantsDisConditions = ["advReminderGrantDisadvantageAttack"];
-    if (this.abilityId === "str" || this.abilityId === "dex" || this.abilityId === "con")
-      disConditions.push("advReminderDisadvantagePhysicalRolls");
+    accumulator.applyConditions(this.targetActor, grantsAdvConditions, grantsDisConditions);
 
-    // find matching keys
-    const accumulator = this._accumulator(options);
-    accumulator.add(this.actorFlags, advKeys, disKeys);
-    accumulator.add(this.targetFlags, grantsAdvKeys, grantsDisKeys);
-    // handle status effects
-    accumulator.fromConditions(this.actor, advConditions, disConditions);
-    accumulator.fromConditions(this.targetActor, grantsAdvConditions, grantsDisConditions);
-    // handle distance-based status effects
+    // process distance-based status effects
     if (this.targetActor) {
-      const grantAdjacentAttack = this._getConditionForEffect(this.targetActor, "advReminderGrantAdjacentAttack");
+      const grantAdjacentAttack = accumulator._getConditionForEffect(this.targetActor, "advReminderGrantAdjacentAttack");
       if (grantAdjacentAttack.length) {
         const distance = this.distanceFn();
-        const accumFn = distance <= 5 ? accumulator.advantage : accumulator.disadvantage;
+        const accumFn = distance <= 5 ? accumulator.advantageIf.bind(accumulator) : accumulator.disadvantageIf.bind(accumulator);
         grantAdjacentAttack.forEach(accumFn);
       }
     }
-    accumulator.update(options);
   }
 }
 
