@@ -4,6 +4,7 @@ import {
   AdvantageAccumulator,
   AttackReminder,
   AttackReminderV2,
+  CriticalAccumulator,
   CriticalReminder,
   CriticalReminderV2,
   DeathSaveReminder,
@@ -220,7 +221,56 @@ export class DeathSaveSource extends SourceMixin(DeathSaveReminder) {
   }
 }
 
+class CriticalLabelAccumulator extends CriticalAccumulator {
+  /** @type {string[]} */
+  criticalLabels = [];
+  /** @type {string[]} */
+  normalLabels = [];
+
+  applyFlags(actorFlags, critKeys, normalKeys) {
+    critKeys.forEach(key => {
+      if (actorFlags[key]) this.criticalLabels.push(...actorFlags[key]);
+    });
+    normalKeys.forEach(key => {
+      if(actorFlags[key]) this.normalLabels.push(...actorFlags[key]);
+    });
+  }
+
+  critical(label) {
+    if (label) this.criticalLabels.push(label);
+  }
+
+  // TODO consider extracting to an LabelMixin
+  _getConditionForEffect(actor, key) {
+    const props = super._getConditionForEffect(actor, key);
+    return props
+      // remove the number after exhaustion
+      .map((k) => k.split("-").shift())
+      .flatMap((k) => {
+        // look for active effects with this status in it, get their names
+        const activeEffectNames = actor.appliedEffects
+          .filter((e) => e.statuses.some((s) => s === k))
+          .map((e) => e.name);
+        if (activeEffectNames.length) return activeEffectNames;
+        // fallback to the status effect's name (mostly for exhaustion)
+        return CONFIG.statusEffects.filter((s) => s.id === k).map((s) => s.name);
+      });
+  }
+
+  update(options, labelPrefix) {
+    debug("criticalLabels", this.criticalLabels, "normalLabels", this.normalLabels);
+    if (this.criticalLabels.length)
+      foundry.utils.setProperty(options, `${labelPrefix}.adv-reminder.criticalLabels`, this.criticalLabels);
+    if (this.normalLabels.length)
+      foundry.utils.setProperty(options, `${labelPrefix}.adv-reminder.normalLabels`, this.normalLabels);
+  }
+}
+
 export class CriticalSource extends SourceMixin(CriticalReminder) {
+  static AccumulatorClass = CriticalLabelAccumulator;
+
+  static UpdateMessage = "checking for crit/normal effects to display their source";
+
   _adjustRange(distanceFn, grantsCriticalRange) {
     // check if the range applies, remove flag if not
     if ("grants.critical.range" in this.targetFlags) {
@@ -229,39 +279,16 @@ export class CriticalSource extends SourceMixin(CriticalReminder) {
     }
   }
 
-  _accumulator() {
-    const criticalLabels = [];
-    const normalLabels = [];
-
-    return {
-      add: (changes, critKeys, normalKeys) => {
-        critKeys.forEach(key => {
-          if (changes[key]) criticalLabels.push(...changes[key]);
-        });
-        normalKeys.forEach(key => {
-          if(changes[key]) normalLabels.push(...changes[key]);
-        });
-      },
-      critical: (label) => {
-        if (label) criticalLabels.push(label);
-      },
-      update: (options) => {
-        debug("criticalLabels", criticalLabels, "normalLabels", normalLabels);
-        const merge = (newLabels, key) => {
-          if (newLabels.length) {
-            const labels = foundry.utils.getProperty(options, key);
-            if (labels) newLabels.push(...labels);
-            foundry.utils.setProperty(options, key, newLabels);
-          }
-        };
-        merge(criticalLabels, "dialogOptions.adv-reminder.criticalLabels");
-        merge(normalLabels, "dialogOptions.adv-reminder.normalLabels");
-      },
-    };
+  updateOptions(options) {
+    super.updateOptions(options, "dialogOptions");
   }
 }
 
 export class CriticalSourceV2 extends SourceMixin(CriticalReminderV2) {
+  static AccumulatorClass = CriticalLabelAccumulator;
+
+  static UpdateMessage = "checking for crit/normal effects to display their source";
+
   _adjustRange(distanceFn, grantsCriticalRange) {
     // check if the range applies, remove flag if not
     if ("grants.critical.range" in this.targetFlags) {
@@ -270,34 +297,7 @@ export class CriticalSourceV2 extends SourceMixin(CriticalReminderV2) {
     }
   }
 
-  _accumulator() {
-    const criticalLabels = [];
-    const normalLabels = [];
-
-    return {
-      add: (changes, critKeys, normalKeys) => {
-        critKeys.forEach(key => {
-          if (changes[key]) criticalLabels.push(...changes[key]);
-        });
-        normalKeys.forEach(key => {
-          if(changes[key]) normalLabels.push(...changes[key]);
-        });
-      },
-      critical: (label) => {
-        if (label) criticalLabels.push(label);
-      },
-      update: (options) => {
-        debug("criticalLabels", criticalLabels, "normalLabels", normalLabels);
-        const merge = (newLabels, key) => {
-          if (newLabels.length) {
-            const labels = foundry.utils.getProperty(options, key);
-            if (labels) newLabels.push(...labels);
-            foundry.utils.setProperty(options, key, newLabels);
-          }
-        };
-        merge(criticalLabels, "options.adv-reminder.criticalLabels");
-        merge(normalLabels, "options.adv-reminder.normalLabels");
-      },
-    };
+  updateOptions(options) {
+    super.updateOptions(options, "options");
   }
 }

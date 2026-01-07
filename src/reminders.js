@@ -353,6 +353,29 @@ export class DeathSaveReminder extends AbilityBaseReminder {
   }
 }
 
+export class CriticalAccumulator extends AdvantageAccumulator {
+  /** @type {boolean} */
+  crit;
+  /** @type {boolean} */
+  normal;
+
+  applyFlags(actorFlags, critKeys, normalKeys) {
+    this.crit = critKeys.reduce((accum, curr) => accum || actorFlags[curr], this.crit);
+    this.normal = normalKeys.reduce((accum, curr) => accum || actorFlags[curr], this.normal);
+  }
+
+  critical(label) {
+    if (label) this.crit = true;
+  }
+
+  update(options, critProp) {
+    // a normal hit overrides a crit
+    const critical = this.normal ? false : !!this.crit;
+    debug(`updating ${critProp}: ${critical}`);
+    options[critProp] = critical;
+  }
+}
+
 export class CriticalReminder extends BaseReminder {
   constructor(actor, targetActor, item, distanceFn) {
     super(actor);
@@ -382,8 +405,12 @@ export class CriticalReminder extends BaseReminder {
     }
   }
 
+  static AccumulatorClass = CriticalAccumulator;
+
+  static UpdateMessage = "checking for critical/normal effects for the roll";
+
   updateOptions(options, critProp = "critical") {
-    this._message();
+    debug(this.constructor.UpdateMessage);
 
     // build the active effect keys applicable for this roll
     const critKeys = ["critical.all", `critical.${this.actionType}`];
@@ -396,40 +423,18 @@ export class CriticalReminder extends BaseReminder {
     const grantsNormalKeys = ["fail.critical.all", `fail.critical.${this.actionType}`];
 
     // find matching keys and update options
-    const accumulator = this._accumulator();
-    accumulator.add(this.actorFlags, critKeys, normalKeys);
-    accumulator.add(this.targetFlags, grantsCritKeys, grantsNormalKeys);
+    const accumulator = new this.constructor.AccumulatorClass();
+    accumulator.applyFlags(this.actorFlags, critKeys, normalKeys);
+    accumulator.applyFlags(this.targetFlags, grantsCritKeys, grantsNormalKeys);
     // handle distance-based status effects
     if (this.targetActor) {
-      const grantAdjacentCritical = this._getConditionForEffect(this.targetActor, "advReminderGrantAdjacentCritical");
+      const grantAdjacentCritical = accumulator._getConditionForEffect(this.targetActor, "advReminderGrantAdjacentCritical");
       if (grantAdjacentCritical.length) {
         const distance = this.distanceFn();
-        if (distance <= 5) grantAdjacentCritical.forEach(accumulator.critical);
+        if (distance <= 5) grantAdjacentCritical.forEach(accumulator.critical.bind(accumulator));
       }
     }
     accumulator.update(options, critProp);
-  }
-
-  /** @override */
-  _accumulator() {
-    let crit;
-    let normal;
-
-    return {
-      add: (actorFlags, critKeys, normalKeys) => {
-        crit = critKeys.reduce((accum, curr) => accum || actorFlags[curr], crit);
-        normal = normalKeys.reduce((accum, curr) => accum || actorFlags[curr], normal);
-      },
-      critical: (label) => {
-        if (label) crit = true;
-      },
-      update: (options, critProp) => {
-        // a normal hit overrides a crit
-        const critical = normal ? false : !!crit;
-        debug(`updating ${critProp}: ${critical}`);
-        options[critProp] = critical;
-      },
-    };
   }
 }
 
