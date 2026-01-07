@@ -13,7 +13,28 @@ import {
 } from "./reminders.js";
 import { debug } from "./util.js";
 
-class LabelAccumulator extends AdvantageAccumulator {
+/**
+ * A mixin to share a function override between the two label accumulators.
+ */
+const LabelMixin = (superClass) => class extends superClass {
+  _getConditionForEffect(actor, key) {
+    const props = super._getConditionForEffect(actor, key);
+    return props
+      // remove the number after exhaustion
+      .map((k) => k.split("-").shift())
+      .flatMap((k) => {
+        // look for active effects with this status in it, get their names
+        const activeEffectNames = actor.appliedEffects
+          .filter((e) => e.statuses.some((s) => s === k))
+          .map((e) => e.name);
+        if (activeEffectNames.length) return activeEffectNames;
+        // fallback to the status effect's name (mostly for exhaustion)
+        return CONFIG.statusEffects.filter((s) => s.id === k).map((s) => s.name);
+      });
+  }
+}
+
+class LabelAccumulator extends LabelMixin(AdvantageAccumulator) {
   /** @type {string[]} */
   advantageLabels = [];
   /** @type {string[]} */
@@ -82,22 +103,6 @@ class LabelAccumulator extends AdvantageAccumulator {
     this.advantageLabels.push(...advLabels);
     const disLabels = disConditions.flatMap(c => this._getConditionForEffect(actor, c));
     this.disadvantageLabels.push(...disLabels);
-  }
-
-  _getConditionForEffect(actor, key) {
-    const props = super._getConditionForEffect(actor, key);
-    return props
-      // remove the number after exhaustion
-      .map((k) => k.split("-").shift())
-      .flatMap((k) => {
-        // look for active effects with this status in it, get their names
-        const activeEffectNames = actor.appliedEffects
-          .filter((e) => e.statuses.some((s) => s === k))
-          .map((e) => e.name);
-        if (activeEffectNames.length) return activeEffectNames;
-        // fallback to the status effect's name (mostly for exhaustion)
-        return CONFIG.statusEffects.filter((s) => s.id === k).map((s) => s.name);
-      });
   }
 
   advantageIf(label) {
@@ -221,7 +226,7 @@ export class DeathSaveSource extends SourceMixin(DeathSaveReminder) {
   }
 }
 
-class CriticalLabelAccumulator extends CriticalAccumulator {
+class CriticalLabelAccumulator extends LabelMixin(CriticalAccumulator) {
   /** @type {string[]} */
   criticalLabels = [];
   /** @type {string[]} */
@@ -238,23 +243,6 @@ class CriticalLabelAccumulator extends CriticalAccumulator {
 
   critical(label) {
     if (label) this.criticalLabels.push(label);
-  }
-
-  // TODO consider extracting to an LabelMixin
-  _getConditionForEffect(actor, key) {
-    const props = super._getConditionForEffect(actor, key);
-    return props
-      // remove the number after exhaustion
-      .map((k) => k.split("-").shift())
-      .flatMap((k) => {
-        // look for active effects with this status in it, get their names
-        const activeEffectNames = actor.appliedEffects
-          .filter((e) => e.statuses.some((s) => s === k))
-          .map((e) => e.name);
-        if (activeEffectNames.length) return activeEffectNames;
-        // fallback to the status effect's name (mostly for exhaustion)
-        return CONFIG.statusEffects.filter((s) => s.id === k).map((s) => s.name);
-      });
   }
 
   update(options, labelPrefix) {
