@@ -1,10 +1,16 @@
 import { debug } from "./util.js";
 
+const AdvantageModeField = dnd5e.dataModels.fields.AdvantageModeField;
+
 export class AdvantageAccumulator {
-  /** @type {boolean} */
-  advantage;
-  /** @type {boolean} */
-  disadvantage;
+  /**
+   * @param {boolean} advantage
+   * @param {boolean} disadvantage
+   */
+  constructor({advantage, disadvantage} = {}) {
+    this.advantage = advantage;
+    this.disadvantage = disadvantage;
+  }
 
   /**
    * Apply labels from active effects that use the Midi flags.
@@ -111,12 +117,30 @@ class BaseReminder {
     const disConditions = this.disadvantageConditions;
     debug("advConditions", advConditions, "disConditions", disConditions);
 
+    // get the underlying adv/dis counts to initialize the accumulator
+    const counts = this._rollModeCounts(this.rollModes);
+
     // find matching keys, status effects, and update options
-    const accumulator = new this.constructor.AccumulatorClass();
+    const accumulator = new this.constructor.AccumulatorClass(counts);
     accumulator.applyFlags(this.actorFlags, advKeys, disKeys);
     accumulator.applyConditions(this.actor, advConditions, disConditions);
     this._customUpdateOptions(accumulator);
     accumulator.update(options);
+  }
+
+  _rollModeCounts(rollModes) {
+    if (foundry.utils.isEmpty(rollModes)) return {};
+
+    // TODO handle more than one in 5.1 using combineFields
+
+    const path = Object.keys(rollModes)[0];
+    const counts = AdvantageModeField.getCounts(this.actor, { key: path });
+    const advantage = (((counts.advantages.count > 0) && (counts.override === null)) || (counts.override === 1))
+      && !counts.advantages.suppressed;
+    const disadvantage = (((counts.disadvantages.count > 0) && (counts.override === null)) || (counts.override === -1))
+      && !counts.disadvantages.suppressed;
+    debug("Roll Mode from actor", path, advantage, disadvantage);
+    return { advantage, disadvantage };
   }
 
   _customUpdateOptions(accumulator) {}
@@ -350,6 +374,12 @@ export class DeathSaveReminder extends AbilityBaseReminder {
       "disadvantage.ability.save.all",
       "disadvantage.deathSave",
     ]);
+  }
+
+  get rollModes() {
+    return {
+      "system.attributes.death.roll.mode": ["DND5E.DeathSave"]
+    };
   }
 }
 
