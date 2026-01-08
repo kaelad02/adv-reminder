@@ -1,7 +1,5 @@
 import { debug } from "./util.js";
 
-const AdvantageModeField = dnd5e.dataModels.fields.AdvantageModeField;
-
 export class AdvantageAccumulator {
   /**
    * @param {boolean} advantage
@@ -134,7 +132,7 @@ class BaseReminder {
     // TODO handle more than one in 5.1 using combineFields
 
     const path = Object.keys(rollModes)[0];
-    const counts = AdvantageModeField.getCounts(this.actor, { key: path });
+    const counts = dnd5e.dataModels.fields.AdvantageModeField.getCounts(this.actor, { key: path });
     const advantage = (((counts.advantages.count > 0) && (counts.override === null)) || (counts.override === 1))
       && !counts.advantages.suppressed;
     const disadvantage = (((counts.disadvantages.count > 0) && (counts.override === null)) || (counts.override === -1))

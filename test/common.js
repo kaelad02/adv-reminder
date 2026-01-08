@@ -15,6 +15,21 @@ export default function commonTestInit() {
   globalThis.CONFIG.DND5E = {};
   globalThis.CONFIG.DND5E.conditionEffects = {};
 
+  // for reminders
+  globalThis.dnd5e = {
+    dataModels: {
+      fields: {
+        AdvantageModeField: {
+          getCounts: () => ({
+            override: null,
+            advantages: { count: 0, suppressed: false },
+            disadvantages: { count: 0, suppressed: false }
+          })
+        }
+      }
+    }
+  };
+
   // copied from Foundry
 
   function filter(test) {
