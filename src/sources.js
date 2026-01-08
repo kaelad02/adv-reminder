@@ -4,6 +4,7 @@ import {
   AdvantageAccumulator,
   AttackReminder,
   AttackReminderV2,
+  ConcentrationReminder,
   CriticalAccumulator,
   CriticalReminder,
   CriticalReminderV2,
@@ -171,13 +172,7 @@ export class AttackSourceV2 extends SourceMixin(AttackReminderV2) {}
 
 export class AbilitySaveSource extends SourceMixin(AbilitySaveReminder) {}
 
-export class ConcentrationSource extends SourceMixin(AbilitySaveReminder) {
-  get rollModes() {
-    return {
-      "system.attributes.concentration.roll.mode": ["DND5E.Concentration"]
-    };
-  }
-}
+export class ConcentrationSource extends SourceMixin(ConcentrationReminder) {}
 
 export class AbilityCheckSource extends SourceMixin(AbilityCheckReminder) {}
 

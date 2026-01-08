@@ -17,6 +17,7 @@ import {
   DeathSaveReminder,
   SkillReminder,
   InitiativeReminder,
+  ConcentrationReminder,
 } from "../reminders.js";
 import {
   AbilityCheckSource,
@@ -118,7 +119,7 @@ export default class CoreRollerHooks {
     const abilityId = config.ability;
     new ConcentrationMessage(actor, abilityId).addMessage(dialog);
     if (showSources) new ConcentrationSource(actor, abilityId).updateOptions(dialog);
-    new AbilitySaveReminder(actor, abilityId).updateOptions(config.rolls[0].options);
+    new ConcentrationReminder(actor, abilityId).updateOptions(config.rolls[0].options);
   }
 
   preRollAbilityCheckV2(config, dialog, message) {

@@ -309,6 +309,14 @@ export class AbilitySaveReminder extends AbilityBaseReminder {
   }
 }
 
+export class ConcentrationReminder extends AbilitySaveReminder {
+  get rollModes() {
+    return {
+      "system.attributes.concentration.roll.mode": ["DND5E.Concentration"]
+    };
+  }
+}
+
 export class SkillReminder extends AbilityCheckReminder {
   constructor(actor, abilityId, skillId, checkArmorStealth = true) {
     super(actor, abilityId);
