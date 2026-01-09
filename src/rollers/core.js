@@ -10,10 +10,10 @@ import {
   SkillMessage,
 } from "../messages.js";
 import {
-  AttackReminderV2,
+  AttackReminder,
   AbilityCheckReminder,
   AbilitySaveReminder,
-  CriticalReminderV2,
+  CriticalReminder,
   DeathSaveReminder,
   SkillReminder,
   InitiativeReminder,
@@ -84,7 +84,7 @@ export default class CoreRollerHooks {
 
     new AttackMessage(activity.actor, target, activity).addMessage(dialog);
     if (showSources) new AttackSourceV2(activity.actor, target, activity, distanceFn).updateOptions(dialog);
-    new AttackReminderV2(activity.actor, target, activity, distanceFn).updateOptions(config.rolls[0].options);
+    new AttackReminder(activity.actor, target, activity, distanceFn).updateOptions(config.rolls[0].options);
   }
 
   preRollSavingThrowV2(config, dialog, message) {
@@ -199,7 +199,7 @@ export default class CoreRollerHooks {
 
     new DamageMessage(activity.actor, target, activity).addMessage(dialog);
     if (showSources) new CriticalSourceV2(activity.actor, target, activity, distanceFn).updateOptions(dialog);
-    const reminder = new CriticalReminderV2(activity.actor, target, activity, distanceFn);
+    const reminder = new CriticalReminder(activity.actor, target, activity, distanceFn);
     config.rolls.forEach(roll => reminder.updateOptions(roll.options, "isCritical"));
     
     // workaround for https://github.com/foundryvtt/dnd5e/issues/5455

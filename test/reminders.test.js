@@ -9,13 +9,8 @@ import {
 } from "../src/reminders";
 import commonTestInit from "./common.js";
 
-function createItem(actionType, abilityMod) {
-  return {
-    abilityMod,
-    system: {
-      actionType,
-    },
-  };
+function createActivity(actionType, ability) {
+  return { actionType, ability };
 }
 
 beforeAll(() => {
@@ -26,10 +21,10 @@ describe("AttackReminder no legit active effects", () => {
   test("attack with no active effects should be normal", () => {
     const actor = createActorWithFlags();
     const target = createActorWithFlags();
-    const item = createItem("mwak", "str");
+    const activity = createActivity("mwak", "str");
     const options = {};
 
-    const reminder = new AttackReminder(actor, target, item);
+    const reminder = new AttackReminder(actor, target, activity);
     reminder.updateOptions(options);
 
     expect(options.advantage).toBeUndefined();
@@ -40,10 +35,10 @@ describe("AttackReminder no legit active effects", () => {
 describe("AttackReminder advantage flags", () => {
   test("attack with advantage.all flag should be advantage", () => {
     const actor = createActorWithFlags("flags.midi-qol.advantage.all");
-    const item = createItem("mwak", "str");
+    const activity = createActivity("mwak", "str");
     const options = {};
 
-    const reminder = new AttackReminder(actor, null, item);
+    const reminder = new AttackReminder(actor, null, activity);
     reminder.updateOptions(options);
 
     expect(options.advantage).toBe(true);
@@ -52,10 +47,10 @@ describe("AttackReminder advantage flags", () => {
 
   test("attack with advantage.attack.all flag should be advantage", () => {
     const actor = createActorWithFlags("flags.midi-qol.advantage.attack.all");
-    const item = createItem("mwak", "str");
+    const activity = createActivity("mwak", "str");
     const options = {};
 
-    const reminder = new AttackReminder(actor, null, item);
+    const reminder = new AttackReminder(actor, null, activity);
     reminder.updateOptions(options);
 
     expect(options.advantage).toBe(true);
@@ -64,10 +59,10 @@ describe("AttackReminder advantage flags", () => {
 
   test("attack with advantage.attack.mwak flag should be advantage for Melee Weapon Attack", () => {
     const actor = createActorWithFlags("flags.midi-qol.advantage.attack.mwak");
-    const item = createItem("mwak", "str");
+    const activity = createActivity("mwak", "str");
     const options = {};
 
-    const reminder = new AttackReminder(actor, null, item);
+    const reminder = new AttackReminder(actor, null, activity);
     reminder.updateOptions(options);
 
     expect(options.advantage).toBe(true);
@@ -76,10 +71,10 @@ describe("AttackReminder advantage flags", () => {
 
   test("attack with advantage.attack.mwak flag should be normal for Ranged Weapon Attack", () => {
     const actor = createActorWithFlags("flags.midi-qol.advantage.attack.mwak");
-    const item = createItem("rwak", "dex");
+    const activity = createActivity("rwak", "dex");
     const options = {};
 
-    const reminder = new AttackReminder(actor, null, item);
+    const reminder = new AttackReminder(actor, null, activity);
     reminder.updateOptions(options);
 
     expect(options.advantage).toBeUndefined();
@@ -88,10 +83,10 @@ describe("AttackReminder advantage flags", () => {
 
   test("attack with advantage.attack.cha flag should be advantage for Charisma Attack", () => {
     const actor = createActorWithFlags("flags.midi-qol.advantage.attack.cha");
-    const item = createItem("rsak", "cha");
+    const activity = createActivity("rsak", "cha");
     const options = {};
 
-    const reminder = new AttackReminder(actor, null, item);
+    const reminder = new AttackReminder(actor, null, activity);
     reminder.updateOptions(options);
 
     expect(options.advantage).toBe(true);
@@ -100,10 +95,10 @@ describe("AttackReminder advantage flags", () => {
 
   test("attack with advantage.attack.cha flag should be normal for Intelligence Attack", () => {
     const actor = createActorWithFlags("flags.midi-qol.advantage.attack.cha");
-    const item = createItem("rsak", "int");
+    const activity = createActivity("rsak", "int");
     const options = {};
 
-    const reminder = new AttackReminder(actor, null, item);
+    const reminder = new AttackReminder(actor, null, activity);
     reminder.updateOptions(options);
 
     expect(options.advantage).toBeUndefined();
@@ -113,10 +108,10 @@ describe("AttackReminder advantage flags", () => {
   test("attack with grants.advantage.attack.all flag should be advantage", () => {
     const actor = createActorWithFlags();
     const target = createActorWithFlags("flags.midi-qol.grants.advantage.attack.all");
-    const item = createItem("rwak", "dex");
+    const activity = createActivity("rwak", "dex");
     const options = {};
 
-    const reminder = new AttackReminder(actor, target, item);
+    const reminder = new AttackReminder(actor, target, activity);
     reminder.updateOptions(options);
 
     expect(options.advantage).toBe(true);
@@ -126,10 +121,10 @@ describe("AttackReminder advantage flags", () => {
   test("attack with grants.advantage.attack.rwak flag should be advantage for Ranged Weapon Attack", () => {
     const actor = createActorWithFlags();
     const target = createActorWithFlags("flags.midi-qol.grants.advantage.attack.rwak");
-    const item = createItem("rwak", "dex");
+    const activity = createActivity("rwak", "dex");
     const options = {};
 
-    const reminder = new AttackReminder(actor, target, item);
+    const reminder = new AttackReminder(actor, target, activity);
     reminder.updateOptions(options);
 
     expect(options.advantage).toBe(true);
@@ -139,10 +134,10 @@ describe("AttackReminder advantage flags", () => {
   test("attack with grants.advantage.attack.rwak flag should be advantage for Ranged Spell Attack", () => {
     const actor = createActorWithFlags();
     const target = createActorWithFlags("flags.midi-qol.grants.advantage.attack.rwak");
-    const item = createItem("rsak", "wis");
+    const activity = createActivity("rsak", "wis");
     const options = {};
 
-    const reminder = new AttackReminder(actor, target, item);
+    const reminder = new AttackReminder(actor, target, activity);
     reminder.updateOptions(options);
 
     expect(options.advantage).toBeUndefined();
@@ -153,10 +148,10 @@ describe("AttackReminder advantage flags", () => {
 describe("AttackReminder disadvantage flags", () => {
   test("attack with disadvantage.all flag should be disadvantage", () => {
     const actor = createActorWithFlags("flags.midi-qol.disadvantage.all");
-    const item = createItem("mwak", "str");
+    const activity = createActivity("mwak", "str");
     const options = {};
 
-    const reminder = new AttackReminder(actor, null, item);
+    const reminder = new AttackReminder(actor, null, activity);
     reminder.updateOptions(options);
 
     expect(options.advantage).toBeUndefined;
@@ -165,10 +160,10 @@ describe("AttackReminder disadvantage flags", () => {
 
   test("attack with disadvantage.attack.all flag should be disadvantage", () => {
     const actor = createActorWithFlags("flags.midi-qol.disadvantage.attack.all");
-    const item = createItem("mwak", "str");
+    const activity = createActivity("mwak", "str");
     const options = {};
 
-    const reminder = new AttackReminder(actor, null, item);
+    const reminder = new AttackReminder(actor, null, activity);
     reminder.updateOptions(options);
 
     expect(options.advantage).toBeUndefined();
@@ -177,10 +172,10 @@ describe("AttackReminder disadvantage flags", () => {
 
   test("attack with disadvantage.attack.mwak flag should be disadvantage for Melee Weapon Attack", () => {
     const actor = createActorWithFlags("flags.midi-qol.disadvantage.attack.mwak");
-    const item = createItem("mwak", "str");
+    const activity = createActivity("mwak", "str");
     const options = {};
 
-    const reminder = new AttackReminder(actor, null, item);
+    const reminder = new AttackReminder(actor, null, activity);
     reminder.updateOptions(options);
 
     expect(options.advantage).toBeUndefined();
@@ -189,10 +184,10 @@ describe("AttackReminder disadvantage flags", () => {
 
   test("attack with disadvantage.attack.mwak flag should be normal for Ranged Weapon Attack", () => {
     const actor = createActorWithFlags("flags.midi-qol.disadvantage.attack.mwak");
-    const item = createItem("rwak", "dex");
+    const activity = createActivity("rwak", "dex");
     const options = {};
 
-    const reminder = new AttackReminder(actor, null, item);
+    const reminder = new AttackReminder(actor, null, activity);
     reminder.updateOptions(options);
 
     expect(options.advantage).toBeUndefined();
@@ -201,10 +196,10 @@ describe("AttackReminder disadvantage flags", () => {
 
   test("attack with disadvantage.attack.cha flag should be disadvantage for Charisma Attack", () => {
     const actor = createActorWithFlags("flags.midi-qol.disadvantage.attack.cha");
-    const item = createItem("rsak", "cha");
+    const activity = createActivity("rsak", "cha");
     const options = {};
 
-    const reminder = new AttackReminder(actor, null, item);
+    const reminder = new AttackReminder(actor, null, activity);
     reminder.updateOptions(options);
 
     expect(options.advantage).toBeUndefined();
@@ -213,10 +208,10 @@ describe("AttackReminder disadvantage flags", () => {
 
   test("attack with disadvantage.attack.cha flag should be normal for Intelligence Attack", () => {
     const actor = createActorWithFlags("flags.midi-qol.disadvantage.attack.cha");
-    const item = createItem("rsak", "int");
+    const activity = createActivity("rsak", "int");
     const options = {};
 
-    const reminder = new AttackReminder(actor, null, item);
+    const reminder = new AttackReminder(actor, null, activity);
     reminder.updateOptions(options);
 
     expect(options.advantage).toBeUndefined();
@@ -226,10 +221,10 @@ describe("AttackReminder disadvantage flags", () => {
   test("attack with grants.disadvantage.attack.all flag should be disadvantage", () => {
     const actor = createActorWithFlags();
     const target = createActorWithFlags("flags.midi-qol.grants.disadvantage.attack.all");
-    const item = createItem("rwak", "dex");
+    const activity = createActivity("rwak", "dex");
     const options = {};
 
-    const reminder = new AttackReminder(actor, target, item);
+    const reminder = new AttackReminder(actor, target, activity);
     reminder.updateOptions(options);
 
     expect(options.advantage).toBeUndefined();
@@ -239,10 +234,10 @@ describe("AttackReminder disadvantage flags", () => {
   test("attack with grants.disadvantage.attack.rwak flag should be disadvantage for Ranged Weapon Attack", () => {
     const actor = createActorWithFlags();
     const target = createActorWithFlags("flags.midi-qol.grants.disadvantage.attack.rwak");
-    const item = createItem("rwak", "dex");
+    const activity = createActivity("rwak", "dex");
     const options = {};
 
-    const reminder = new AttackReminder(actor, target, item);
+    const reminder = new AttackReminder(actor, target, activity);
     reminder.updateOptions(options);
 
     expect(options.advantage).toBeUndefined();
@@ -252,10 +247,10 @@ describe("AttackReminder disadvantage flags", () => {
   test("attack with grants.disadvantage.attack.rwak flag should be disadvantage for Ranged Spell Attack", () => {
     const actor = createActorWithFlags();
     const target = createActorWithFlags("flags.midi-qol.grants.disadvantage.attack.rwak");
-    const item = createItem("rsak", "wis");
+    const activity = createActivity("rsak", "wis");
     const options = {};
 
-    const reminder = new AttackReminder(actor, target, item);
+    const reminder = new AttackReminder(actor, target, activity);
     reminder.updateOptions(options);
 
     expect(options.advantage).toBeUndefined();
@@ -268,10 +263,10 @@ describe("AttackReminder both advantage and disadvantage flags", () => {
     const actor = createActorWithFlags("flags.midi-qol.advantage.attack.rsak");
     // simulates Dodge
     const target = createActorWithFlags("flags.midi-qol.grants.disadvantage.attack.all");
-    const item = createItem("rsak", "wis");
+    const activity = createActivity("rsak", "wis");
     const options = {};
 
-    const reminder = new AttackReminder(actor, target, item);
+    const reminder = new AttackReminder(actor, target, activity);
     reminder.updateOptions(options);
 
     expect(options.advantage).toBe(true);
@@ -282,10 +277,10 @@ describe("AttackReminder both advantage and disadvantage flags", () => {
     const actor = createActorWithFlags("flags.midi-qol.advantage.attack.mwak");
     // simulates Dodge
     const target = createActorWithFlags("flags.midi-qol.grants.disadvantage.attack.all");
-    const item = createItem("rsak", "wis");
+    const activity = createActivity("rsak", "wis");
     const options = {};
 
-    const reminder = new AttackReminder(actor, target, item);
+    const reminder = new AttackReminder(actor, target, activity);
     reminder.updateOptions(options);
 
     expect(options.advantage).toBeUndefined();
@@ -296,10 +291,10 @@ describe("AttackReminder both advantage and disadvantage flags", () => {
     const actor = createActorWithFlags("flags.midi-qol.advantage.attack.rsak");
     // simulates Dodge
     const target = createActorWithFlags("flags.midi-qol.grants.disadvantage.attack.mwak");
-    const item = createItem("rsak", "wis");
+    const activity = createActivity("rsak", "wis");
     const options = {};
 
-    const reminder = new AttackReminder(actor, target, item);
+    const reminder = new AttackReminder(actor, target, activity);
     reminder.updateOptions(options);
 
     expect(options.advantage).toBe(true);
@@ -1094,10 +1089,10 @@ describe("DeathSaveReminder both advantage and disadvantage flags", () => {
 describe("CriticalReminder no legit active effects", () => {
   test("damage roll with no active effects should be normal", () => {
     const actor = createActorWithFlags();
-    const item = createItem("mwak", "str");
+    const activity = createActivity("mwak", "str");
     const options = {};
 
-    const reminder = new CriticalReminder(actor, null, item);
+    const reminder = new CriticalReminder(actor, null, activity);
     reminder.updateOptions(options);
 
     expect(options.advantage).toBeUndefined();
@@ -1108,10 +1103,10 @@ describe("CriticalReminder no legit active effects", () => {
 describe("CriticalReminder critical flags", () => {
   test("damage roll with critical.all flag should be critical", () => {
     const actor = createActorWithFlags("flags.midi-qol.critical.all");
-    const item = createItem("mwak", "str");
+    const activity = createActivity("mwak", "str");
     const options = {};
 
-    const reminder = new CriticalReminder(actor, null, item);
+    const reminder = new CriticalReminder(actor, null, activity);
     reminder.updateOptions(options);
 
     expect(options.critical).toBe(true);
@@ -1119,10 +1114,10 @@ describe("CriticalReminder critical flags", () => {
 
   test("damage roll with critical.mwak flag should be critical for Melee Weapon Attack", () => {
     const actor = createActorWithFlags("flags.midi-qol.critical.mwak");
-    const item = createItem("mwak", "str");
+    const activity = createActivity("mwak", "str");
     const options = {};
 
-    const reminder = new CriticalReminder(actor, null, item);
+    const reminder = new CriticalReminder(actor, null, activity);
     reminder.updateOptions(options);
 
     expect(options.critical).toBe(true);
@@ -1130,10 +1125,10 @@ describe("CriticalReminder critical flags", () => {
 
   test("damage roll with critical.rsak flag should be normal for Melee Weapon Attack", () => {
     const actor = createActorWithFlags("flags.midi-qol.critical.rsak");
-    const item = createItem("mwak", "str");
+    const activity = createActivity("mwak", "str");
     const options = {};
 
-    const reminder = new CriticalReminder(actor, null, item);
+    const reminder = new CriticalReminder(actor, null, activity);
     reminder.updateOptions(options);
 
     expect(options.critical).toBe(false);
@@ -1142,10 +1137,10 @@ describe("CriticalReminder critical flags", () => {
   test("damage roll with grants.critical.all flag should be critical", () => {
     const actor = createActorWithFlags();
     const target = createActorWithFlags("flags.midi-qol.grants.critical.all");
-    const item = createItem("mwak", "str");
+    const activity = createActivity("mwak", "str");
     const options = {};
 
-    const reminder = new CriticalReminder(actor, target, item);
+    const reminder = new CriticalReminder(actor, target, activity);
     reminder.updateOptions(options);
 
     expect(options.critical).toBe(true);
@@ -1154,10 +1149,10 @@ describe("CriticalReminder critical flags", () => {
   test("damage roll with grants.critical.rwak flag should be critical for Ranged Weapon Attack", () => {
     const actor = createActorWithFlags();
     const target = createActorWithFlags("flags.midi-qol.grants.critical.rwak");
-    const item = createItem("rwak", "dex");
+    const activity = createActivity("rwak", "dex");
     const options = {};
 
-    const reminder = new CriticalReminder(actor, target, item);
+    const reminder = new CriticalReminder(actor, target, activity);
     reminder.updateOptions(options);
 
     expect(options.critical).toBe(true);
@@ -1166,10 +1161,10 @@ describe("CriticalReminder critical flags", () => {
   test("damage roll with grants.critical.rwak flag should be normal for Melee Spell Attack", () => {
     const actor = createActorWithFlags();
     const target = createActorWithFlags("flags.midi-qol.grants.critical.rwak");
-    const item = createItem("msak", "int");
+    const activity = createActivity("msak", "int");
     const options = {};
 
-    const reminder = new CriticalReminder(actor, target, item);
+    const reminder = new CriticalReminder(actor, target, activity);
     reminder.updateOptions(options);
 
     expect(options.critical).toBe(false);
@@ -1179,10 +1174,10 @@ describe("CriticalReminder critical flags", () => {
 describe("CriticalReminder no critical flags", () => {
   test("damage roll with noCritical.all flag should be normal", () => {
     const actor = createActorWithFlags("flags.midi-qol.noCritical.all");
-    const item = createItem("mwak", "str");
+    const activity = createActivity("mwak", "str");
     const options = {};
 
-    const reminder = new CriticalReminder(actor, null, item);
+    const reminder = new CriticalReminder(actor, null, activity);
     reminder.updateOptions(options);
 
     expect(options.critical).toBe(false);
@@ -1190,10 +1185,10 @@ describe("CriticalReminder no critical flags", () => {
 
   test("damage roll with noCritical.mwak flag should be normal for Melee Weapon Attack", () => {
     const actor = createActorWithFlags("flags.midi-qol.noCritical.mwak");
-    const item = createItem("mwak", "str");
+    const activity = createActivity("mwak", "str");
     const options = {};
 
-    const reminder = new CriticalReminder(actor, null, item);
+    const reminder = new CriticalReminder(actor, null, activity);
     reminder.updateOptions(options);
 
     expect(options.critical).toBe(false);
@@ -1202,10 +1197,10 @@ describe("CriticalReminder no critical flags", () => {
   test("damage roll with fail.critical.all flag should be normal", () => {
     const actor = createActorWithFlags();
     const target = createActorWithFlags("flags.midi-qol.fail.critical.all");
-    const item = createItem("mwak", "str");
+    const activity = createActivity("mwak", "str");
     const options = {};
 
-    const reminder = new CriticalReminder(actor, target, item);
+    const reminder = new CriticalReminder(actor, target, activity);
     reminder.updateOptions(options);
 
     expect(options.critical).toBe(false);
@@ -1214,10 +1209,10 @@ describe("CriticalReminder no critical flags", () => {
   test("damage roll with fail.critical.rwak flag should be normal for Ranged Weapon Attack", () => {
     const actor = createActorWithFlags();
     const target = createActorWithFlags("flags.midi-qol.fail.critical.rwak");
-    const item = createItem("rwak", "dex");
+    const activity = createActivity("rwak", "dex");
     const options = {};
 
-    const reminder = new CriticalReminder(actor, target, item);
+    const reminder = new CriticalReminder(actor, target, activity);
     reminder.updateOptions(options);
 
     expect(options.critical).toBe(false);
@@ -1233,10 +1228,10 @@ describe("CriticalReminder both critical and no critical flags", () => {
     );
     // cancel all crits, like Adamantine Armor
     const target = createActorWithFlags("flags.midi-qol.fail.critical.all");
-    const item = createItem("mwak", "str");
+    const activity = createActivity("mwak", "str");
     const options = {};
 
-    const reminder = new CriticalReminder(actor, target, item);
+    const reminder = new CriticalReminder(actor, target, activity);
     reminder.updateOptions(options);
 
     expect(options.critical).toBe(false);
