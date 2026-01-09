@@ -1,5 +1,87 @@
 import { debug } from "./util.js";
 
+export class AdvantageAccumulator {
+  /**
+   * @param {boolean} advantage
+   * @param {boolean} disadvantage
+   */
+  constructor({advantage, disadvantage} = {}) {
+    this.advantage = advantage;
+    this.disadvantage = disadvantage;
+  }
+
+  /**
+   * Apply labels from active effects that use the Midi flags.
+   * @param {Object.<string, boolean>} actorFlags
+   * @param {string[]} advKeys
+   * @param {string[]} disKeys
+   */
+  applyFlags(actorFlags, advKeys, disKeys) {
+    this.advantage = advKeys.reduce((accum, curr) => accum || actorFlags[curr], this.advantage);
+    this.disadvantage = disKeys.reduce((accum, curr) => accum || actorFlags[curr], this.disadvantage);
+  }
+
+  /**
+   * Apply labels from conditions the actor has.
+   * @param {Actor5e} actor
+   * @param {string[]} advConditions
+   * @param {string[]} disConditions
+   */
+  applyConditions(actor, advConditions, disConditions) {
+    if (!actor) return;
+    if (advConditions.flatMap(c => this._getConditionForEffect(actor, c)).length) this.advantage = true;
+    if (disConditions.flatMap(c => this._getConditionForEffect(actor, c)).length) this.disadvantage = true;
+  }
+
+  /**
+   * Modeled after Actor5e#hasConditionEffect, check to see if the actor is under the effect of
+   * this property from some status or due to its level of exhaustion. But instead of a true/false,
+   * it returns the ID of the condition.
+   * @param {Actor5e} actor
+   * @param {string} key
+   * @returns {string[]}
+   */
+  _getConditionForEffect(actor, key) {
+    const props = CONFIG.DND5E.conditionEffects[key] ?? new Set();
+    const level = actor.system.attributes?.exhaustion ?? null;
+    const imms = actor.system.traits?.ci?.value ?? new Set();
+    const statuses = actor.statuses;
+    return props
+      .filter(k => {
+        const l = Number(k.split("-").pop());
+        return (statuses.has(k) && !imms.has(k))
+          || (!imms.has("exhaustion") && (level !== null) && Number.isInteger(l) && (level >= l));
+      })
+      .toObject();
+  }
+
+  /**
+   * Set advantage if the label exists.
+   * @param {string} label
+   */
+  advantageIf(label) {
+    if (label) this.advantage = true;
+  }
+
+  /**
+   * Set disadvantage if the label exists.
+   * @param {string} label
+   */
+  disadvantageIf(label) {
+    if (label) this.disadvantage = true;
+  }
+
+  /**
+   * Update the options with the advantage and disadvantage properties
+   * @param {Object} options
+   */
+  update(options) {
+    debug(`updating options with {advantage: ${this.advantage}, disadvantage: ${this.disadvantage}}`);
+    if (this.advantage) options.advantage = true;
+    if (this.disadvantage) options.disadvantage = true;
+  }
+}
+
 class BaseReminder {
   constructor(actor) {
     /** @type {Actor5e*} */
@@ -18,71 +100,48 @@ class BaseReminder {
     return foundry.utils.flattenObject(midiFlags);
   }
 
-  _message() {
-    debug("checking for adv/dis effects for the roll");
+  static AccumulatorClass = AdvantageAccumulator;
+
+  static UpdateMessage = "checking for adv/dis effects for the roll";
+
+  updateOptions(options) {
+    debug(this.constructor.UpdateMessage);
+
+    // get the active effect keys applicable for this roll
+    const advKeys = this.advantageKeys;
+    const disKeys = this.disadvantageKeys;
+    debug("advKeys", advKeys, "disKeys", disKeys);
+    const advConditions = this.advantageConditions;
+    const disConditions = this.disadvantageConditions;
+    debug("advConditions", advConditions, "disConditions", disConditions);
+
+    // get the underlying adv/dis counts to initialize the accumulator
+    const counts = this._rollModeCounts(this.rollModes);
+
+    // find matching keys, status effects, and update options
+    const accumulator = new this.constructor.AccumulatorClass(counts);
+    accumulator.applyFlags(this.actorFlags, advKeys, disKeys);
+    accumulator.applyConditions(this.actor, advConditions, disConditions);
+    this._customUpdateOptions(accumulator);
+    accumulator.update(options);
   }
 
-  /**
-   * Modeled after Actor5e#hasConditionEffect, check to see if the actor is under the effect of
-   * this property from some status or due to its level of exhaustion. But instead of a true/false,
-   * it returns the ID of the condition.
-   * @param {Actor5e} actor the actor
-   * @param {string} key the effect key
-   * @returns {Set} a set of the condition IDs the actor has for the effect
-   */
-  _getConditionForEffect(actor, key) {
-    const props = CONFIG.DND5E.conditionEffects[key] ?? new Set();
-    const level = actor.system.attributes?.exhaustion ?? null;
-    const imms = actor.system.traits?.ci?.value ?? new Set();
-    const statuses = actor.statuses;
-    return props.filter(k => {
-      const l = Number(k.split("-").pop());
-      return (statuses.has(k) && !imms.has(k))
-        || (!imms.has("exhaustion") && (level !== null) && Number.isInteger(l) && (level >= l));
-    }).toObject();
+  _rollModeCounts(rollModes) {
+    if (foundry.utils.isEmpty(rollModes)) return {};
+
+    // TODO handle more than one in 5.1 using combineFields
+
+    const path = Object.keys(rollModes)[0];
+    const counts = dnd5e.dataModels.fields.AdvantageModeField.getCounts(this.actor, { key: path });
+    const advantage = (((counts.advantages.count > 0) && (counts.override === null)) || (counts.override === 1))
+      && !counts.advantages.suppressed;
+    const disadvantage = (((counts.disadvantages.count > 0) && (counts.override === null)) || (counts.override === -1))
+      && !counts.disadvantages.suppressed;
+    debug("Roll Mode from actor", path, advantage, disadvantage);
+    return { advantage, disadvantage };
   }
 
-  /**
-   * An accumulator that looks for matching keys and tracks advantage/disadvantage.
-   * @param {Object} options
-   * @param {boolean} options.advantage initial value for advantage
-   * @param {boolean} options.disadvantage initial value for disadvantage
-   */
-  _accumulator({advantage, disadvantage} = {}) {
-    return {
-      advantage,
-      disadvantage,
-      add: (actorFlags, advKeys, disKeys) => {
-        advantage = advKeys.reduce((accum, curr) => accum || actorFlags[curr], advantage);
-        disadvantage = disKeys.reduce((accum, curr) => accum || actorFlags[curr], disadvantage);
-      },
-      fromConditions: (actor, advConditions, disConditions) => {
-        if (!actor) return;
-        if (advConditions.flatMap(c => this._getConditionForEffect(actor, c)).length) advantage = true;
-        if (disConditions.flatMap(c => this._getConditionForEffect(actor, c)).length) disadvantage = true;
-      },
-      advantage: (label) => {
-        if (label) advantage = true;
-      },
-      disadvantage: (label) => {
-        if (label) disadvantage = true;
-      },
-      update: (options) => {
-        debug(`updating options with {advantage: ${advantage}, disadvantage: ${disadvantage}}`);
-        // only set if adv or dis, the die roller doesn't handle when both are true correctly
-        if (advantage && !disadvantage) {
-          options.advantage = true;
-          if (options.disadvantage) options.disadvantage = false;
-        } else if (!advantage && disadvantage) {
-          if (options.advantage) options.advantage = false;
-          options.disadvantage = true;
-        } else {
-          if (options.advantage) options.advantage = false;
-          if (options.disadvantage) options.disadvantage = false;
-        }
-      },
-    };
-  }
+  _customUpdateOptions(accumulator) {}
 }
 
 export class AttackReminder extends BaseReminder {
@@ -101,22 +160,37 @@ export class AttackReminder extends BaseReminder {
     this.distanceFn = distanceFn;
   }
 
-  updateOptions(options) {
-    this._message();
-
-    // build the active effect keys applicable for this roll
-    const advKeys = [
+  get advantageKeys() {
+    return [
       "advantage.all",
       "advantage.attack.all",
       `advantage.attack.${this.actionType}`,
       `advantage.attack.${this.abilityId}`,
     ];
-    const disKeys = [
+  }
+
+  get disadvantageKeys() {
+    return [
       "disadvantage.all",
       "disadvantage.attack.all",
       `disadvantage.attack.${this.actionType}`,
       `disadvantage.attack.${this.abilityId}`,
     ];
+  }
+
+  get advantageConditions() {
+    return ["advReminderAdvantageAttack"];
+  }
+
+  get disadvantageConditions() {
+    const conditions = ["advReminderDisadvantageAttack"];
+    if (this.abilityId === "str" || this.abilityId === "dex" || this.abilityId === "con")
+      conditions.push("advReminderDisadvantagePhysicalRolls");
+    return conditions;
+  }
+
+  _customUpdateOptions(accumulator) {
+    // process target flags
     const grantsAdvKeys = [
       "grants.advantage.attack.all",
       `grants.advantage.attack.${this.actionType}`,
@@ -125,31 +199,22 @@ export class AttackReminder extends BaseReminder {
       "grants.disadvantage.attack.all",
       `grants.disadvantage.attack.${this.actionType}`,
     ];
-    // build the condition effect keys for this roll
-    const advConditions = ["advReminderAdvantageAttack"];
-    const disConditions = ["advReminderDisadvantageAttack"];
+    accumulator.applyFlags(this.targetFlags, grantsAdvKeys, grantsDisKeys);
+
+    // process target's conditions
     const grantsAdvConditions = ["advReminderGrantAdvantageAttack"];
     const grantsDisConditions = ["advReminderGrantDisadvantageAttack"];
-    if (this.abilityId === "str" || this.abilityId === "dex" || this.abilityId === "con")
-      disConditions.push("advReminderDisadvantagePhysicalRolls");
+    accumulator.applyConditions(this.targetActor, grantsAdvConditions, grantsDisConditions);
 
-    // find matching keys
-    const accumulator = this._accumulator(options);
-    accumulator.add(this.actorFlags, advKeys, disKeys);
-    accumulator.add(this.targetFlags, grantsAdvKeys, grantsDisKeys);
-    // handle status effects
-    accumulator.fromConditions(this.actor, advConditions, disConditions);
-    accumulator.fromConditions(this.targetActor, grantsAdvConditions, grantsDisConditions);
-    // handle distance-based status effects
+    // process distance-based status effects
     if (this.targetActor) {
-      const grantAdjacentAttack = this._getConditionForEffect(this.targetActor, "advReminderGrantAdjacentAttack");
+      const grantAdjacentAttack = accumulator._getConditionForEffect(this.targetActor, "advReminderGrantAdjacentAttack");
       if (grantAdjacentAttack.length) {
         const distance = this.distanceFn();
-        const accumFn = distance <= 5 ? accumulator.advantage : accumulator.disadvantage;
+        const accumFn = distance <= 5 ? accumulator.advantageIf.bind(accumulator) : accumulator.disadvantageIf.bind(accumulator);
         grantAdjacentAttack.forEach(accumFn);
       }
     }
-    accumulator.update(options);
   }
 }
 
@@ -183,21 +248,6 @@ class AbilityBaseReminder extends BaseReminder {
     if (this.abilityId === "str" || this.abilityId === "dex" || this.abilityId === "con")
       return ["advReminderDisadvantagePhysicalRolls"];
     return [];
-  }
-
-  updateOptions(options) {
-    this._message();
-
-    // get the active effect keys applicable for this roll
-    const advKeys = this.advantageKeys;
-    const disKeys = this.disadvantageKeys;
-    debug("advKeys", advKeys, "disKeys", disKeys);
-
-    // find matching keys, status effects, and update options
-    const accumulator = this._accumulator(options);
-    accumulator.add(this.actorFlags, advKeys, disKeys);
-    accumulator.fromConditions(this.actor, this.advantageConditions, this.disadvantageConditions);
-    accumulator.update(options);
   }
 }
 
@@ -257,6 +307,14 @@ export class AbilitySaveReminder extends AbilityBaseReminder {
   }
 }
 
+export class ConcentrationReminder extends AbilitySaveReminder {
+  get rollModes() {
+    return {
+      "system.attributes.concentration.roll.mode": ["DND5E.Concentration"]
+    };
+  }
+}
+
 export class SkillReminder extends AbilityCheckReminder {
   constructor(actor, abilityId, skillId, checkArmorStealth = true) {
     super(actor, abilityId);
@@ -282,36 +340,16 @@ export class SkillReminder extends AbilityCheckReminder {
     ]);
   }
 
-  /** @override */
-  updateOptions(options) {
-    this._message();
+  _customUpdateOptions(accumulator) {
+    super._customUpdateOptions(accumulator);
 
-    // get the active effect keys applicable for this roll
-    const advKeys = this.advantageKeys;
-    const disKeys = this.disadvantageKeys;
-    debug("advKeys", advKeys, "disKeys", disKeys);
-
-    // find matching keys and update options
-    const accumulator = this._accumulator(options);
-    if (this.checkArmorStealth) {
-      accumulator.disadvantage(this._armorStealthDisadvantage());
-    }
-    accumulator.add(this.actorFlags, advKeys, disKeys);
-    accumulator.fromConditions(this.actor, this.advantageConditions, this.disadvantageConditions);
-    accumulator.update(options);
-  }
-
-  /**
-   * Check if the actor is wearing armor that imposes stealth disadvantage.
-   * @returns true if they are wearing armor that imposes stealth disadvantage, false otherwise
-   */
-  _armorStealthDisadvantage() {
-    if (this.skillId === "ste") {
+    // Check if the actor is wearing armor that imposes stealth disadvantage
+    if (this.checkArmorStealth && this.skillId === "ste") {
       const item = this.items.find(
         (item) => item.type === "equipment" && item.system.equipped && item.system.properties.has("stealthDisadvantage")
       );
       debug("equiped item that imposes stealth disadvantage", item?.name);
-      return item?.name;
+      accumulator.disadvantageIf(item?.name);
     }
   }
 }
@@ -342,6 +380,35 @@ export class DeathSaveReminder extends AbilityBaseReminder {
       "disadvantage.ability.save.all",
       "disadvantage.deathSave",
     ]);
+  }
+
+  get rollModes() {
+    return {
+      "system.attributes.death.roll.mode": ["DND5E.DeathSave"]
+    };
+  }
+}
+
+export class CriticalAccumulator extends AdvantageAccumulator {
+  /** @type {boolean} */
+  crit;
+  /** @type {boolean} */
+  normal;
+
+  applyFlags(actorFlags, critKeys, normalKeys) {
+    this.crit = critKeys.reduce((accum, curr) => accum || actorFlags[curr], this.crit);
+    this.normal = normalKeys.reduce((accum, curr) => accum || actorFlags[curr], this.normal);
+  }
+
+  critical(label) {
+    if (label) this.crit = true;
+  }
+
+  update(options, critProp) {
+    // a normal hit overrides a crit
+    const critical = this.normal ? false : !!this.crit;
+    debug(`updating ${critProp}: ${critical}`);
+    options[critProp] = critical;
   }
 }
 
@@ -374,8 +441,12 @@ export class CriticalReminder extends BaseReminder {
     }
   }
 
+  static AccumulatorClass = CriticalAccumulator;
+
+  static UpdateMessage = "checking for critical/normal effects for the roll";
+
   updateOptions(options, critProp = "critical") {
-    this._message();
+    debug(this.constructor.UpdateMessage);
 
     // build the active effect keys applicable for this roll
     const critKeys = ["critical.all", `critical.${this.actionType}`];
@@ -388,40 +459,18 @@ export class CriticalReminder extends BaseReminder {
     const grantsNormalKeys = ["fail.critical.all", `fail.critical.${this.actionType}`];
 
     // find matching keys and update options
-    const accumulator = this._accumulator();
-    accumulator.add(this.actorFlags, critKeys, normalKeys);
-    accumulator.add(this.targetFlags, grantsCritKeys, grantsNormalKeys);
+    const accumulator = new this.constructor.AccumulatorClass();
+    accumulator.applyFlags(this.actorFlags, critKeys, normalKeys);
+    accumulator.applyFlags(this.targetFlags, grantsCritKeys, grantsNormalKeys);
     // handle distance-based status effects
     if (this.targetActor) {
-      const grantAdjacentCritical = this._getConditionForEffect(this.targetActor, "advReminderGrantAdjacentCritical");
+      const grantAdjacentCritical = accumulator._getConditionForEffect(this.targetActor, "advReminderGrantAdjacentCritical");
       if (grantAdjacentCritical.length) {
         const distance = this.distanceFn();
-        if (distance <= 5) grantAdjacentCritical.forEach(accumulator.critical);
+        if (distance <= 5) grantAdjacentCritical.forEach(accumulator.critical.bind(accumulator));
       }
     }
     accumulator.update(options, critProp);
-  }
-
-  /** @override */
-  _accumulator() {
-    let crit;
-    let normal;
-
-    return {
-      add: (actorFlags, critKeys, normalKeys) => {
-        crit = critKeys.reduce((accum, curr) => accum || actorFlags[curr], crit);
-        normal = normalKeys.reduce((accum, curr) => accum || actorFlags[curr], normal);
-      },
-      critical: (label) => {
-        if (label) crit = true;
-      },
-      update: (options, critProp) => {
-        // a normal hit overrides a crit
-        const critical = normal ? false : !!crit;
-        debug(`updating ${critProp}: ${critical}`);
-        options[critProp] = critical;
-      },
-    };
   }
 }
 

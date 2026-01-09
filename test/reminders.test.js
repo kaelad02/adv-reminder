@@ -264,7 +264,7 @@ describe("AttackReminder disadvantage flags", () => {
 });
 
 describe("AttackReminder both advantage and disadvantage flags", () => {
-  test("attack with both advantage and disadvantage should be normal", () => {
+  test("attack with both advantage and disadvantage has both set", () => {
     const actor = createActorWithFlags("flags.midi-qol.advantage.attack.rsak");
     // simulates Dodge
     const target = createActorWithFlags("flags.midi-qol.grants.disadvantage.attack.all");
@@ -274,8 +274,8 @@ describe("AttackReminder both advantage and disadvantage flags", () => {
     const reminder = new AttackReminder(actor, target, item);
     reminder.updateOptions(options);
 
-    expect(options.advantage).toBeUndefined();
-    expect(options.disadvantage).toBeUndefined();
+    expect(options.advantage).toBe(true);
+    expect(options.disadvantage).toBe(true);
   });
 
   test("attack with wrong advantage and same disadvantage should be disadvantage", () => {
@@ -435,7 +435,7 @@ describe("AbilityCheckReminder disadvantage flags", () => {
 });
 
 describe("AbilityCheckReminder both advantage and disadvantage flags", () => {
-  test("ability check with both advantage and disadvantage should be normal", () => {
+  test("ability check with both advantage and disadvantage has both set", () => {
     const actor = createActorWithFlags(
       "flags.midi-qol.advantage.ability.check.all",
       "flags.midi-qol.disadvantage.ability.check.cha"
@@ -445,8 +445,8 @@ describe("AbilityCheckReminder both advantage and disadvantage flags", () => {
     const reminder = new AbilityCheckReminder(actor, "cha");
     reminder.updateOptions(options);
 
-    expect(options.advantage).toBeUndefined();
-    expect(options.disadvantage).toBeUndefined();
+    expect(options.advantage).toBe(true);
+    expect(options.disadvantage).toBe(true);
   });
 
   test("ability check with wrong advantage and same disadvantage should be disadvantage", () => {
@@ -606,7 +606,7 @@ describe("AbilitySaveReminder disadvantage flags", () => {
 });
 
 describe("AbilitySaveReminder both advantage and disadvantage flags", () => {
-  test("saving throw with both advantage and disadvantage should be normal", () => {
+  test("saving throw with both advantage and disadvantage has both set", () => {
     const actor = createActorWithFlags(
       "flags.midi-qol.advantage.ability.save.all",
       "flags.midi-qol.disadvantage.ability.save.dex"
@@ -616,8 +616,8 @@ describe("AbilitySaveReminder both advantage and disadvantage flags", () => {
     const reminder = new AbilitySaveReminder(actor, "dex");
     reminder.updateOptions(options);
 
-    expect(options.advantage).toBeUndefined();
-    expect(options.disadvantage).toBeUndefined();
+    expect(options.advantage).toBe(true);
+    expect(options.disadvantage).toBe(true);
   });
 
   test("saving throw with wrong advantage and same disadvantage should be disadvantage", () => {
@@ -927,7 +927,7 @@ describe("SkillReminder disadvantage flags", () => {
 });
 
 describe("SkillReminder both advantage and disadvantage flags", () => {
-  test("skill check with both advantage and disadvantage should be normal", () => {
+  test("skill check with both advantage and disadvantage has both set", () => {
     const actor = createActorWithFlags(
       "flags.midi-qol.advantage.skill.all",
       "flags.midi-qol.disadvantage.skill.prc"
@@ -937,8 +937,8 @@ describe("SkillReminder both advantage and disadvantage flags", () => {
     const reminder = new SkillReminder(actor, "wis", "prc");
     reminder.updateOptions(options);
 
-    expect(options.advantage).toBeUndefined();
-    expect(options.disadvantage).toBeUndefined();
+    expect(options.advantage).toBe(true);
+    expect(options.disadvantage).toBe(true);
   });
 
   test("skill check with wrong advantage and same disadvantage should be disadvantage", () => {
@@ -1076,7 +1076,7 @@ describe("DeathSaveReminder disadvantage flags", () => {
 });
 
 describe("DeathSaveReminder both advantage and disadvantage flags", () => {
-  test("death save with both advantage and disadvantage should be normal", () => {
+  test("death save with both advantage and disadvantage has both set", () => {
     const actor = createActorWithFlags(
       "flags.midi-qol.advantage.ability.save.all",
       "flags.midi-qol.disadvantage.deathSave"
@@ -1086,8 +1086,8 @@ describe("DeathSaveReminder both advantage and disadvantage flags", () => {
     const reminder = new DeathSaveReminder(actor);
     reminder.updateOptions(options);
 
-    expect(options.advantage).toBeUndefined();
-    expect(options.disadvantage).toBeUndefined();
+    expect(options.advantage).toBe(true);
+    expect(options.disadvantage).toBe(true);
   });
 });
 
