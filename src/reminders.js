@@ -218,8 +218,6 @@ export class AttackReminder extends BaseReminder {
   }
 }
 
-export class AttackReminderV2 extends AttackReminder {}
-
 class AbilityBaseReminder extends BaseReminder {
   constructor(actor, abilityId) {
     super(actor);
@@ -469,5 +467,3 @@ export class CriticalReminder extends BaseReminder {
     accumulator.update(options, critProp);
   }
 }
-
-export class CriticalReminderV2 extends CriticalReminder {}

@@ -22,9 +22,9 @@ import {
 import {
   AbilityCheckSource,
   AbilitySaveSource,
-  AttackSourceV2,
+  AttackSource,
   ConcentrationSource,
-  CriticalSourceV2,
+  CriticalSource,
   DeathSaveSource,
   InitiativeSource,
   SkillSource,
@@ -83,7 +83,7 @@ export default class CoreRollerHooks {
     const activity = config.subject;
 
     new AttackMessage(activity.actor, target, activity).addMessage(dialog);
-    if (showSources) new AttackSourceV2(activity.actor, target, activity, distanceFn).updateOptions(dialog);
+    if (showSources) new AttackSource(activity.actor, target, activity, distanceFn).updateOptions(dialog);
     new AttackReminder(activity.actor, target, activity, distanceFn).updateOptions(config.rolls[0].options);
   }
 
@@ -198,7 +198,7 @@ export default class CoreRollerHooks {
     if (!activity) return;
 
     new DamageMessage(activity.actor, target, activity).addMessage(dialog);
-    if (showSources) new CriticalSourceV2(activity.actor, target, activity, distanceFn).updateOptions(dialog);
+    if (showSources) new CriticalSource(activity.actor, target, activity, distanceFn).updateOptions(dialog);
     const reminder = new CriticalReminder(activity.actor, target, activity, distanceFn);
     config.rolls.forEach(roll => reminder.updateOptions(roll.options, "isCritical"));
     

@@ -11,9 +11,9 @@ import {
 import {
   AbilityCheckSource,
   AbilitySaveSource,
-  AttackSourceV2,
+  AttackSource,
   ConcentrationSource,
-  CriticalSourceV2,
+  CriticalSource,
   DeathSaveSource,
   InitiativeSource,
   SkillSource,
@@ -45,7 +45,7 @@ export default class MidiRollerHooks extends CoreRollerHooks {
     const activity = config.subject;
 
     new AttackMessage(activity.actor, target, activity).addMessage(dialog);
-    if (showSources) new AttackSourceV2(activity.actor, target, activity, distanceFn).updateOptions(dialog);
+    if (showSources) new AttackSource(activity.actor, target, activity, distanceFn).updateOptions(dialog);
   }
 
   preRollSavingThrowV2(config, dialog, message) {
@@ -156,6 +156,6 @@ export default class MidiRollerHooks extends CoreRollerHooks {
     if (!activity) return;
 
     new DamageMessage(activity.actor, target, activity).addMessage(dialog);
-    if (showSources) new CriticalSourceV2(activity.actor, target, activity, distanceFn).updateOptions(dialog);
+    if (showSources) new CriticalSource(activity.actor, target, activity, distanceFn).updateOptions(dialog);
   }
 }
