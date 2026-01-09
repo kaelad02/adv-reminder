@@ -57,13 +57,13 @@ class BaseMessage {
 }
 
 export class AttackMessage extends BaseMessage {
-  constructor(actor, targetActor, item) {
+  constructor(actor, targetActor, activity) {
     super(actor, targetActor);
 
     /** @type {string} */
-    this.actionType = item.system.actionType;
+    this.actionType = activity.actionType;
     /** @type {string} */
-    this.abilityId = item.abilityMod;
+    this.abilityId = activity.ability;
   }
 
   /** @override */
@@ -82,12 +82,6 @@ export class AttackMessage extends BaseMessage {
       `flags.adv-reminder.grants.message.attack.${this.actionType}`,
       `flags.adv-reminder.grants.message.attack.${this.abilityId}`,
     ];
-  }
-}
-
-export class AttackMessageV2 extends AttackMessage {
-  constructor(actor, targetActor, activity) {
-    super(actor, targetActor, { system: { actionType: activity.actionType} , abilityMod: activity.ability });
   }
 }
 
@@ -171,11 +165,11 @@ export class DeathSaveMessage extends AbilityBaseMessage {
 }
 
 export class DamageMessage extends BaseMessage {
-  constructor(actor, targetActor, item) {
+  constructor(actor, targetActor, activity) {
     super(actor, targetActor);
 
     /** @type {string} */
-    this.actionType = item.system.actionType;
+    this.actionType = activity.actionType;
   }
 
   /** @override */
@@ -192,11 +186,5 @@ export class DamageMessage extends BaseMessage {
       "flags.adv-reminder.grants.message.damage.all",
       `flags.adv-reminder.grants.message.damage.${this.actionType}`,
     ];
-  }
-}
-
-export class DamageMessageV2 extends DamageMessage {
-  constructor(actor, targetActor, activity) {
-    super(actor, targetActor, { system: { actionType: activity.actionType } });
   }
 }

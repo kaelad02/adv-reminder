@@ -3,11 +3,9 @@ import {
   AbilitySaveReminder,
   AdvantageAccumulator,
   AttackReminder,
-  AttackReminderV2,
   ConcentrationReminder,
   CriticalAccumulator,
   CriticalReminder,
-  CriticalReminderV2,
   DeathSaveReminder,
   InitiativeReminder,
   SkillReminder,
@@ -168,8 +166,6 @@ const SourceMixin = (superclass) =>
 
 export class AttackSource extends SourceMixin(AttackReminder) {}
 
-export class AttackSourceV2 extends SourceMixin(AttackReminderV2) {}
-
 export class AbilitySaveSource extends SourceMixin(AbilitySaveReminder) {}
 
 export class ConcentrationSource extends SourceMixin(ConcentrationReminder) {}
@@ -244,24 +240,6 @@ class CriticalLabelAccumulator extends LabelMixin(CriticalAccumulator) {
 }
 
 export class CriticalSource extends SourceMixin(CriticalReminder) {
-  static AccumulatorClass = CriticalLabelAccumulator;
-
-  static UpdateMessage = "checking for crit/normal effects to display their source";
-
-  _adjustRange(distanceFn, grantsCriticalRange) {
-    // check if the range applies, remove flag if not
-    if ("grants.critical.range" in this.targetFlags) {
-      const distance = distanceFn();
-      if (distance > grantsCriticalRange) delete this.targetFlags["grants.critical.range"];
-    }
-  }
-
-  updateOptions(options) {
-    super.updateOptions(options, "dialogOptions");
-  }
-}
-
-export class CriticalSourceV2 extends SourceMixin(CriticalReminderV2) {
   static AccumulatorClass = CriticalLabelAccumulator;
 
   static UpdateMessage = "checking for crit/normal effects to display their source";

@@ -145,7 +145,7 @@ class BaseReminder {
 }
 
 export class AttackReminder extends BaseReminder {
-  constructor(actor, targetActor, item, distanceFn) {
+  constructor(actor, targetActor, activity, distanceFn) {
     super(actor);
 
     /** @type {Actor5e*} */
@@ -153,9 +153,9 @@ export class AttackReminder extends BaseReminder {
     /** @type {object} */
     this.targetFlags = this._getFlags(targetActor);
     /** @type {string} */
-    this.actionType = item.system.actionType;
+    this.actionType = activity.actionType;
     /** @type {string} */
-    this.abilityId = item.abilityMod;
+    this.abilityId = activity.ability;
     /** @type {function} */
     this.distanceFn = distanceFn;
   }
@@ -217,12 +217,6 @@ export class AttackReminder extends BaseReminder {
     }
   }
 }
-
-export class AttackReminderV2 extends AttackReminder {
-  constructor(actor, targetActor, activity, distanceFn) {
-    super(actor, targetActor, { system: { actionType: activity.actionType} , abilityMod: activity.ability }, distanceFn);
-  }
-} 
 
 class AbilityBaseReminder extends BaseReminder {
   constructor(actor, abilityId) {
@@ -413,7 +407,7 @@ export class CriticalAccumulator extends AdvantageAccumulator {
 }
 
 export class CriticalReminder extends BaseReminder {
-  constructor(actor, targetActor, item, distanceFn) {
+  constructor(actor, targetActor, activity, distanceFn) {
     super(actor);
 
     /** @type {Actor5e*} */
@@ -421,7 +415,7 @@ export class CriticalReminder extends BaseReminder {
     /** @type {object} */
     this.targetFlags = this._getFlags(targetActor);
     /** @type {string} */
-    this.actionType = item.system.actionType;
+    this.actionType = activity.actionType;
     /** @type {function} */
     this.distanceFn = distanceFn;
 
@@ -471,11 +465,5 @@ export class CriticalReminder extends BaseReminder {
       }
     }
     accumulator.update(options, critProp);
-  }
-}
-
-export class CriticalReminderV2 extends CriticalReminder {
-  constructor(actor, targetActor, activity, distanceFn) {
-    super(actor, targetActor, { system: { actionType: activity.actionType } }, distanceFn);
   }
 }

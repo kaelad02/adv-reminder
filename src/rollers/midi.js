@@ -5,6 +5,7 @@ import {
   ConcentrationMessage,
   DamageMessage,
   DeathSaveMessage,
+  InitiativeMessage,
   SkillMessage,
 } from "../messages.js";
 import {
@@ -14,6 +15,7 @@ import {
   ConcentrationSource,
   CriticalSource,
   DeathSaveSource,
+  InitiativeSource,
   SkillSource,
 } from "../sources.js";
 import { showSources } from "../settings.js";
@@ -28,96 +30,132 @@ export default class MidiRollerHooks extends CoreRollerHooks {
     return false;
   }
 
-  preRollAttack(item, config) {
-    debug("preRollAttack hook called");
+  preRollAttackV2(config, dialog, message) {
+    debug("preRollAttackV2 hook called", config, dialog, message);
 
-    if (this.isFastForwarding(config)) return;
+    if (this.isFastForwarding(config, dialog)) return;
     const target = getTarget();
     // use distance from Midi's Workflow
     const distanceFn = () => {
-      const workflow = MidiQOL.Workflow.getWorkflow(item.uuid);
+      const workflow = config.workflow;
       if (!workflow) return Infinity;
       const firstTarget = workflow.hitTargets.values().next().value;
-      return MidiQOL.computeDistance(firstTarget, workflow.token, false);
+      return MidiQOL.computeDistance(firstTarget, workflow.token);
     }
+    const activity = config.subject;
 
-    new AttackMessage(item.actor, target, item).addMessage(config);
-    if (showSources) new AttackSource(item.actor, target, item, distanceFn).updateOptions(config);
+    new AttackMessage(activity.actor, target, activity).addMessage(dialog);
+    if (showSources) new AttackSource(activity.actor, target, activity, distanceFn).updateOptions(dialog);
   }
 
-  preRollAbilitySave(actor, config, abilityId) {
-    debug("preRollAbilitySave hook called");
+  preRollSavingThrowV2(config, dialog, message) {
+    debug("preRollSavingThrowV2 hook called");
 
-    if (this.isFastForwarding(config)) return;
+    // check if we've already processed this roll
+    if (config[CoreRollerHooks.PROCESSED_PROP]) return;
+    config[CoreRollerHooks.PROCESSED_PROP] = true;
 
-    new AbilitySaveMessage(actor, abilityId).addMessage(config);
-    if (showSources) new AbilitySaveSource(actor, abilityId).updateOptions(config);
+    if (this.isFastForwarding(config, dialog)) return;
+
+    const actor = config.subject;
+    const abilityId = config.ability;
+    new AbilitySaveMessage(actor, abilityId).addMessage(dialog);
+    if (showSources) new AbilitySaveSource(actor, abilityId).updateOptions(dialog);
   }
 
-  preRollConcentration(actor, options) {
-    debug("preRollConcentration hook called");
+  preRollConcentrationV2(config, dialog, message) {
+    debug("preRollConcentrationV2 hook called");
 
-    if (this.isFastForwarding(options)) return;
+    // check if we've already processed this roll
+    if (config[CoreRollerHooks.PROCESSED_PROP]) return;
+    config[CoreRollerHooks.PROCESSED_PROP] = true;
 
-    new ConcentrationMessage(actor, options.ability).addMessage(options);
-    if (showSources) new ConcentrationSource(actor, options.ability).updateOptions(options);
+    if (this.isFastForwarding(config, dialog)) return;
+
+    const actor = config.subject;
+    const abilityId = config.ability;
+    new ConcentrationMessage(actor, abilityId).addMessage(dialog);
+    if (showSources) new ConcentrationSource(actor, abilityId).updateOptions(dialog);
   }
 
-  preRollAbilityTest(actor, config, abilityId) {
-    debug("preRollAbilityTest hook called");
+  preRollAbilityCheckV2(config, dialog, message) {
+    debug("preRollAbilityCheckV2 hook called");
 
-    if (this.isFastForwarding(config)) return;
+    // check if we've already processed this roll
+    if (config[CoreRollerHooks.PROCESSED_PROP]) return;
+    config[CoreRollerHooks.PROCESSED_PROP] = true;
 
-    new AbilityCheckMessage(actor, abilityId).addMessage(config);
-    if (showSources) new AbilityCheckSource(actor, abilityId).updateOptions(config);
+    if (this.isFastForwarding(config, dialog)) return;
+
+    const actor = config.subject;
+    const abilityId = config.ability;
+    new AbilityCheckMessage(actor, abilityId).addMessage(dialog);
+    if (showSources) new AbilityCheckSource(actor, abilityId).updateOptions(dialog);
   }
 
-  preRollSkill(actor, config, skillId) {
-    debug("preRollSkill hook called");
+  preRollSkillV2(config, dialog, message) {
+    debug("preRollSkillV2 hook called");
 
-    if (this.isFastForwarding(config)) return;
+    // check if we've already processed this roll
+    if (config[CoreRollerHooks.PROCESSED_PROP]) return;
+    config[CoreRollerHooks.PROCESSED_PROP] = true;
 
-    const ability = config.data.defaultAbility;
-    new SkillMessage(actor, ability, skillId).addMessage(config);
-    if (showSources) new SkillSource(actor, ability, skillId, true).updateOptions(config);
+    if (this.isFastForwarding(config, dialog)) return;
+
+    const actor = config.subject;
+    const ability = config.ability;
+    const skillId = config.skill;
+    new SkillMessage(actor, ability, skillId).addMessage(dialog);
+    if (showSources) new SkillSource(actor, ability, skillId, true).updateOptions(dialog);
   }
 
-  preRollToolCheck(actor, config, toolId) {
-    debug("preRollToolCheck hook called");
+  preRollInitiativeDialogV2(config, dialog, message) {
+    debug("preRollInitiativeDialogV2 hook called");
 
-    if (this.isFastForwarding(config)) return;
+    // check if we've already processed this roll
+    if (config[CoreRollerHooks.PROCESSED_PROP]) return;
+    config[CoreRollerHooks.PROCESSED_PROP] = true;
 
-    const ability = config.data.defaultAbility;
-    new AbilityCheckMessage(actor, ability).addMessage(config);
-    if (showSources) new AbilityCheckSource(actor, ability).updateOptions(config);
+    if (this.isFastForwarding(config, dialog)) return;
+
+    const actor = config.subject;
+    const abilityId = actor.system.attributes?.init?.ability || CONFIG.DND5E.defaultAbilities.initiative;
+    new InitiativeMessage(actor, abilityId).addMessage(dialog);
+    if (showSources) new InitiativeSource(actor, abilityId).updateOptions(dialog);
   }
 
-  preRollDeathSave(actor, config) {
-    debug("preRollDeathSave hook called");
+  preRollDeathSaveV2(config, dialog, message) {
+    debug("preRollDeathSaveV2 hook called");
 
-    if (this.isFastForwarding(config)) return;
+    // check if we've already processed this roll
+    if (config[CoreRollerHooks.PROCESSED_PROP]) return;
+    config[CoreRollerHooks.PROCESSED_PROP] = true;
 
-    new DeathSaveMessage(actor).addMessage(config);
-    if (showSources) new DeathSaveSource(actor).updateOptions(config);
+    if (this.isFastForwarding(config, dialog)) return;
+
+    const actor = config.subject;
+    new DeathSaveMessage(actor).addMessage(dialog);
+    if (showSources) new DeathSaveSource(actor).updateOptions(dialog);
   }
 
-  preRollDamage(item, config) {
-    debug("preRollDamage hook called");
+  preRollDamageV2(config, dialog, message) {
+    debug("preRollDamageV2 hook called", config, dialog, message);
 
-    // damage/healing enricher doesn't have an item, skip
-    if (!item) return;
-
-    if (this.isFastForwarding(config)) return;
+    if (this.isFastForwarding(config, dialog)) return;
     const target = getTarget();
     // use distance from Midi's Workflow
     const distanceFn = () => {
-      const workflow = MidiQOL.Workflow.getWorkflow(item.uuid);
+      const workflow = config.workflow;
       if (!workflow) return Infinity;
       const firstTarget = workflow.hitTargets.values().next().value;
-      return MidiQOL.computeDistance(firstTarget, workflow.token, false);
+      return MidiQOL.computeDistance(firstTarget, workflow.token);
     }
+    const activity = config.subject;
 
-    new DamageMessage(item.actor, target, item).addMessage(config);
-    if (showSources) new CriticalSource(item.actor, target, item, distanceFn).updateOptions(config);
+    // damage/healing enricher doesn't have an activity, skip
+    if (!activity) return;
+
+    new DamageMessage(activity.actor, target, activity).addMessage(dialog);
+    if (showSources) new CriticalSource(activity.actor, target, activity, distanceFn).updateOptions(dialog);
   }
 }
