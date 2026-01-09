@@ -1,3 +1,7 @@
+# 4.3.2
+
+- feature: update Midi QOL compatibility since the big activity change, tested with version 12.4.64
+
 # 4.3.1
 
 - bug fix: fix (again) error when using damage enricher
