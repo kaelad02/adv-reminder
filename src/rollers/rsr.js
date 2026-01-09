@@ -2,9 +2,9 @@ import { AbilitySaveFail } from "../fails.js";
 import {
   AbilityCheckMessage,
   AbilitySaveMessage,
-  AttackMessageV2,
+  AttackMessage,
   ConcentrationMessage,
-  DamageMessageV2,
+  DamageMessage,
   DeathSaveMessage,
   InitiativeMessage,
   SkillMessage,
@@ -51,7 +51,7 @@ export default class ReadySetRollHooks extends CoreRollerHooks {
     const activity = config.subject;
 
     if (this._doMessages(config)) {
-      new AttackMessageV2(activity.actor, target, activity).addMessage(dialog);
+      new AttackMessage(activity.actor, target, activity).addMessage(dialog);
       if (showSources) new AttackSourceV2(activity.actor, target, activity, distanceFn).updateOptions(dialog);
     }
 
@@ -176,7 +176,7 @@ export default class ReadySetRollHooks extends CoreRollerHooks {
     const distanceFn = getDistanceToTargetFn(message.data.speaker);
 
     if (this._doMessages(config)) {
-      new DamageMessageV2(activity.actor, target, activity).addMessage(dialog);
+      new DamageMessage(activity.actor, target, activity).addMessage(dialog);
       if (showSources) new CriticalSourceV2(activity.actor, target, activity, distanceFn).updateOptions(dialog);
       const reminder = new CriticalReminderV2(activity.actor, target, activity, distanceFn);
       config.rolls.forEach(roll => reminder.updateOptions(roll.options, "isCritical"));

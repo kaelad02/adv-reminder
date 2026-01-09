@@ -1,9 +1,9 @@
 import {
   AbilityCheckMessage,
   AbilitySaveMessage,
-  AttackMessageV2,
+  AttackMessage,
   ConcentrationMessage,
-  DamageMessageV2,
+  DamageMessage,
   DeathSaveMessage,
   InitiativeMessage,
   SkillMessage,
@@ -44,7 +44,7 @@ export default class MidiRollerHooks extends CoreRollerHooks {
     }
     const activity = config.subject;
 
-    new AttackMessageV2(activity.actor, target, activity).addMessage(dialog);
+    new AttackMessage(activity.actor, target, activity).addMessage(dialog);
     if (showSources) new AttackSourceV2(activity.actor, target, activity, distanceFn).updateOptions(dialog);
   }
 
@@ -155,7 +155,7 @@ export default class MidiRollerHooks extends CoreRollerHooks {
     // damage/healing enricher doesn't have an activity, skip
     if (!activity) return;
 
-    new DamageMessageV2(activity.actor, target, activity).addMessage(dialog);
+    new DamageMessage(activity.actor, target, activity).addMessage(dialog);
     if (showSources) new CriticalSourceV2(activity.actor, target, activity, distanceFn).updateOptions(dialog);
   }
 }
