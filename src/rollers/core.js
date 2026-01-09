@@ -194,6 +194,9 @@ export default class CoreRollerHooks {
     const distanceFn = getDistanceToTargetFn(message.data.speaker);
     const activity = config.subject;
 
+    // damage/healing enricher doesn't have an activity, skip
+    if (!activity) return;
+
     new DamageMessageV2(activity.actor, target, activity).addMessage(dialog);
     if (showSources) new CriticalSourceV2(activity.actor, target, activity, distanceFn).updateOptions(dialog);
     const reminder = new CriticalReminderV2(activity.actor, target, activity, distanceFn);

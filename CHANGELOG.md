@@ -1,3 +1,7 @@
+# 4.3.1
+
+- bug fix: fix (again) error when using damage enricher
+
 # 4.3.0
 
 - feature: set minimum system version to 4.2.0
