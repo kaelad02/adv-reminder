@@ -57,5 +57,6 @@
   "adv-reminder.UpdateStatusEffects": {
     "Name": "Enable Condition Effects",
     "Hint": "Apply adv/dis/crit with the system's conditions (e.g. apply disadvantage to attacks when Poisoned). Not recommended if you are using another module to modify or replace the status effects."
-  }
+  },
+  "dae.fieldData.fieldCategories.ARMessage": "AR Messages"
 }

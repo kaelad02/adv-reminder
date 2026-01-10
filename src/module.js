@@ -4,6 +4,7 @@ import ReadySetRollHooks from "./rollers/rsr.js";
 import SamplePackBuilder from "./sample-pack.js";
 import { applySettings, ButtonStyle, initSettings } from "./settings.js";
 import { debug, debugEnabled, log } from "./util.js";
+import DaeIntegration from "./dae-integration.js";
 
 const CIRCLE_INFO = `<i class="fa-solid fa-circle-info"></i> `;
 
@@ -21,6 +22,9 @@ Hooks.once("init", () => {
 
   // register hook to apply Midi's flags
   if (rollerHooks.shouldApplyMidiActiveEffect()) Hooks.on("applyActiveEffect", applyMidiCustom);
+
+  // initialize DAE integration
+  new DaeIntegration().init();
 });
 
 // Apply Midi-QOL's custom active effects
@@ -82,38 +86,6 @@ function updateConditionEffects() {
     ce.advReminderDisadvantageInitiative = new Set(["incapacitated", "surprised"]);
   }
 }
-
-// Add message flags to DAE so it shows them in the AE editor
-Hooks.once("DAE.setupComplete", () => {
-  debug("adding Advantage Reminder flags to DAE");
-
-  const fields = [];
-  fields.push("flags.adv-reminder.message.all");
-  fields.push("flags.adv-reminder.message.attack.all");
-  fields.push("flags.adv-reminder.message.ability.all");
-  fields.push("flags.adv-reminder.message.ability.check.all");
-  fields.push("flags.adv-reminder.message.ability.save.all");
-  fields.push("flags.adv-reminder.message.skill.all");
-  fields.push("flags.adv-reminder.message.deathSave");
-  fields.push("flags.adv-reminder.message.damage.all");
-
-  const actionTypes = ["mwak", "rwak", "msak", "rsak"];
-  actionTypes.forEach((actionType) => fields.push(`flags.adv-reminder.message.attack.${actionType}`));
-
-  Object.keys(CONFIG.DND5E.itemActionTypes).forEach((actionType) =>
-    fields.push(`flags.adv-reminder.message.damage.${actionType}`)
-  );
-
-  Object.keys(CONFIG.DND5E.abilities).forEach((abilityId) => {
-    fields.push(`flags.adv-reminder.message.attack.${abilityId}`);
-    fields.push(`flags.adv-reminder.message.ability.check.${abilityId}`);
-    fields.push(`flags.adv-reminder.message.ability.save.${abilityId}`);
-  });
-
-  Object.keys(CONFIG.DND5E.skills).forEach((skillId) => fields.push(`flags.adv-reminder.message.skill.${skillId}`));
-
-  window.DAE.addAutoFields(fields);
-});
 
 Hooks.once("ready", () => {
   // expose SamplePackBuilder
