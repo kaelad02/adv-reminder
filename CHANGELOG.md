@@ -1,6 +1,7 @@
 # 4.3.3
 
 - feature: update fast-forward check based on the system's implementation in `applyKeybindings`
+- feature: improve DAE integration with an AR Messages tab in the field browser and forcing all message flags to use Custom change mode
 
 # 4.3.2
 
