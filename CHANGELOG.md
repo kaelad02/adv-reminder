@@ -1,3 +1,7 @@
+# 4.3.3
+
+- feature: update fast-forward check based on the system's implementation in `applyKeybindings`
+
 # 4.3.2
 
 - feature: update Midi QOL compatibility since the big activity change, tested with version 12.4.64
