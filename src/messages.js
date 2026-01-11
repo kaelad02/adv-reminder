@@ -48,7 +48,6 @@ class BaseMessage {
     if (messages.length > 0) {
       debug("messages found:", messages);
       foundry.utils.setProperty(options, "options.adv-reminder.messages", messages);
-      foundry.utils.setProperty(options, "options.adv-reminder.rollData", this.actor.getRollData());
     }
   }
 }

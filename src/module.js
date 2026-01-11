@@ -104,7 +104,7 @@ Hooks.once("ready", () => {
 Hooks.on("renderRollConfigurationDialog", async (dialog, html) => {
   debug("renderRollConfigurationDialog hook called");
 
-  const message = await prepareMessage(dialog.options);
+  const message = await prepareMessage(dialog);
   if (message) {
     // add messages right after configuration
     const configFieldset = html.querySelector('fieldset[data-application-part="configuration"]');
@@ -140,8 +140,8 @@ Hooks.on("renderRollConfigurationDialog", async (dialog, html) => {
   dialog.setPosition();
 });
 
-async function prepareMessage(dialogOptions) {
-  const opt = dialogOptions["adv-reminder"];
+async function prepareMessage(dialog) {
+  const opt = dialog.options["adv-reminder"];
   if (!opt) return;
   if (opt.rendered) return;
 
@@ -167,7 +167,7 @@ async function prepareMessage(dialogOptions) {
       documents: true,
       links: false,
       rolls: true,
-      rollData: opt.rollData ?? {},
+      rollData: dialog.rolls[0]?.data ?? {},
       async: true,
     });
     debug("messages", messages, "enriched", enriched);
