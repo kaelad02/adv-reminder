@@ -2,6 +2,7 @@
 
 - feature: update fast-forward check based on the system's implementation in `applyKeybindings`
 - feature: improve DAE integration with an AR Messages tab in the field browser and forcing all message flags to use Custom change mode
+- feature: refactor messages to use flags on the actor instead of reading the active effects
 
 # 4.3.2
 
