@@ -209,24 +209,20 @@ export default class CoreRollerHooks {
   }
 
   /**
-   * Check if we should fast-forward the roll by checking the fastForward flag
-   * and if one of the modifier keys was pressed.
-   * @param {object} options
-   * @param {boolean} [options.fastForward] a specific fastForward flag
-   * @param {Event} [options.event] the triggering event
-   * @param {object} dialog
-   * @param {boolean} [dialog.configure] whether or not to show the dialog
+   * Check if the roll is being fast-forwarded. Copied from the system's D20Roll#applyKeybindings function.
+   * @param {Event} event the triggering event
+   * @param {boolean} configure whether or not to show the dialog
    * @returns {boolean} true if they are fast-forwarding, false otherwise
    */
-  isFastForwarding({ fastForward = false, event = {} }, { configure = true } = {}) {
-    const isFF = !!(
-      fastForward ||
-      !configure ||
-      dnd5e.utils.areKeysPressed(event, "skipDialogNormal") ||
-      dnd5e.utils.areKeysPressed(event, "skipDialogAdvantage") ||
-      dnd5e.utils.areKeysPressed(event, "skipDialogDisadvantage")
-    );
-    if (isFF) debug("fast-forwarding the roll, stop processing");
-    return isFF;
+  isFastForwarding({ event }, { configure } = {}) {
+    debug("before checking FF, configure:", configure);
+    const keys = {
+      normal: dnd5e.utils.areKeysPressed(event, "skipDialogNormal"),
+      advantage: dnd5e.utils.areKeysPressed(event, "skipDialogAdvantage"),
+      disadvantage: dnd5e.utils.areKeysPressed(event, "skipDialogDisadvantage")
+    };
+    configure ??= !Object.values(keys).some(k => k);
+    if (!configure) debug("fast-forwarding the roll, stop processing");
+    return !configure;
   }
 }

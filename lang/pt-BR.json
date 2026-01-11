@@ -57,5 +57,6 @@
   "adv-reminder.UpdateStatusEffects": {
     "Name": "Atualizar Condições",
     "Hint": "Atualiza as condições que o sistema adiciona para incluir as flags de vantagem/desvantagem apropriadas. Não recomendado se você usa outro módulo para modificar e substituir elas."
-  }
+  },
+  "dae.fieldData.fieldCategories.ARMessage": "AR Mensagens"
 }

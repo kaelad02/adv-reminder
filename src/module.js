@@ -4,6 +4,7 @@ import ReadySetRollHooks from "./rollers/rsr.js";
 import SamplePackBuilder from "./sample-pack.js";
 import { applySettings, ButtonStyle, initSettings } from "./settings.js";
 import { debug, debugEnabled, log } from "./util.js";
+import DaeIntegration from "./dae-integration.js";
 
 const CIRCLE_INFO = `<i class="fa-solid fa-circle-info"></i> `;
 
@@ -19,9 +20,20 @@ Hooks.once("init", () => {
   else rollerHooks = new CoreRollerHooks();
   rollerHooks.init();
 
-  // register hook to apply Midi's flags
+  // register hook(s) to apply flags
+  Hooks.on("applyActiveEffect", applyMessageEffect);
   if (rollerHooks.shouldApplyMidiActiveEffect()) Hooks.on("applyActiveEffect", applyMidiCustom);
+
+  // initialize DAE integration
+  new DaeIntegration().init();
 });
+
+function applyMessageEffect(actor, change, current, delta, changes) {
+  if (!change.key.startsWith("flags.adv-reminder.message.") && !change.key.startsWith("flags.adv-reminder.grants.message.")) return;
+
+  if (current) current.push(...delta);
+  else foundry.utils.setProperty(actor, change.key, [delta]);
+}
 
 // Apply Midi-QOL's custom active effects
 function applyMidiCustom(actor, change) {
@@ -83,38 +95,6 @@ function updateConditionEffects() {
   }
 }
 
-// Add message flags to DAE so it shows them in the AE editor
-Hooks.once("DAE.setupComplete", () => {
-  debug("adding Advantage Reminder flags to DAE");
-
-  const fields = [];
-  fields.push("flags.adv-reminder.message.all");
-  fields.push("flags.adv-reminder.message.attack.all");
-  fields.push("flags.adv-reminder.message.ability.all");
-  fields.push("flags.adv-reminder.message.ability.check.all");
-  fields.push("flags.adv-reminder.message.ability.save.all");
-  fields.push("flags.adv-reminder.message.skill.all");
-  fields.push("flags.adv-reminder.message.deathSave");
-  fields.push("flags.adv-reminder.message.damage.all");
-
-  const actionTypes = ["mwak", "rwak", "msak", "rsak"];
-  actionTypes.forEach((actionType) => fields.push(`flags.adv-reminder.message.attack.${actionType}`));
-
-  Object.keys(CONFIG.DND5E.itemActionTypes).forEach((actionType) =>
-    fields.push(`flags.adv-reminder.message.damage.${actionType}`)
-  );
-
-  Object.keys(CONFIG.DND5E.abilities).forEach((abilityId) => {
-    fields.push(`flags.adv-reminder.message.attack.${abilityId}`);
-    fields.push(`flags.adv-reminder.message.ability.check.${abilityId}`);
-    fields.push(`flags.adv-reminder.message.ability.save.${abilityId}`);
-  });
-
-  Object.keys(CONFIG.DND5E.skills).forEach((skillId) => fields.push(`flags.adv-reminder.message.skill.${skillId}`));
-
-  window.DAE.addAutoFields(fields);
-});
-
 Hooks.once("ready", () => {
   // expose SamplePackBuilder
   if (debugEnabled) window.samplePack = new SamplePackBuilder();
@@ -124,7 +104,7 @@ Hooks.once("ready", () => {
 Hooks.on("renderRollConfigurationDialog", async (dialog, html) => {
   debug("renderRollConfigurationDialog hook called");
 
-  const message = await prepareMessage(dialog.options);
+  const message = await prepareMessage(dialog);
   if (message) {
     // add messages right after configuration
     const configFieldset = html.querySelector('fieldset[data-application-part="configuration"]');
@@ -160,8 +140,8 @@ Hooks.on("renderRollConfigurationDialog", async (dialog, html) => {
   dialog.setPosition();
 });
 
-async function prepareMessage(dialogOptions) {
-  const opt = dialogOptions["adv-reminder"];
+async function prepareMessage(dialog) {
+  const opt = dialog.options["adv-reminder"];
   if (!opt) return;
   if (opt.rendered) return;
 
@@ -187,7 +167,7 @@ async function prepareMessage(dialogOptions) {
       documents: true,
       links: false,
       rolls: true,
-      rollData: opt.rollData ?? {},
+      rollData: dialog.rolls[0]?.data ?? {},
       async: true,
     });
     debug("messages", messages, "enriched", enriched);
