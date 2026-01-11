@@ -10,24 +10,12 @@ import {
 import commonTestInit from "./common.js";
 
 function createActorWithEffects(...keyValuePairs) {
-  const appliedEffects = keyValuePairs.map(createEffect);
-  return {
-    appliedEffects,
-    getRollData: () => ({}),
-  };
-}
-
-function createEffect([key, value]) {
-  return {
-    changes: [
-      {
-        key,
-        value,
-        mode: 0,
-        priority: "0",
-      },
-    ]
-  };
+  return keyValuePairs.reduce((actor, [key, value]) => {
+    const current = foundry.utils.getProperty(actor, key);
+    if (current) current.push(value);
+    else foundry.utils.setProperty(actor, key, [value]);
+    return actor;
+  }, { flags: {} });
 }
 
 function createActivity(actionType, ability) {

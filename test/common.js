@@ -113,7 +113,7 @@ export default function commonTestInit() {
       [Map, "Map"],
       [Promise, "Promise"],
       [Error, "Error"],
-      [Color, "number"],
+      //[Color, "number"],
     ];
     if ("HTMLElement" in globalThis) prototypes.push([globalThis.HTMLElement, "HTMLElement"]);
     for (const [cls, type] of prototypes) {
