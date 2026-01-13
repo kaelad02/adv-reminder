@@ -1,13 +1,8 @@
 import { debug } from "./util.js";
 
 export class AdvantageAccumulator {
-  /**
-   * @param {boolean} advantage
-   * @param {boolean} disadvantage
-   */
-  constructor({advantage, disadvantage} = {}) {
-    this.advantage = advantage;
-    this.disadvantage = disadvantage;
+  constructor(counts) {
+    this.counts = counts;
   }
 
   /**
@@ -17,8 +12,8 @@ export class AdvantageAccumulator {
    * @param {string[]} disKeys
    */
   applyFlags(actorFlags, advKeys, disKeys) {
-    this.advantage = advKeys.reduce((accum, curr) => accum || actorFlags[curr], this.advantage);
-    this.disadvantage = disKeys.reduce((accum, curr) => accum || actorFlags[curr], this.disadvantage);
+    this.counts.advantages.count += advKeys.filter(key => actorFlags[key]).length;
+    this.counts.disadvantages.count += disKeys.filter(key => actorFlags[key]).length;
   }
 
   /**
@@ -29,8 +24,8 @@ export class AdvantageAccumulator {
    */
   applyConditions(actor, advConditions, disConditions) {
     if (!actor) return;
-    if (advConditions.flatMap(c => this._getConditionForEffect(actor, c)).length) this.advantage = true;
-    if (disConditions.flatMap(c => this._getConditionForEffect(actor, c)).length) this.disadvantage = true;
+    this.counts.advantages.count += advConditions.flatMap(c => this._getConditionForEffect(actor, c)).length;
+    this.counts.disadvantages.count += disConditions.flatMap(c => this._getConditionForEffect(actor, c)).length;
   }
 
   /**
@@ -60,7 +55,7 @@ export class AdvantageAccumulator {
    * @param {string} label
    */
   advantageIf(label) {
-    if (label) this.advantage = true;
+    if (label) this.counts.advantages.count++;
   }
 
   /**
@@ -68,7 +63,7 @@ export class AdvantageAccumulator {
    * @param {string} label
    */
   disadvantageIf(label) {
-    if (label) this.disadvantage = true;
+    if (label) this.counts.disadvantages.count++;
   }
 
   /**
@@ -76,9 +71,10 @@ export class AdvantageAccumulator {
    * @param {Object} options
    */
   update(options) {
-    debug(`updating options with {advantage: ${this.advantage}, disadvantage: ${this.disadvantage}}`);
-    if (this.advantage) options.advantage = true;
-    if (this.disadvantage) options.disadvantage = true;
+    const mode = dnd5e.dataModels.fields.AdvantageModeField.resolveMode({}, {}, this.counts);
+    debug("updating options with roll mode", mode);
+    options.advantage = (mode === 1);
+    options.disadvantage = (mode === -1);
   }
 }
 
@@ -127,18 +123,18 @@ class BaseReminder {
   }
 
   _rollModeCounts(rollModes) {
-    if (foundry.utils.isEmpty(rollModes)) return {};
+    if (foundry.utils.isEmpty(rollModes)) return {
+      override: null,
+      advantages: { count: 0, suppressed: false },
+      disadvantages: { count: 0, suppressed: false }
+    };
 
     // TODO handle more than one in 5.1 using combineFields
 
     const path = Object.keys(rollModes)[0];
     const counts = dnd5e.dataModels.fields.AdvantageModeField.getCounts(this.actor, { key: path });
-    const advantage = (((counts.advantages.count > 0) && (counts.override === null)) || (counts.override === 1))
-      && !counts.advantages.suppressed;
-    const disadvantage = (((counts.disadvantages.count > 0) && (counts.override === null)) || (counts.override === -1))
-      && !counts.disadvantages.suppressed;
-    debug("Roll Mode from actor", path, advantage, disadvantage);
-    return { advantage, disadvantage };
+    debug("Roll Mode counts actor", path, counts);
+    return foundry.utils.deepClone(counts);
   }
 
   _customUpdateOptions(accumulator) {}
