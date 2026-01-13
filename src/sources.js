@@ -13,6 +13,25 @@ import {
 import { debug } from "./util.js";
 
 /**
+ * @typedef LabelModeData
+ * @property {LabelModeOverride|null} override  Information about the source if overridden.
+ * @property {LabelModeCounts} advantages       The advantage sources.
+ * @property {LabelModeCounts} disadvantages    The disadvantage sources.
+ */
+
+/**
+ * @typedef LabelModeOverride
+ * @property {string} label    The source that overrides this mode.
+ * @property {number} mode     The value of the override.
+ */
+
+/**
+ * @typedef LabelModeCounts
+ * @property {string[]} labels      The sources that applied this mode.
+ * @property {string[]} suppressed  The sources that suppressed this mode.
+ */
+
+/**
  * A mixin to share a function override between the two label accumulators.
  */
 const LabelMixin = (superClass) => class extends superClass {
@@ -34,6 +53,14 @@ const LabelMixin = (superClass) => class extends superClass {
 }
 
 class LabelAccumulator extends LabelMixin(AdvantageAccumulator) {
+  /**
+   * @param {LabelModeData} counts
+   */
+  constructor(counts) {
+    super();
+    this.counts = counts;
+  }
+
   /**
    * Apply labels from directly setting roll modes on the actor.
    * @param actor
