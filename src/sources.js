@@ -72,10 +72,10 @@ class LabelAccumulator extends LabelMixin(AdvantageAccumulator) {
       const mode = foundry.utils.getProperty(source, key);
       if (mode === 1) {
         const label = this._rollModeLabel(...labels, "DND5E.AdvantageMode");
-        this.advantageLabels.push(label);
+        this.counts.advantages.labels.push(label);
       } else if (mode === -1) {
         const label = this._rollModeLabel(...labels, "DND5E.AdvantageMode");
-        this.disadvantageLabels.push(label);
+        this.counts.disadvantages.labels.push(label);
       }
     });
   }
