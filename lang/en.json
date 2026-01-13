@@ -49,8 +49,19 @@
     "Hint": "If an active effect determines adv/dis/crit on a roll, show its name as a message in the dialog"
   },
   "adv-reminder.Source": {
-    "Adv": "Advantage from {sources}",
-    "Dis": "Disadvantage from {sources}",
+    "Advantage": {
+      "override": "Advantage Override from",
+      "suppressed": "Advantage Suppressed by",
+      "prefix": "Advantage from"
+    },
+    "Normal": {
+      "override": "Normal Override from"
+    },
+    "Disadvantage": {
+      "override": "Disadvantage Override from",
+      "suppressed": "Disadvantage Suppressed by",
+      "prefix": "Disadvantage from"
+    },
     "Crit": "Critical Hit from {sources}",
     "Norm": "Normal from {sources}"
   },

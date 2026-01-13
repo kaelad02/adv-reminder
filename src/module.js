@@ -153,14 +153,45 @@ async function prepareMessage(dialog) {
       messages.push(CIRCLE_INFO + game.i18n.format(stringId, { sources }));
     }
   };
-  addLabels(opt.advantageLabels, "adv-reminder.Source.Adv");
-  addLabels(opt.disadvantageLabels, "adv-reminder.Source.Dis");
+
+  const sources = [];
+  const addSources = (icon, prefix, labels) => {
+    if (labels?.length) sources.push({ icon, prefix, labels: labels.join(", ") });
+  };
+  if (opt.sources?.override) {
+    let icon, prefix;
+    switch (opt.sources.override.mode) {
+      case 1:
+        icon = "fas fa-angles-up";
+        prefix = "adv-reminder.Source.Advantage.override";
+        break;
+      case 0:
+        icon = "fas fa-minus";
+        prefix = "adv-reminder.Source.Normal.override";
+        break;
+      case -1:
+        icon = "fas fa-angles-down";
+        prefix = "adv-reminder.Source.Disadvantage.override";
+        break;
+    }
+    addSources(icon, prefix, [opt.sources.override.label]);
+  } else {
+    if (opt.sources?.advantages?.suppressed?.length)
+      addSources("fas fa-circle-xmark", "adv-reminder.Source.Advantage.suppressed", opt.sources.advantages.suppressed);
+    else
+      addSources("fas fa-angle-up", "adv-reminder.Source.Advantage.prefix", opt.sources?.advantages?.labels);
+
+    if (opt.sources?.disadvantages?.suppressed?.length)
+      addSources("fas fa-circle-xmark", "adv-reminder.Source.Disadvantage.suppressed", opt.sources.disadvantages.suppressed);
+    else
+      addSources("fas fa-angle-down", "adv-reminder.Source.Disadvantage.prefix", opt.sources?.disadvantages?.labels);
+  }
   addLabels(opt.criticalLabels, "adv-reminder.Source.Crit");
   addLabels(opt.normalLabels, "adv-reminder.Source.Norm");
 
-  if (messages.length) {
+  if (messages.length || sources.length) {
     // build message
-    const message = await renderTemplate("modules/adv-reminder/templates/roll-dialog-messages.hbs", { messages });
+    const message = await renderTemplate("modules/adv-reminder/templates/roll-dialog-messages.hbs", { messages, sources });
     // enrich message, specifically replacing rolls
     const enriched = await TextEditor.enrichHTML(message, {
       secrets: true,
