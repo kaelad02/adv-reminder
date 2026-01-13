@@ -100,6 +100,49 @@ Hooks.once("ready", () => {
   if (debugEnabled) window.samplePack = new SamplePackBuilder();
 });
 
+/**
+ * Process the d20 roll sources of advantage/normal/disadvantage
+ */
+Hooks.on("renderD20RollConfigurationDialog", (dialog, html) => {
+  const opt = dialog.options["adv-reminder"];
+  if (!opt || opt.sources || !opt.advSources) return;
+  const advSources = opt.advSources;
+
+  opt.sources = [];
+  const addSources = (icon, prefix, labels) => {
+    if (labels?.length) opt.sources.push({ icon, prefix, labels: labels.join(", ") });
+  };
+
+  if (advSources.override) {
+    let icon, prefix;
+    switch (advSources.override.mode) {
+      case 1:
+        icon = "fas fa-angles-up";
+        prefix = "adv-reminder.Source.Advantage.override";
+        break;
+      case 0:
+        icon = "fas fa-minus";
+        prefix = "adv-reminder.Source.Normal.override";
+        break;
+      case -1:
+        icon = "fas fa-angles-down";
+        prefix = "adv-reminder.Source.Disadvantage.override";
+        break;
+    }
+    addSources(icon, prefix, [advSources.override.label]);
+  } else {
+    if (advSources.advantages?.suppressed?.length)
+      addSources("fas fa-circle-xmark", "adv-reminder.Source.Advantage.suppressed", advSources.advantages.suppressed);
+    else
+      addSources("fas fa-angle-up", "adv-reminder.Source.Advantage.prefix", advSources.advantages?.labels);
+
+    if (advSources.disadvantages?.suppressed?.length)
+      addSources("fas fa-circle-xmark", "adv-reminder.Source.Disadvantage.suppressed", advSources.disadvantages.suppressed);
+    else
+      addSources("fas fa-angle-down", "adv-reminder.Source.Disadvantage.prefix", advSources.disadvantages?.labels);
+  }
+});
+
 // New roll dialog hook, as of dnd5e v4.0
 Hooks.on("renderRollConfigurationDialog", async (dialog, html) => {
   debug("renderRollConfigurationDialog hook called");
@@ -153,41 +196,10 @@ async function prepareMessage(dialog) {
       messages.push(CIRCLE_INFO + game.i18n.format(stringId, { sources }));
     }
   };
-
-  const sources = [];
-  const addSources = (icon, prefix, labels) => {
-    if (labels?.length) sources.push({ icon, prefix, labels: labels.join(", ") });
-  };
-  if (opt.sources?.override) {
-    let icon, prefix;
-    switch (opt.sources.override.mode) {
-      case 1:
-        icon = "fas fa-angles-up";
-        prefix = "adv-reminder.Source.Advantage.override";
-        break;
-      case 0:
-        icon = "fas fa-minus";
-        prefix = "adv-reminder.Source.Normal.override";
-        break;
-      case -1:
-        icon = "fas fa-angles-down";
-        prefix = "adv-reminder.Source.Disadvantage.override";
-        break;
-    }
-    addSources(icon, prefix, [opt.sources.override.label]);
-  } else {
-    if (opt.sources?.advantages?.suppressed?.length)
-      addSources("fas fa-circle-xmark", "adv-reminder.Source.Advantage.suppressed", opt.sources.advantages.suppressed);
-    else
-      addSources("fas fa-angle-up", "adv-reminder.Source.Advantage.prefix", opt.sources?.advantages?.labels);
-
-    if (opt.sources?.disadvantages?.suppressed?.length)
-      addSources("fas fa-circle-xmark", "adv-reminder.Source.Disadvantage.suppressed", opt.sources.disadvantages.suppressed);
-    else
-      addSources("fas fa-angle-down", "adv-reminder.Source.Disadvantage.prefix", opt.sources?.disadvantages?.labels);
-  }
   addLabels(opt.criticalLabels, "adv-reminder.Source.Crit");
   addLabels(opt.normalLabels, "adv-reminder.Source.Norm");
+
+  const sources = opt.sources;
 
   if (messages.length || sources.length) {
     // build message

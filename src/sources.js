@@ -159,7 +159,7 @@ class LabelAccumulator extends LabelMixin(AdvantageAccumulator) {
     debug("counts for source labels", this.counts);
     // too much logic on what to pass which would just be duplicated in renderRollConfigurationDialog hook anyway
     // pass it all and have the hook decide what to show
-    foundry.utils.setProperty(dialog, "options.adv-reminder.sources", this.counts);
+    foundry.utils.setProperty(dialog, "options.adv-reminder.advSources", this.counts);
   }
 }
 
