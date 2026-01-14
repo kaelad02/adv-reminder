@@ -400,7 +400,7 @@ export class CriticalAccumulator extends AdvantageAccumulator {
 
   update(options) {
     // a normal hit overrides a crit
-    const critical = this.normal ? false : !!this.crit;
+    const critical = this.normal ? false : options.isCritical || !!this.crit;
     debug("updating isCritical", critical);
     options.isCritical = critical;
   }
@@ -464,6 +464,7 @@ export class CriticalReminder extends BaseReminder {
         if (distance <= 5) grantAdjacentCritical.forEach(accumulator.critical.bind(accumulator));
       }
     }
+    this._customUpdateOptions(accumulator);
     accumulator.update(options);
   }
 }

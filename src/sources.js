@@ -240,6 +240,13 @@ class CriticalLabelAccumulator extends LabelMixin(CriticalAccumulator) {
 }
 
 export class CriticalSource extends SourceMixin(CriticalReminder) {
+  constructor(actor, targetActor, activity, distanceFn, event) {
+    super(actor, targetActor, activity, distanceFn);
+
+    /** @type {Event} */
+    this.event = event;
+  }
+
   static AccumulatorClass = CriticalLabelAccumulator;
 
   static UpdateMessage = "checking for crit/normal effects to display their source";
@@ -249,6 +256,19 @@ export class CriticalSource extends SourceMixin(CriticalReminder) {
     if ("grants.critical.range" in this.targetFlags) {
       const distance = distanceFn();
       if (distance > grantsCriticalRange) delete this.targetFlags["grants.critical.range"];
+    }
+  }
+
+  _customUpdateOptions(accumulator) {
+    // only do this check on 4.3
+    if (!foundry.utils.isNewerVersion(game.system.version, "4.2.99")) return;
+
+    // check if the preceding attack roll was a critical hit
+    const messageId = this.event?.currentTarget?.dataset?.messageId;
+    if (messageId) {
+      const lastAttack = dnd5e.registry.messages.get(messageId, "attack").pop();
+      const isCritical = lastAttack?.rolls[0]?.isCritical;
+      if (isCritical) accumulator.critical(game.i18n.localize("DND5E.CriticalHit"));
     }
   }
 }
