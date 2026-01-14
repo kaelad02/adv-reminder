@@ -179,7 +179,7 @@ export default class ReadySetRollHooks extends CoreRollerHooks {
       new DamageMessage(activity.actor, target, activity).addMessage(dialog);
       if (showSources) new CriticalSource(activity.actor, target, activity, distanceFn).updateOptions(dialog);
       const reminder = new CriticalReminder(activity.actor, target, activity, distanceFn);
-      config.rolls.forEach(roll => reminder.updateOptions(roll.options, "isCritical"));
+      config.rolls.forEach(roll => reminder.updateOptions(roll.options));
     }
   }
 

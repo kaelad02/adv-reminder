@@ -230,12 +230,12 @@ class CriticalLabelAccumulator extends LabelMixin(CriticalAccumulator) {
     if (label) this.criticalLabels.push(label);
   }
 
-  update(options, labelPrefix) {
+  update(options) {
     debug("criticalLabels", this.criticalLabels, "normalLabels", this.normalLabels);
     if (this.criticalLabels.length)
-      foundry.utils.setProperty(options, `${labelPrefix}.adv-reminder.criticalLabels`, this.criticalLabels);
+      foundry.utils.setProperty(options, "options.adv-reminder.criticalLabels", this.criticalLabels);
     if (this.normalLabels.length)
-      foundry.utils.setProperty(options, `${labelPrefix}.adv-reminder.normalLabels`, this.normalLabels);
+      foundry.utils.setProperty(options, "options.adv-reminder.normalLabels", this.normalLabels);
   }
 }
 
@@ -250,9 +250,5 @@ export class CriticalSource extends SourceMixin(CriticalReminder) {
       const distance = distanceFn();
       if (distance > grantsCriticalRange) delete this.targetFlags["grants.critical.range"];
     }
-  }
-
-  updateOptions(options) {
-    super.updateOptions(options, "options");
   }
 }
