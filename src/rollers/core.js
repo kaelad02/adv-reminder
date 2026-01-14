@@ -203,9 +203,7 @@ export default class CoreRollerHooks {
     config.rolls.forEach(roll => reminder.updateOptions(roll.options));
     
     // workaround for https://github.com/foundryvtt/dnd5e/issues/5455
-    if (config.rolls[0].options?.isCritical) {
-      dialog.options.defaultButton = "critical";
-    }
+    dialog.options.defaultButton = config.rolls[0].options?.isCritical ? "critical" : "normal";
   }
 
   /**
