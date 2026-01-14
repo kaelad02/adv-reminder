@@ -1109,7 +1109,7 @@ describe("CriticalReminder critical flags", () => {
     const reminder = new CriticalReminder(actor, null, activity);
     reminder.updateOptions(options);
 
-    expect(options.critical).toBe(true);
+    expect(options.isCritical).toBe(true);
   });
 
   test("damage roll with critical.mwak flag should be critical for Melee Weapon Attack", () => {
@@ -1120,7 +1120,7 @@ describe("CriticalReminder critical flags", () => {
     const reminder = new CriticalReminder(actor, null, activity);
     reminder.updateOptions(options);
 
-    expect(options.critical).toBe(true);
+    expect(options.isCritical).toBe(true);
   });
 
   test("damage roll with critical.rsak flag should be normal for Melee Weapon Attack", () => {
@@ -1131,7 +1131,7 @@ describe("CriticalReminder critical flags", () => {
     const reminder = new CriticalReminder(actor, null, activity);
     reminder.updateOptions(options);
 
-    expect(options.critical).toBe(false);
+    expect(options.isCritical).toBe(false);
   });
 
   test("damage roll with grants.critical.all flag should be critical", () => {
@@ -1143,7 +1143,7 @@ describe("CriticalReminder critical flags", () => {
     const reminder = new CriticalReminder(actor, target, activity);
     reminder.updateOptions(options);
 
-    expect(options.critical).toBe(true);
+    expect(options.isCritical).toBe(true);
   });
 
   test("damage roll with grants.critical.rwak flag should be critical for Ranged Weapon Attack", () => {
@@ -1155,7 +1155,7 @@ describe("CriticalReminder critical flags", () => {
     const reminder = new CriticalReminder(actor, target, activity);
     reminder.updateOptions(options);
 
-    expect(options.critical).toBe(true);
+    expect(options.isCritical).toBe(true);
   });
 
   test("damage roll with grants.critical.rwak flag should be normal for Melee Spell Attack", () => {
@@ -1167,7 +1167,7 @@ describe("CriticalReminder critical flags", () => {
     const reminder = new CriticalReminder(actor, target, activity);
     reminder.updateOptions(options);
 
-    expect(options.critical).toBe(false);
+    expect(options.isCritical).toBe(false);
   });
 });
 
@@ -1180,7 +1180,7 @@ describe("CriticalReminder no critical flags", () => {
     const reminder = new CriticalReminder(actor, null, activity);
     reminder.updateOptions(options);
 
-    expect(options.critical).toBe(false);
+    expect(options.isCritical).toBe(false);
   });
 
   test("damage roll with noCritical.mwak flag should be normal for Melee Weapon Attack", () => {
@@ -1191,7 +1191,7 @@ describe("CriticalReminder no critical flags", () => {
     const reminder = new CriticalReminder(actor, null, activity);
     reminder.updateOptions(options);
 
-    expect(options.critical).toBe(false);
+    expect(options.isCritical).toBe(false);
   });
 
   test("damage roll with fail.critical.all flag should be normal", () => {
@@ -1203,7 +1203,7 @@ describe("CriticalReminder no critical flags", () => {
     const reminder = new CriticalReminder(actor, target, activity);
     reminder.updateOptions(options);
 
-    expect(options.critical).toBe(false);
+    expect(options.isCritical).toBe(false);
   });
 
   test("damage roll with fail.critical.rwak flag should be normal for Ranged Weapon Attack", () => {
@@ -1215,7 +1215,7 @@ describe("CriticalReminder no critical flags", () => {
     const reminder = new CriticalReminder(actor, target, activity);
     reminder.updateOptions(options);
 
-    expect(options.critical).toBe(false);
+    expect(options.isCritical).toBe(false);
   });
 });
 
@@ -1234,6 +1234,6 @@ describe("CriticalReminder both critical and no critical flags", () => {
     const reminder = new CriticalReminder(actor, target, activity);
     reminder.updateOptions(options);
 
-    expect(options.critical).toBe(false);
+    expect(options.isCritical).toBe(false);
   });
 });
