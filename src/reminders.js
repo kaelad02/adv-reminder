@@ -10,7 +10,18 @@ import { debug } from "./util.js";
 /**
  * @typedef AdvantageModeCounts
  * @property {number} count          The number of applications of this mode.
- * @property {boolean} [suppressed]  Whether this mode is suppressed.
+ * @property {boolean} suppressed  Whether this mode is suppressed.
+ */
+
+/**
+ * @typedef CriticalModeData
+ * @property {CriticalModeCounts} critical  The critical counts.
+ */
+
+/**
+ * @typedef CriticalModeCounts
+ * @property {number} count        The number of applications of this mode.
+ * @property {boolean} suppressed  Whether this mode is suppressed.
  */
 
 export class AdvantageAccumulator {
@@ -396,23 +407,26 @@ export class DeathSaveReminder extends AbilityBaseReminder {
 }
 
 export class CriticalAccumulator extends AdvantageAccumulator {
-  /** @type {boolean} */
-  crit;
-  /** @type {boolean} */
-  normal;
+  /**
+   * @param {CriticalModeData} counts
+   */
+  constructor(counts) {
+    super();
+    this.counts = counts;
+  }
 
   applyFlags(actorFlags, critKeys, normalKeys) {
-    this.crit = critKeys.reduce((accum, curr) => accum || actorFlags[curr], this.crit);
-    this.normal = normalKeys.reduce((accum, curr) => accum || actorFlags[curr], this.normal);
+    this.counts.critical.count += critKeys.filter(key => actorFlags[key]).length;
+    this.counts.critical.suppressed ||= normalKeys.some(key => actorFlags[key]);
   }
 
   critical(label) {
-    if (label) this.crit = true;
+    if (label) this.counts.critical.count++;
   }
 
   update(options) {
     // a normal hit overrides a crit
-    const critical = this.normal ? false : options.isCritical || !!this.crit;
+    const critical = this.counts.critical.suppressed ? false : (this.counts.critical.count > 0);
     debug("updating isCritical", critical);
     options.isCritical = critical;
   }
@@ -464,8 +478,11 @@ export class CriticalReminder extends BaseReminder {
     ];
     const grantsNormalKeys = ["fail.critical.all", `fail.critical.${this.actionType}`];
 
+    // initialize the critical counts
+    const counts = this._initCounts(options.isCritical);
+
     // find matching keys and update options
-    const accumulator = new this.constructor.AccumulatorClass();
+    const accumulator = new this.constructor.AccumulatorClass(counts);
     accumulator.applyFlags(this.actorFlags, critKeys, normalKeys);
     accumulator.applyFlags(this.targetFlags, grantsCritKeys, grantsNormalKeys);
     // handle distance-based status effects
@@ -478,5 +495,16 @@ export class CriticalReminder extends BaseReminder {
     }
     this._customUpdateOptions(accumulator);
     accumulator.update(options);
+  }
+
+  /**
+   * @returns {CriticalModeData}
+   */
+  _initCounts(isCritical) {
+    const counts = {
+      critical: { count: 0, suppressed: false }
+    };
+    if (isCritical) counts.critical.count++;
+    return counts;
   }
 }
