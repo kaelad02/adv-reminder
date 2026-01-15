@@ -6,8 +6,6 @@ import { applySettings, ButtonStyle, initSettings } from "./settings.js";
 import { debug, debugEnabled, log } from "./util.js";
 import DaeIntegration from "./dae-integration.js";
 
-const CIRCLE_INFO = `<i class="fa-solid fa-circle-info"></i> `;
-
 Hooks.once("init", () => {
   log("initializing Advantage Reminder");
 

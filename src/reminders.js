@@ -101,7 +101,7 @@ export class AdvantageAccumulator {
 
 class BaseReminder {
   constructor(actor) {
-    /** @type {Actor5e*} */
+    /** @type {Actor5e} */
     this.actor = actor;
     /** @type {object} */
     this.actorFlags = this._getFlags(actor);
@@ -109,7 +109,7 @@ class BaseReminder {
 
   /**
    * Get the midi-qol flags on the actor, flattened.
-   * @param {Actor5e*} actor
+   * @param {Actor5e} actor
    * @returns {object} the midi-qol flags on the actor, flattened
    */
   _getFlags(actor) {
@@ -165,7 +165,7 @@ export class AttackReminder extends BaseReminder {
   constructor(actor, targetActor, activity, distanceFn) {
     super(actor);
 
-    /** @type {Actor5e*} */
+    /** @type {Actor5e} */
     this.targetActor = targetActor;
     /** @type {object} */
     this.targetFlags = this._getFlags(targetActor);
@@ -359,7 +359,7 @@ export class SkillReminder extends AbilityCheckReminder {
       const item = this.items.find(
         (item) => item.type === "equipment" && item.system.equipped && item.system.properties.has("stealthDisadvantage")
       );
-      debug("equiped item that imposes stealth disadvantage", item?.name);
+      debug("equipped item that imposes stealth disadvantage", item?.name);
       accumulator.disadvantageIf(item?.name);
     }
   }
@@ -430,7 +430,7 @@ export class CriticalReminder extends BaseReminder {
   constructor(actor, targetActor, activity, distanceFn) {
     super(actor);
 
-    /** @type {Actor5e*} */
+    /** @type {Actor5e} */
     this.targetActor = targetActor;
     /** @type {object} */
     this.targetFlags = this._getFlags(targetActor);
