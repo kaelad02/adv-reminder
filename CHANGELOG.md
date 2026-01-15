@@ -1,3 +1,8 @@
+# 4.3.4
+
+- feature: refactor preRollDamageV2 hook to set `isCritical` at the config level, not the individual rolls
+- feature: as of system version 4.3.0, the system sets `isCritical` when the attack is a crit, support that
+
 # 4.3.3
 
 - feature: set verified system version to 4.3.9

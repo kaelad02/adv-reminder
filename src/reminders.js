@@ -398,11 +398,11 @@ export class CriticalAccumulator extends AdvantageAccumulator {
     if (label) this.crit = true;
   }
 
-  update(options, critProp) {
+  update(options) {
     // a normal hit overrides a crit
-    const critical = this.normal ? false : !!this.crit;
-    debug(`updating ${critProp}: ${critical}`);
-    options[critProp] = critical;
+    const critical = this.normal ? false : options.isCritical || !!this.crit;
+    debug("updating isCritical", critical);
+    options.isCritical = critical;
   }
 }
 
@@ -439,7 +439,7 @@ export class CriticalReminder extends BaseReminder {
 
   static UpdateMessage = "checking for critical/normal effects for the roll";
 
-  updateOptions(options, critProp = "critical") {
+  updateOptions(options) {
     debug(this.constructor.UpdateMessage);
 
     // build the active effect keys applicable for this roll
@@ -464,6 +464,7 @@ export class CriticalReminder extends BaseReminder {
         if (distance <= 5) grantAdjacentCritical.forEach(accumulator.critical.bind(accumulator));
       }
     }
-    accumulator.update(options, critProp);
+    this._customUpdateOptions(accumulator);
+    accumulator.update(options);
   }
 }

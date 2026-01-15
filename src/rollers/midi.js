@@ -156,6 +156,17 @@ export default class MidiRollerHooks extends CoreRollerHooks {
     if (!activity) return;
 
     new DamageMessage(activity.actor, target, activity).addMessage(dialog);
-    if (showSources) new CriticalSource(activity.actor, target, activity, distanceFn).updateOptions(dialog);
+    if (showSources) {
+      const source = new CriticalSource(activity.actor, target, activity, distanceFn);
+      // use Midi's workflow to check for a critical hit, not the standard check w/ the event
+      source._customUpdateOptions = function(accumulator) {
+        const criticalHit = config.workflow?.attackRoll?.isCritical;
+        if (criticalHit) {
+          const value = config.workflow.attackRoll.d20.total;
+          accumulator.critical(game.i18n.format("adv-reminder.Source.Nat20", { value }));
+        }
+      };
+      source.updateOptions(dialog);
+    }
   }
 }

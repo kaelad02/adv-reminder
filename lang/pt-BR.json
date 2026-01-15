@@ -52,7 +52,8 @@
     "Adv": "Vantagem de {sources}",
     "Dis": "Desvantagem de {sources}",
     "Crit": "Acerto Crítico de from {sources}",
-    "Norm": "Normal de {sources}"
+    "Norm": "Normal de {sources}",
+    "Nat20": "{value} natural"
   },
   "adv-reminder.UpdateStatusEffects": {
     "Name": "Atualizar Condições",

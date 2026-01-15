@@ -51,7 +51,8 @@
     "Adv": "Source de l'avantage : {sources}",
     "Dis": "Source du désavantage : {sources}",
     "Crit": "Source du coup critique : {sources}",
-    "Norm": "Source du jet normal : {sources}"
+    "Norm": "Source du jet normal : {sources}",
+    "Nat20": "{value} naturel"
   },
   "adv-reminder.UpdateStatusEffects": {
     "Name": "Activer les effets de condition",
