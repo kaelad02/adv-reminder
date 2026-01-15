@@ -48,11 +48,24 @@
     "Hint": "Si un effet actif donne un adv / dis / crit sur un jet, affichez son nom sous forme de message dans la boîte de dialogue."
   },
   "adv-reminder.Source": {
-    "Adv": "Source de l'avantage : {sources}",
-    "Dis": "Source du désavantage : {sources}",
-    "Crit": "Source du coup critique : {sources}",
-    "Norm": "Source du jet normal : {sources}",
-    "Nat20": "{value} naturel"
+    "Advantage": {
+      "override": "Source de la priorité d'avantage :",
+      "suppressed": "Source de l'avantage supprimé :",
+      "prefix": "Source de l'avantage :"
+    },
+    "Normal": {
+      "override": "Source de la priorité normal :"
+    },
+    "Disadvantage": {
+      "override": "Source de la priorité désavantage :",
+      "suppressed": "Source du désavantage supprimé :",
+      "prefix": "Source du désavantage :"
+    },
+    "Critical": {
+      "suppressed": "Source du coup critique supprimé :",
+      "prefix": "Source du coup critique :",
+      "nat20": "{value} naturel"
+    }
   },
   "adv-reminder.UpdateStatusEffects": {
     "Name": "Activer les effets de condition",
