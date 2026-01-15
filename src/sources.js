@@ -32,6 +32,11 @@ import { debug } from "./util.js";
  */
 
 /**
+ * @typedef CriticalLabelModeData
+ * @property {LabelModeCounts} critical  The critical sources.
+ */
+
+/**
  * A mixin to share a function override between the two label accumulators.
  */
 const LabelMixin = (superClass) => class extends superClass {
@@ -285,30 +290,32 @@ export class InitiativeSource extends SourceMixin(InitiativeReminder) {
 export class DeathSaveSource extends SourceMixin(DeathSaveReminder) {}
 
 class CriticalLabelAccumulator extends LabelMixin(CriticalAccumulator) {
-  /** @type {string[]} */
-  criticalLabels = [];
-  /** @type {string[]} */
-  normalLabels = [];
+  /**
+   * @param {CriticalLabelModeData} counts
+   */
+  constructor(counts) {
+    super();
+    this.counts = counts;
+  }
 
   applyFlags(actorFlags, critKeys, normalKeys) {
     critKeys.forEach(key => {
-      if (actorFlags[key]) this.criticalLabels.push(...actorFlags[key]);
+      if (actorFlags[key]) this.counts.critical.labels.push(...actorFlags[key]);
     });
     normalKeys.forEach(key => {
-      if(actorFlags[key]) this.normalLabels.push(...actorFlags[key]);
+      if(actorFlags[key]) this.counts.critical.suppressed.push(...actorFlags[key]);
     });
   }
 
   critical(label) {
-    if (label) this.criticalLabels.push(label);
+    if (label) this.counts.critical.labels.push(label);
   }
 
-  update(options) {
-    debug("criticalLabels", this.criticalLabels, "normalLabels", this.normalLabels);
-    if (this.criticalLabels.length)
-      foundry.utils.setProperty(options, "options.adv-reminder.criticalLabels", this.criticalLabels);
-    if (this.normalLabels.length)
-      foundry.utils.setProperty(options, "options.adv-reminder.normalLabels", this.normalLabels);
+  update(dialog) {
+    debug("counts for source labels", this.counts);
+    // too much logic on what to pass which would just be duplicated in renderRollConfigurationDialog hook anyway
+    // pass it all and have the hook decide what to show
+    foundry.utils.setProperty(dialog, "options.adv-reminder.critSources", this.counts);
   }
 }
 
@@ -332,7 +339,18 @@ export class CriticalSource extends SourceMixin(CriticalReminder) {
     }
   }
 
-  _customUpdateOptions(accumulator) {
+  /**
+   * @returns {CriticalLabelModeData}
+   */
+  _initCounts(isCritical) {
+    const counts = {
+      critical: { labels: [], suppressed: [] }
+    };
+    this._applyNat20(counts);
+    return counts;
+  }
+
+  _applyNat20(counts) {
     // only do this check on 4.3
     if (!foundry.utils.isNewerVersion(game.system.version, "4.2.99")) return;
 
@@ -343,7 +361,7 @@ export class CriticalSource extends SourceMixin(CriticalReminder) {
       const isCritical = lastAttack?.rolls[0]?.isCritical;
       if (isCritical) {
         const value = lastAttack.rolls[0].d20.total;
-        accumulator.critical(game.i18n.format("adv-reminder.Source.Nat20", { value }));
+        counts.critical.labels.push(game.i18n.format("adv-reminder.Source.Critical.nat20", { value }));
       }
     }
   }

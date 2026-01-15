@@ -15,13 +15,7 @@ import { debug } from "./util.js";
 
 /**
  * @typedef CriticalModeData
- * @property {CriticalModeCounts} critical  The critical counts.
- */
-
-/**
- * @typedef CriticalModeCounts
- * @property {number} count        The number of applications of this mode.
- * @property {boolean} suppressed  Whether this mode is suppressed.
+ * @property {AdvantageModeCounts} critical  The critical counts.
  */
 
 export class AdvantageAccumulator {

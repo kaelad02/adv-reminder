@@ -143,6 +143,25 @@ Hooks.on("renderD20RollConfigurationDialog", (dialog, html) => {
   }
 });
 
+/**
+ * Process the damage roll sources of crits
+ */
+Hooks.on("renderDamageRollConfigurationDialog", (dialog, html) => {
+  const opt = dialog.options["adv-reminder"];
+  if (!opt || opt.sources || !opt.critSources) return;
+  const critSources = opt.critSources;
+
+  opt.sources = [];
+  const addSources = (icon, prefix, labels) => {
+    if (labels?.length) opt.sources.push({ icon, prefix, labels: labels.join(", ") });
+  };
+
+  if (critSources.critical?.suppressed?.length)
+    addSources("fas fa-circle-xmark", "adv-reminder.Source.Critical.suppressed", critSources.critical.suppressed);
+  else
+    addSources("fas fa-bomb", "adv-reminder.Source.Critical.prefix", critSources.critical.labels);
+});
+
 // New roll dialog hook, as of dnd5e v4.0
 Hooks.on("renderRollConfigurationDialog", async (dialog, html) => {
   debug("renderRollConfigurationDialog hook called");
@@ -185,21 +204,11 @@ Hooks.on("renderRollConfigurationDialog", async (dialog, html) => {
 
 async function prepareMessage(dialog) {
   const opt = dialog.options["adv-reminder"];
-  if (!opt) return;
-  if (opt.rendered) return;
+  if (!opt || opt.rendered) return;
 
-  // merge the messages with the advantage/disadvantage from sources
-  const messages = [...(opt.messages ?? [])];
-  const addLabels = (labels, stringId) => {
-    if (labels) {
-      const sources = labels.join(", ");
-      messages.push(CIRCLE_INFO + game.i18n.format(stringId, { sources }));
-    }
-  };
-  addLabels(opt.criticalLabels, "adv-reminder.Source.Crit");
-  addLabels(opt.normalLabels, "adv-reminder.Source.Norm");
-
-  const sources = opt.sources;
+  // get the messages and sources
+  const messages = opt.messages ?? [];
+  const sources = opt.sources ?? [];
 
   if (messages.length || sources.length) {
     // build message

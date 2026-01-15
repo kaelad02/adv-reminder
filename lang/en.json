@@ -62,9 +62,11 @@
       "suppressed": "Disadvantage Suppressed by",
       "prefix": "Disadvantage from"
     },
-    "Crit": "Critical Hit from {sources}",
-    "Norm": "Normal from {sources}",
-    "Nat20": "Natural {value}"
+    "Critical": {
+      "suppressed": "Critical Hit Suppressed by",
+      "prefix": "Critical Hit from",
+      "nat20": "Natural {value}"
+    }
   },
   "adv-reminder.UpdateStatusEffects": {
     "Name": "Enable Condition Effects",
