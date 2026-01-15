@@ -303,16 +303,23 @@ class CriticalLabelAccumulator extends LabelMixin(CriticalAccumulator) {
     if (label) this.criticalLabels.push(label);
   }
 
-  update(options, labelPrefix) {
+  update(options) {
     debug("criticalLabels", this.criticalLabels, "normalLabels", this.normalLabels);
     if (this.criticalLabels.length)
-      foundry.utils.setProperty(options, `${labelPrefix}.adv-reminder.criticalLabels`, this.criticalLabels);
+      foundry.utils.setProperty(options, "options.adv-reminder.criticalLabels", this.criticalLabels);
     if (this.normalLabels.length)
-      foundry.utils.setProperty(options, `${labelPrefix}.adv-reminder.normalLabels`, this.normalLabels);
+      foundry.utils.setProperty(options, "options.adv-reminder.normalLabels", this.normalLabels);
   }
 }
 
 export class CriticalSource extends SourceMixin(CriticalReminder) {
+  constructor(actor, targetActor, activity, distanceFn, event) {
+    super(actor, targetActor, activity, distanceFn);
+
+    /** @type {Event} */
+    this.event = event;
+  }
+
   static AccumulatorClass = CriticalLabelAccumulator;
 
   static UpdateMessage = "checking for crit/normal effects to display their source";
@@ -325,7 +332,19 @@ export class CriticalSource extends SourceMixin(CriticalReminder) {
     }
   }
 
-  updateOptions(options) {
-    super.updateOptions(options, "options");
+  _customUpdateOptions(accumulator) {
+    // only do this check on 4.3
+    if (!foundry.utils.isNewerVersion(game.system.version, "4.2.99")) return;
+
+    // check if the preceding attack roll was a critical hit
+    const messageId = this.event?.currentTarget?.dataset?.messageId;
+    if (messageId) {
+      const lastAttack = dnd5e.registry.messages.get(messageId, "attack").pop();
+      const isCritical = lastAttack?.rolls[0]?.isCritical;
+      if (isCritical) {
+        const value = lastAttack.rolls[0].d20.total;
+        accumulator.critical(game.i18n.format("adv-reminder.Source.Nat20", { value }));
+      }
+    }
   }
 }

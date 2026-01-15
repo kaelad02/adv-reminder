@@ -177,9 +177,11 @@ export default class ReadySetRollHooks extends CoreRollerHooks {
 
     if (this._doMessages(config)) {
       new DamageMessage(activity.actor, target, activity).addMessage(dialog);
-      if (showSources) new CriticalSource(activity.actor, target, activity, distanceFn).updateOptions(dialog);
-      const reminder = new CriticalReminder(activity.actor, target, activity, distanceFn);
-      config.rolls.forEach(roll => reminder.updateOptions(roll.options, "isCritical"));
+      if (showSources) new CriticalSource(activity.actor, target, activity, distanceFn, config.event).updateOptions(dialog);
+      new CriticalReminder(activity.actor, target, activity, distanceFn).updateOptions(config);
+
+      // workaround for https://github.com/foundryvtt/dnd5e/issues/5455
+      dialog.options.defaultButton = config.isCritical ? "critical" : "normal";
     }
   }
 
