@@ -52,7 +52,8 @@
     "Adv": "Advantage from {sources}",
     "Dis": "Disadvantage from {sources}",
     "Crit": "Critical Hit from {sources}",
-    "Norm": "Normal from {sources}"
+    "Norm": "Normal from {sources}",
+    "Nat20": "Natural {value}"
   },
   "adv-reminder.UpdateStatusEffects": {
     "Name": "Enable Condition Effects",

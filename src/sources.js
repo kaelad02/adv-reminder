@@ -268,7 +268,10 @@ export class CriticalSource extends SourceMixin(CriticalReminder) {
     if (messageId) {
       const lastAttack = dnd5e.registry.messages.get(messageId, "attack").pop();
       const isCritical = lastAttack?.rolls[0]?.isCritical;
-      if (isCritical) accumulator.critical(game.i18n.localize("DND5E.CriticalHit"));
+      if (isCritical) {
+        const value = lastAttack.rolls[0].d20.total;
+        accumulator.critical(game.i18n.format("adv-reminder.Source.Nat20", { value }));
+      }
     }
   }
 }
