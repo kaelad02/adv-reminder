@@ -75,7 +75,7 @@ export class AdvantageAccumulator {
    * Set advantage if the label exists.
    * @param {string} label
    */
-  advantageIf(label) {
+  advantage(label) {
     if (label) this.counts.advantages.count++;
   }
 
@@ -83,7 +83,7 @@ export class AdvantageAccumulator {
    * Set disadvantage if the label exists.
    * @param {string} label
    */
-  disadvantageIf(label) {
+  disadvantage(label) {
     if (label) this.counts.disadvantages.count++;
   }
 
@@ -228,7 +228,7 @@ export class AttackReminder extends BaseReminder {
       const grantAdjacentAttack = accumulator._getConditionForEffect(this.targetActor, "advReminderGrantAdjacentAttack");
       if (grantAdjacentAttack.length) {
         const distance = this.distanceFn();
-        const accumFn = distance <= 5 ? accumulator.advantageIf.bind(accumulator) : accumulator.disadvantageIf.bind(accumulator);
+        const accumFn = distance <= 5 ? accumulator.advantage.bind(accumulator) : accumulator.disadvantage.bind(accumulator);
         grantAdjacentAttack.forEach(accumFn);
       }
     }
@@ -360,7 +360,7 @@ export class SkillReminder extends AbilityCheckReminder {
         (item) => item.type === "equipment" && item.system.equipped && item.system.properties.has("stealthDisadvantage")
       );
       debug("equipped item that imposes stealth disadvantage", item?.name);
-      accumulator.disadvantageIf(item?.name);
+      accumulator.disadvantage(item?.name);
     }
   }
 }

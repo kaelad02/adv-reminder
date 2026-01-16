@@ -175,11 +175,11 @@ class LabelAccumulator extends LabelMixin(AdvantageAccumulator) {
     this.counts.disadvantages.labels.push(...disLabels);
   }
 
-  advantageIf(label) {
+  advantage(label) {
     if (label) this.counts.advantages.labels.push(label);
   }
 
-  disadvantageIf(label) {
+  disadvantage(label) {
     if (label) this.counts.disadvantages.labels.push(label);
   }
 
@@ -269,7 +269,7 @@ export class InitiativeSource extends SourceMixin(InitiativeReminder) {
   _applyFlagSource(accumulator, flags) {
     flags
       .filter(flag => foundry.utils.getProperty(this.actor._source, `flags.dnd5e.${flag}`))
-      .forEach(flag => accumulator.advantageIf(CONFIG.DND5E.characterFlags[flag]?.name));
+      .forEach(flag => accumulator.advantage(CONFIG.DND5E.characterFlags[flag]?.name));
   }
 
   /**
@@ -282,7 +282,7 @@ export class InitiativeSource extends SourceMixin(InitiativeReminder) {
         const hasFlag = effect.changes
           .map(change => change.key)
           .some(key => flagKeys.includes(key));
-        if (hasFlag) accumulator.advantageIf(effect.name);
+        if (hasFlag) accumulator.advantage(effect.name);
       });
   }
 }
