@@ -888,6 +888,7 @@ describe("SkillReminder disadvantage flags", () => {
           equipped: true,
           properties: new Set(["stealthDisadvantage"]),
         },
+        link: "@UUID[fake-uuid]{Scale Mail}",
       },
     ];
     const options = {};
