@@ -222,7 +222,6 @@ async function prepareMessage(dialog) {
       links: false,
       rolls: true,
       rollData: dialog.rolls[0]?.data ?? {},
-      async: true,
     });
     debug("messages", messages, "enriched", enriched);
     opt.rendered = true;
