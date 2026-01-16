@@ -30,6 +30,35 @@ export default function commonTestInit() {
     }
   };
 
+  // copied from dnd5e
+
+  globalThis.dnd5e = {
+    dataModels: {
+      fields: {
+        AdvantageModeField: {}
+      }
+    }
+  };
+
+  dnd5e.dataModels.fields.AdvantageModeField.getCounts = function (model, change) {
+    const parentKey = change.key.substring(0, change.key.lastIndexOf("."));
+    const roll = foundry.utils.getProperty(model, parentKey) ?? {};
+    return roll.modeCounts ??= {
+      override: null,
+      advantages: { count: 0, suppressed: false },
+      disadvantages: { count: 0, suppressed: false }
+    };
+  }
+
+  dnd5e.dataModels.fields.AdvantageModeField.resolveMode = function (model, change, counts) {
+    const { override, advantages, disadvantages } = counts ?? this.getCounts(model, change);
+    if ( override !== null ) return override;
+    const src = foundry.utils.getProperty(model._source, change.key) ?? 0;
+    const advantageCount = advantages.suppressed ? 0 : advantages.count + Number(src === 1);
+    const disadvantageCount = disadvantages.suppressed ? 0 : disadvantages.count + Number(src === -1);
+    return Math.sign(advantageCount) - Math.sign(disadvantageCount);
+  }
+
   // copied from Foundry
 
   function filter(test) {
@@ -139,5 +168,34 @@ export default function commonTestInit() {
       default:
         return false;
     }
+  };
+
+  globalThis.foundry.utils.deepClone = (original, {strict=false, _d=0}={}) => {
+    if ( _d > 100 ) {
+      throw new Error("Maximum depth exceeded. Be sure your object does not contain cyclical data structures.");
+    }
+    _d++;
+
+    // Simple types
+    if ( (typeof original !== "object") || (original === null) ) return original;
+
+    // Arrays
+    if ( original instanceof Array ) return original.map(o => foundry.utils.deepClone(o, {strict, _d}));
+
+    // Dates
+    if ( original instanceof Date ) return new Date(original);
+
+    // Unsupported advanced objects
+    if ( original.constructor && (original.constructor !== Object) ) {
+      if ( strict ) throw new Error("deepClone cannot clone advanced objects");
+      return original;
+    }
+
+    // Other objects
+    const clone = {};
+    for ( let k of Object.keys(original) ) {
+      clone[k] = foundry.utils.deepClone(original[k], {strict, _d});
+    }
+    return clone;
   };
 }
