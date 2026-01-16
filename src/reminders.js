@@ -365,7 +365,7 @@ export class SkillReminder extends AbilityCheckReminder {
         (item) => item.type === "equipment" && item.system.equipped && item.system.properties.has("stealthDisadvantage")
       );
       debug("equipped item that imposes stealth disadvantage", item?.name);
-      accumulator.disadvantage(item?.name);
+      accumulator.disadvantage(item?.link);
     }
   }
 }
