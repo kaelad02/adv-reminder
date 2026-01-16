@@ -102,8 +102,10 @@ Hooks.once("ready", () => {
  * Process the d20 roll sources of advantage/normal/disadvantage
  */
 Hooks.on("renderD20RollConfigurationDialog", (dialog, html) => {
+  debug("renderD20RollConfigurationDialog hook called");
+
   const opt = dialog.options["adv-reminder"];
-  if (!opt || opt.sources || !opt.advSources) return;
+  if (opt?.sources || !opt?.advSources) return;
   const advSources = opt.advSources;
 
   opt.sources = [];
@@ -145,8 +147,10 @@ Hooks.on("renderD20RollConfigurationDialog", (dialog, html) => {
  * Process the damage roll sources of crits
  */
 Hooks.on("renderDamageRollConfigurationDialog", (dialog, html) => {
+  debug("renderDamageRollConfigurationDialog hook called");
+
   const opt = dialog.options["adv-reminder"];
-  if (!opt || opt.sources || !opt.critSources) return;
+  if (opt?.sources || !opt?.critSources) return;
   const critSources = opt.critSources;
 
   opt.sources = [];
