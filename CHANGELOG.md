@@ -1,3 +1,8 @@
+# next
+
+- feature: support advantage roll mode features like overriding (i.e. use the Override change mode) and suppressing (i.e. use the Upgrade/Downgrade change mode)
+- feature: update source tracking to only show what's actually affecting the roll: only show override if used, and if advantage is suppressed then show what suppressed it instead of any sources of advantage
+
 # 4.3.4
 
 - feature: refactor preRollDamageV2 hook to set `isCritical` at the config level, not the individual rolls

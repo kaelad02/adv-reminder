@@ -27,8 +27,8 @@ describe("AttackReminder no legit active effects", () => {
     const reminder = new AttackReminder(actor, target, activity);
     reminder.updateOptions(options);
 
-    expect(options.advantage).toBeUndefined();
-    expect(options.disadvantage).toBeUndefined();
+    expect(options.advantage).toBe(false);
+    expect(options.disadvantage).toBe(false);
   });
 });
 
@@ -42,7 +42,7 @@ describe("AttackReminder advantage flags", () => {
     reminder.updateOptions(options);
 
     expect(options.advantage).toBe(true);
-    expect(options.disadvantage).toBeUndefined();
+    expect(options.disadvantage).toBe(false);
   });
 
   test("attack with advantage.attack.all flag should be advantage", () => {
@@ -54,7 +54,7 @@ describe("AttackReminder advantage flags", () => {
     reminder.updateOptions(options);
 
     expect(options.advantage).toBe(true);
-    expect(options.disadvantage).toBeUndefined();
+    expect(options.disadvantage).toBe(false);
   });
 
   test("attack with advantage.attack.mwak flag should be advantage for Melee Weapon Attack", () => {
@@ -66,7 +66,7 @@ describe("AttackReminder advantage flags", () => {
     reminder.updateOptions(options);
 
     expect(options.advantage).toBe(true);
-    expect(options.disadvantage).toBeUndefined();
+    expect(options.disadvantage).toBe(false);
   });
 
   test("attack with advantage.attack.mwak flag should be normal for Ranged Weapon Attack", () => {
@@ -77,8 +77,8 @@ describe("AttackReminder advantage flags", () => {
     const reminder = new AttackReminder(actor, null, activity);
     reminder.updateOptions(options);
 
-    expect(options.advantage).toBeUndefined();
-    expect(options.disadvantage).toBeUndefined();
+    expect(options.advantage).toBe(false);
+    expect(options.disadvantage).toBe(false);
   });
 
   test("attack with advantage.attack.cha flag should be advantage for Charisma Attack", () => {
@@ -90,7 +90,7 @@ describe("AttackReminder advantage flags", () => {
     reminder.updateOptions(options);
 
     expect(options.advantage).toBe(true);
-    expect(options.disadvantage).toBeUndefined();
+    expect(options.disadvantage).toBe(false);
   });
 
   test("attack with advantage.attack.cha flag should be normal for Intelligence Attack", () => {
@@ -101,8 +101,8 @@ describe("AttackReminder advantage flags", () => {
     const reminder = new AttackReminder(actor, null, activity);
     reminder.updateOptions(options);
 
-    expect(options.advantage).toBeUndefined();
-    expect(options.disadvantage).toBeUndefined();
+    expect(options.advantage).toBe(false);
+    expect(options.disadvantage).toBe(false);
   });
 
   test("attack with grants.advantage.attack.all flag should be advantage", () => {
@@ -115,7 +115,7 @@ describe("AttackReminder advantage flags", () => {
     reminder.updateOptions(options);
 
     expect(options.advantage).toBe(true);
-    expect(options.disadvantage).toBeUndefined();
+    expect(options.disadvantage).toBe(false);
   });
 
   test("attack with grants.advantage.attack.rwak flag should be advantage for Ranged Weapon Attack", () => {
@@ -128,7 +128,7 @@ describe("AttackReminder advantage flags", () => {
     reminder.updateOptions(options);
 
     expect(options.advantage).toBe(true);
-    expect(options.disadvantage).toBeUndefined();
+    expect(options.disadvantage).toBe(false);
   });
 
   test("attack with grants.advantage.attack.rwak flag should be advantage for Ranged Spell Attack", () => {
@@ -140,8 +140,8 @@ describe("AttackReminder advantage flags", () => {
     const reminder = new AttackReminder(actor, target, activity);
     reminder.updateOptions(options);
 
-    expect(options.advantage).toBeUndefined();
-    expect(options.disadvantage).toBeUndefined();
+    expect(options.advantage).toBe(false);
+    expect(options.disadvantage).toBe(false);
   });
 });
 
@@ -166,7 +166,7 @@ describe("AttackReminder disadvantage flags", () => {
     const reminder = new AttackReminder(actor, null, activity);
     reminder.updateOptions(options);
 
-    expect(options.advantage).toBeUndefined();
+    expect(options.advantage).toBe(false);
     expect(options.disadvantage).toBe(true);
   });
 
@@ -178,7 +178,7 @@ describe("AttackReminder disadvantage flags", () => {
     const reminder = new AttackReminder(actor, null, activity);
     reminder.updateOptions(options);
 
-    expect(options.advantage).toBeUndefined();
+    expect(options.advantage).toBe(false);
     expect(options.disadvantage).toBe(true);
   });
 
@@ -190,8 +190,8 @@ describe("AttackReminder disadvantage flags", () => {
     const reminder = new AttackReminder(actor, null, activity);
     reminder.updateOptions(options);
 
-    expect(options.advantage).toBeUndefined();
-    expect(options.disadvantage).toBeUndefined();
+    expect(options.advantage).toBe(false);
+    expect(options.disadvantage).toBe(false);
   });
 
   test("attack with disadvantage.attack.cha flag should be disadvantage for Charisma Attack", () => {
@@ -202,7 +202,7 @@ describe("AttackReminder disadvantage flags", () => {
     const reminder = new AttackReminder(actor, null, activity);
     reminder.updateOptions(options);
 
-    expect(options.advantage).toBeUndefined();
+    expect(options.advantage).toBe(false);
     expect(options.disadvantage).toBe(true);
   });
 
@@ -214,8 +214,8 @@ describe("AttackReminder disadvantage flags", () => {
     const reminder = new AttackReminder(actor, null, activity);
     reminder.updateOptions(options);
 
-    expect(options.advantage).toBeUndefined();
-    expect(options.disadvantage).toBeUndefined();
+    expect(options.advantage).toBe(false);
+    expect(options.disadvantage).toBe(false);
   });
 
   test("attack with grants.disadvantage.attack.all flag should be disadvantage", () => {
@@ -227,7 +227,7 @@ describe("AttackReminder disadvantage flags", () => {
     const reminder = new AttackReminder(actor, target, activity);
     reminder.updateOptions(options);
 
-    expect(options.advantage).toBeUndefined();
+    expect(options.advantage).toBe(false);
     expect(options.disadvantage).toBe(true);
   });
 
@@ -240,7 +240,7 @@ describe("AttackReminder disadvantage flags", () => {
     const reminder = new AttackReminder(actor, target, activity);
     reminder.updateOptions(options);
 
-    expect(options.advantage).toBeUndefined();
+    expect(options.advantage).toBe(false);
     expect(options.disadvantage).toBe(true);
   });
 
@@ -253,13 +253,13 @@ describe("AttackReminder disadvantage flags", () => {
     const reminder = new AttackReminder(actor, target, activity);
     reminder.updateOptions(options);
 
-    expect(options.advantage).toBeUndefined();
-    expect(options.disadvantage).toBeUndefined();
+    expect(options.advantage).toBe(false);
+    expect(options.disadvantage).toBe(false);
   });
 });
 
 describe("AttackReminder both advantage and disadvantage flags", () => {
-  test("attack with both advantage and disadvantage has both set", () => {
+  test("attack with both advantage and disadvantage has both set to false", () => {
     const actor = createActorWithFlags("flags.midi-qol.advantage.attack.rsak");
     // simulates Dodge
     const target = createActorWithFlags("flags.midi-qol.grants.disadvantage.attack.all");
@@ -269,8 +269,8 @@ describe("AttackReminder both advantage and disadvantage flags", () => {
     const reminder = new AttackReminder(actor, target, activity);
     reminder.updateOptions(options);
 
-    expect(options.advantage).toBe(true);
-    expect(options.disadvantage).toBe(true);
+    expect(options.advantage).toBe(false);
+    expect(options.disadvantage).toBe(false);
   });
 
   test("attack with wrong advantage and same disadvantage should be disadvantage", () => {
@@ -283,7 +283,7 @@ describe("AttackReminder both advantage and disadvantage flags", () => {
     const reminder = new AttackReminder(actor, target, activity);
     reminder.updateOptions(options);
 
-    expect(options.advantage).toBeUndefined();
+    expect(options.advantage).toBe(false);
     expect(options.disadvantage).toBe(true);
   });
 
@@ -298,7 +298,7 @@ describe("AttackReminder both advantage and disadvantage flags", () => {
     reminder.updateOptions(options);
 
     expect(options.advantage).toBe(true);
-    expect(options.disadvantage).toBeUndefined();
+    expect(options.disadvantage).toBe(false);
   });
 });
 
@@ -310,8 +310,8 @@ describe("AbilityCheckReminder no legit active effects", () => {
     const reminder = new AbilityCheckReminder(actor, "str");
     reminder.updateOptions(options);
 
-    expect(options.advantage).toBeUndefined();
-    expect(options.disadvantage).toBeUndefined();
+    expect(options.advantage).toBe(false);
+    expect(options.disadvantage).toBe(false);
   });
 });
 
@@ -324,7 +324,7 @@ describe("AbilityCheckReminder advantage flags", () => {
     reminder.updateOptions(options);
 
     expect(options.advantage).toBe(true);
-    expect(options.disadvantage).toBeUndefined();
+    expect(options.disadvantage).toBe(false);
   });
 
   test("ability check with advantage.ability.all should be advantage", () => {
@@ -335,7 +335,7 @@ describe("AbilityCheckReminder advantage flags", () => {
     reminder.updateOptions(options);
 
     expect(options.advantage).toBe(true);
-    expect(options.disadvantage).toBeUndefined();
+    expect(options.disadvantage).toBe(false);
   });
 
   test("ability check with advantage.ability.check.all should be advantage", () => {
@@ -346,7 +346,7 @@ describe("AbilityCheckReminder advantage flags", () => {
     reminder.updateOptions(options);
 
     expect(options.advantage).toBe(true);
-    expect(options.disadvantage).toBeUndefined();
+    expect(options.disadvantage).toBe(false);
   });
 
   test("ability check with advantage.ability.check.str should be advantage for str check", () => {
@@ -357,7 +357,7 @@ describe("AbilityCheckReminder advantage flags", () => {
     reminder.updateOptions(options);
 
     expect(options.advantage).toBe(true);
-    expect(options.disadvantage).toBeUndefined();
+    expect(options.disadvantage).toBe(false);
   });
 
   test("ability check with advantage.ability.check.str should be normal for con check", () => {
@@ -367,8 +367,8 @@ describe("AbilityCheckReminder advantage flags", () => {
     const reminder = new AbilityCheckReminder(actor, "con");
     reminder.updateOptions(options);
 
-    expect(options.advantage).toBeUndefined();
-    expect(options.disadvantage).toBeUndefined();
+    expect(options.advantage).toBe(false);
+    expect(options.disadvantage).toBe(false);
   });
 });
 
@@ -380,7 +380,7 @@ describe("AbilityCheckReminder disadvantage flags", () => {
     const reminder = new AbilityCheckReminder(actor, "str");
     reminder.updateOptions(options);
 
-    expect(options.advantage).toBeUndefined();
+    expect(options.advantage).toBe(false);
     expect(options.disadvantage).toBe(true);
   });
 
@@ -391,7 +391,7 @@ describe("AbilityCheckReminder disadvantage flags", () => {
     const reminder = new AbilityCheckReminder(actor, "str");
     reminder.updateOptions(options);
 
-    expect(options.advantage).toBeUndefined();
+    expect(options.advantage).toBe(false);
     expect(options.disadvantage).toBe(true);
   });
 
@@ -402,7 +402,7 @@ describe("AbilityCheckReminder disadvantage flags", () => {
     const reminder = new AbilityCheckReminder(actor, "str");
     reminder.updateOptions(options);
 
-    expect(options.advantage).toBeUndefined();
+    expect(options.advantage).toBe(false);
     expect(options.disadvantage).toBe(true);
   });
 
@@ -413,7 +413,7 @@ describe("AbilityCheckReminder disadvantage flags", () => {
     const reminder = new AbilityCheckReminder(actor, "str");
     reminder.updateOptions(options);
 
-    expect(options.advantage).toBeUndefined();
+    expect(options.advantage).toBe(false);
     expect(options.disadvantage).toBe(true);
   });
 
@@ -424,13 +424,13 @@ describe("AbilityCheckReminder disadvantage flags", () => {
     const reminder = new AbilityCheckReminder(actor, "con");
     reminder.updateOptions(options);
 
-    expect(options.advantage).toBeUndefined();
-    expect(options.disadvantage).toBeUndefined();
+    expect(options.advantage).toBe(false);
+    expect(options.disadvantage).toBe(false);
   });
 });
 
 describe("AbilityCheckReminder both advantage and disadvantage flags", () => {
-  test("ability check with both advantage and disadvantage has both set", () => {
+  test("ability check with both advantage and disadvantage should be normal", () => {
     const actor = createActorWithFlags(
       "flags.midi-qol.advantage.ability.check.all",
       "flags.midi-qol.disadvantage.ability.check.cha"
@@ -440,8 +440,8 @@ describe("AbilityCheckReminder both advantage and disadvantage flags", () => {
     const reminder = new AbilityCheckReminder(actor, "cha");
     reminder.updateOptions(options);
 
-    expect(options.advantage).toBe(true);
-    expect(options.disadvantage).toBe(true);
+    expect(options.advantage).toBe(false);
+    expect(options.disadvantage).toBe(false);
   });
 
   test("ability check with wrong advantage and same disadvantage should be disadvantage", () => {
@@ -454,7 +454,7 @@ describe("AbilityCheckReminder both advantage and disadvantage flags", () => {
     const reminder = new AbilityCheckReminder(actor, "cha");
     reminder.updateOptions(options);
 
-    expect(options.advantage).toBeUndefined();
+    expect(options.advantage).toBe(false);
     expect(options.disadvantage).toBe(true);
   });
 
@@ -469,7 +469,7 @@ describe("AbilityCheckReminder both advantage and disadvantage flags", () => {
     reminder.updateOptions(options);
 
     expect(options.advantage).toBe(true);
-    expect(options.disadvantage).toBeUndefined();
+    expect(options.disadvantage).toBe(false);
   });
 });
 
@@ -481,8 +481,8 @@ describe("AbilitySaveReminder no legit active effects", () => {
     const reminder = new AbilitySaveReminder(actor, "wis");
     reminder.updateOptions(options);
 
-    expect(options.advantage).toBeUndefined();
-    expect(options.disadvantage).toBeUndefined();
+    expect(options.advantage).toBe(false);
+    expect(options.disadvantage).toBe(false);
   });
 });
 
@@ -495,7 +495,7 @@ describe("AbilitySaveReminder advantage flags", () => {
     reminder.updateOptions(options);
 
     expect(options.advantage).toBe(true);
-    expect(options.disadvantage).toBeUndefined();
+    expect(options.disadvantage).toBe(false);
   });
 
   test("saving throw with advantage.ability.all should be advantage", () => {
@@ -506,7 +506,7 @@ describe("AbilitySaveReminder advantage flags", () => {
     reminder.updateOptions(options);
 
     expect(options.advantage).toBe(true);
-    expect(options.disadvantage).toBeUndefined();
+    expect(options.disadvantage).toBe(false);
   });
 
   test("saving throw with advantage.ability.save.all should be advantage", () => {
@@ -517,7 +517,7 @@ describe("AbilitySaveReminder advantage flags", () => {
     reminder.updateOptions(options);
 
     expect(options.advantage).toBe(true);
-    expect(options.disadvantage).toBeUndefined();
+    expect(options.disadvantage).toBe(false);
   });
 
   test("saving throw with advantage.ability.save.wis should be advantage for wis save", () => {
@@ -528,7 +528,7 @@ describe("AbilitySaveReminder advantage flags", () => {
     reminder.updateOptions(options);
 
     expect(options.advantage).toBe(true);
-    expect(options.disadvantage).toBeUndefined();
+    expect(options.disadvantage).toBe(false);
   });
 
   test("saving throw with advantage.ability.save.wis should be normal for dex save", () => {
@@ -538,8 +538,8 @@ describe("AbilitySaveReminder advantage flags", () => {
     const reminder = new AbilitySaveReminder(actor, "dex");
     reminder.updateOptions(options);
 
-    expect(options.advantage).toBeUndefined();
-    expect(options.disadvantage).toBeUndefined();
+    expect(options.advantage).toBe(false);
+    expect(options.disadvantage).toBe(false);
   });
 });
 
@@ -551,7 +551,7 @@ describe("AbilitySaveReminder disadvantage flags", () => {
     const reminder = new AbilitySaveReminder(actor, "wis");
     reminder.updateOptions(options);
 
-    expect(options.advantage).toBeUndefined();
+    expect(options.advantage).toBe(false);
     expect(options.disadvantage).toBe(true);
   });
 
@@ -562,7 +562,7 @@ describe("AbilitySaveReminder disadvantage flags", () => {
     const reminder = new AbilitySaveReminder(actor, "wis");
     reminder.updateOptions(options);
 
-    expect(options.advantage).toBeUndefined();
+    expect(options.advantage).toBe(false);
     expect(options.disadvantage).toBe(true);
   });
 
@@ -573,7 +573,7 @@ describe("AbilitySaveReminder disadvantage flags", () => {
     const reminder = new AbilitySaveReminder(actor, "wis");
     reminder.updateOptions(options);
 
-    expect(options.advantage).toBeUndefined();
+    expect(options.advantage).toBe(false);
     expect(options.disadvantage).toBe(true);
   });
 
@@ -584,7 +584,7 @@ describe("AbilitySaveReminder disadvantage flags", () => {
     const reminder = new AbilitySaveReminder(actor, "wis");
     reminder.updateOptions(options);
 
-    expect(options.advantage).toBeUndefined();
+    expect(options.advantage).toBe(false);
     expect(options.disadvantage).toBe(true);
   });
 
@@ -595,13 +595,13 @@ describe("AbilitySaveReminder disadvantage flags", () => {
     const reminder = new AbilitySaveReminder(actor, "con");
     reminder.updateOptions(options);
 
-    expect(options.advantage).toBeUndefined();
-    expect(options.disadvantage).toBeUndefined();
+    expect(options.advantage).toBe(false);
+    expect(options.disadvantage).toBe(false);
   });
 });
 
 describe("AbilitySaveReminder both advantage and disadvantage flags", () => {
-  test("saving throw with both advantage and disadvantage has both set", () => {
+  test("saving throw with both advantage and disadvantage should be normal", () => {
     const actor = createActorWithFlags(
       "flags.midi-qol.advantage.ability.save.all",
       "flags.midi-qol.disadvantage.ability.save.dex"
@@ -611,8 +611,8 @@ describe("AbilitySaveReminder both advantage and disadvantage flags", () => {
     const reminder = new AbilitySaveReminder(actor, "dex");
     reminder.updateOptions(options);
 
-    expect(options.advantage).toBe(true);
-    expect(options.disadvantage).toBe(true);
+    expect(options.advantage).toBe(false);
+    expect(options.disadvantage).toBe(false);
   });
 
   test("saving throw with wrong advantage and same disadvantage should be disadvantage", () => {
@@ -625,7 +625,7 @@ describe("AbilitySaveReminder both advantage and disadvantage flags", () => {
     const reminder = new AbilitySaveReminder(actor, "cha");
     reminder.updateOptions(options);
 
-    expect(options.advantage).toBeUndefined();
+    expect(options.advantage).toBe(false);
     expect(options.disadvantage).toBe(true);
   });
 
@@ -640,7 +640,7 @@ describe("AbilitySaveReminder both advantage and disadvantage flags", () => {
     reminder.updateOptions(options);
 
     expect(options.advantage).toBe(true);
-    expect(options.disadvantage).toBeUndefined();
+    expect(options.disadvantage).toBe(false);
   });
 });
 
@@ -652,8 +652,8 @@ describe("SkillReminder no legit active effects", () => {
     const reminder = new SkillReminder(actor, "wis", "prc");
     reminder.updateOptions(options);
 
-    expect(options.advantage).toBeUndefined();
-    expect(options.disadvantage).toBeUndefined();
+    expect(options.advantage).toBe(false);
+    expect(options.disadvantage).toBe(false);
   });
 
   test("Stealth check with armor that imposes disadvantage but wrong type", () => {
@@ -673,8 +673,8 @@ describe("SkillReminder no legit active effects", () => {
     const reminder = new SkillReminder(actor, "dex", "ste");
     reminder.updateOptions(options);
 
-    expect(options.advantage).toBeUndefined();
-    expect(options.disadvantage).toBeUndefined();
+    expect(options.advantage).toBe(false);
+    expect(options.disadvantage).toBe(false);
   });
 
   test("Stealth check with armor that imposes disadvantage but not equipped", () => {
@@ -694,8 +694,8 @@ describe("SkillReminder no legit active effects", () => {
     const reminder = new SkillReminder(actor, "dex", "ste");
     reminder.updateOptions(options);
 
-    expect(options.advantage).toBeUndefined();
-    expect(options.disadvantage).toBeUndefined();
+    expect(options.advantage).toBe(false);
+    expect(options.disadvantage).toBe(false);
   });
 });
 
@@ -708,7 +708,7 @@ describe("SkillReminder advantage flags", () => {
     reminder.updateOptions(options);
 
     expect(options.advantage).toBe(true);
-    expect(options.disadvantage).toBeUndefined();
+    expect(options.disadvantage).toBe(false);
   });
 
   test("skill check with advantage.ability.all should be advantage", () => {
@@ -719,7 +719,7 @@ describe("SkillReminder advantage flags", () => {
     reminder.updateOptions(options);
 
     expect(options.advantage).toBe(true);
-    expect(options.disadvantage).toBeUndefined();
+    expect(options.disadvantage).toBe(false);
   });
 
   test("skill check with advantage.ability.check.all should be advantage", () => {
@@ -730,7 +730,7 @@ describe("SkillReminder advantage flags", () => {
     reminder.updateOptions(options);
 
     expect(options.advantage).toBe(true);
-    expect(options.disadvantage).toBeUndefined();
+    expect(options.disadvantage).toBe(false);
   });
 
   test("skill check with advantage.ability.check.wis should be advantage for prc check", () => {
@@ -741,7 +741,7 @@ describe("SkillReminder advantage flags", () => {
     reminder.updateOptions(options);
 
     expect(options.advantage).toBe(true);
-    expect(options.disadvantage).toBeUndefined();
+    expect(options.disadvantage).toBe(false);
   });
 
   test("skill check with advantage.ability.check.wis should be normal for arc check", () => {
@@ -751,8 +751,8 @@ describe("SkillReminder advantage flags", () => {
     const reminder = new SkillReminder(actor, "int", "arc");
     reminder.updateOptions(options);
 
-    expect(options.advantage).toBeUndefined();
-    expect(options.disadvantage).toBeUndefined();
+    expect(options.advantage).toBe(false);
+    expect(options.disadvantage).toBe(false);
   });
 
   test("skill check with advantage.skill.all should be advantage", () => {
@@ -763,7 +763,7 @@ describe("SkillReminder advantage flags", () => {
     reminder.updateOptions(options);
 
     expect(options.advantage).toBe(true);
-    expect(options.disadvantage).toBeUndefined();
+    expect(options.disadvantage).toBe(false);
   });
 
   test("skill check with advantage.skill.prc should be advantage for prc check", () => {
@@ -774,7 +774,7 @@ describe("SkillReminder advantage flags", () => {
     reminder.updateOptions(options);
 
     expect(options.advantage).toBe(true);
-    expect(options.disadvantage).toBeUndefined();
+    expect(options.disadvantage).toBe(false);
   });
 
   test("skill check with advantage.skill.prc should be normal for arc check", () => {
@@ -784,8 +784,8 @@ describe("SkillReminder advantage flags", () => {
     const reminder = new SkillReminder(actor, "int", "arc");
     reminder.updateOptions(options);
 
-    expect(options.advantage).toBeUndefined();
-    expect(options.disadvantage).toBeUndefined();
+    expect(options.advantage).toBe(false);
+    expect(options.disadvantage).toBe(false);
   });
 });
 
@@ -797,7 +797,7 @@ describe("SkillReminder disadvantage flags", () => {
     const reminder = new SkillReminder(actor, "wis", "prc");
     reminder.updateOptions(options);
 
-    expect(options.advantage).toBeUndefined();
+    expect(options.advantage).toBe(false);
     expect(options.disadvantage).toBe(true);
   });
 
@@ -808,7 +808,7 @@ describe("SkillReminder disadvantage flags", () => {
     const reminder = new SkillReminder(actor, "wis", "prc");
     reminder.updateOptions(options);
 
-    expect(options.advantage).toBeUndefined();
+    expect(options.advantage).toBe(false);
     expect(options.disadvantage).toBe(true);
   });
 
@@ -819,7 +819,7 @@ describe("SkillReminder disadvantage flags", () => {
     const reminder = new SkillReminder(actor, "wis", "prc");
     reminder.updateOptions(options);
 
-    expect(options.advantage).toBeUndefined();
+    expect(options.advantage).toBe(false);
     expect(options.disadvantage).toBe(true);
   });
 
@@ -830,7 +830,7 @@ describe("SkillReminder disadvantage flags", () => {
     const reminder = new SkillReminder(actor, "wis", "prc");
     reminder.updateOptions(options);
 
-    expect(options.advantage).toBeUndefined();
+    expect(options.advantage).toBe(false);
     expect(options.disadvantage).toBe(true);
   });
 
@@ -841,8 +841,8 @@ describe("SkillReminder disadvantage flags", () => {
     const reminder = new SkillReminder(actor, "int", "arc");
     reminder.updateOptions(options);
 
-    expect(options.advantage).toBeUndefined();
-    expect(options.disadvantage).toBeUndefined();
+    expect(options.advantage).toBe(false);
+    expect(options.disadvantage).toBe(false);
   });
 
   test("skill check with disadvantage.skill.all should be disadvantage", () => {
@@ -852,7 +852,7 @@ describe("SkillReminder disadvantage flags", () => {
     const reminder = new SkillReminder(actor, "wis", "prc");
     reminder.updateOptions(options);
 
-    expect(options.advantage).toBeUndefined();
+    expect(options.advantage).toBe(false);
     expect(options.disadvantage).toBe(true);
   });
 
@@ -863,7 +863,7 @@ describe("SkillReminder disadvantage flags", () => {
     const reminder = new SkillReminder(actor, "wis", "prc");
     reminder.updateOptions(options);
 
-    expect(options.advantage).toBeUndefined();
+    expect(options.advantage).toBe(false);
     expect(options.disadvantage).toBe(true);
   });
 
@@ -874,8 +874,8 @@ describe("SkillReminder disadvantage flags", () => {
     const reminder = new SkillReminder(actor, "int", "arc");
     reminder.updateOptions(options);
 
-    expect(options.advantage).toBeUndefined();
-    expect(options.disadvantage).toBeUndefined();
+    expect(options.advantage).toBe(false);
+    expect(options.disadvantage).toBe(false);
   });
 
   test("Stealth check with armor that imposes disadvantage", () => {
@@ -895,7 +895,7 @@ describe("SkillReminder disadvantage flags", () => {
     const reminder = new SkillReminder(actor, "dex", "ste");
     reminder.updateOptions(options);
 
-    expect(options.advantage).toBeUndefined();
+    expect(options.advantage).toBe(false);
     expect(options.disadvantage).toBe(true);
   });
 
@@ -916,13 +916,13 @@ describe("SkillReminder disadvantage flags", () => {
     const reminder = new SkillReminder(actor, "dex", "ste", false);
     reminder.updateOptions(options);
 
-    expect(options.advantage).toBeUndefined();
-    expect(options.disadvantage).toBeUndefined();
+    expect(options.advantage).toBe(false);
+    expect(options.disadvantage).toBe(false);
   });
 });
 
 describe("SkillReminder both advantage and disadvantage flags", () => {
-  test("skill check with both advantage and disadvantage has both set", () => {
+  test("skill check with both advantage and disadvantage should be normal", () => {
     const actor = createActorWithFlags(
       "flags.midi-qol.advantage.skill.all",
       "flags.midi-qol.disadvantage.skill.prc"
@@ -932,8 +932,8 @@ describe("SkillReminder both advantage and disadvantage flags", () => {
     const reminder = new SkillReminder(actor, "wis", "prc");
     reminder.updateOptions(options);
 
-    expect(options.advantage).toBe(true);
-    expect(options.disadvantage).toBe(true);
+    expect(options.advantage).toBe(false);
+    expect(options.disadvantage).toBe(false);
   });
 
   test("skill check with wrong advantage and same disadvantage should be disadvantage", () => {
@@ -946,7 +946,7 @@ describe("SkillReminder both advantage and disadvantage flags", () => {
     const reminder = new SkillReminder(actor, "wis", "prc");
     reminder.updateOptions(options);
 
-    expect(options.advantage).toBeUndefined();
+    expect(options.advantage).toBe(false);
     expect(options.disadvantage).toBe(true);
   });
 
@@ -961,7 +961,7 @@ describe("SkillReminder both advantage and disadvantage flags", () => {
     reminder.updateOptions(options);
 
     expect(options.advantage).toBe(true);
-    expect(options.disadvantage).toBeUndefined();
+    expect(options.disadvantage).toBe(false);
   });
 });
 
@@ -973,8 +973,8 @@ describe("DeathSaveReminder no legit active effects", () => {
     const reminder = new DeathSaveReminder(actor);
     reminder.updateOptions(options);
 
-    expect(options.advantage).toBeUndefined();
-    expect(options.disadvantage).toBeUndefined();
+    expect(options.advantage).toBe(false);
+    expect(options.disadvantage).toBe(false);
   });
 });
 
@@ -987,7 +987,7 @@ describe("DeathSaveReminder advantage flags", () => {
     reminder.updateOptions(options);
 
     expect(options.advantage).toBe(true);
-    expect(options.disadvantage).toBeUndefined();
+    expect(options.disadvantage).toBe(false);
   });
 
   test("death save with advantage.ability.all should be advantage", () => {
@@ -998,7 +998,7 @@ describe("DeathSaveReminder advantage flags", () => {
     reminder.updateOptions(options);
 
     expect(options.advantage).toBe(true);
-    expect(options.disadvantage).toBeUndefined();
+    expect(options.disadvantage).toBe(false);
   });
 
   test("death save with advantage.ability.save.all should be advantage", () => {
@@ -1009,7 +1009,7 @@ describe("DeathSaveReminder advantage flags", () => {
     reminder.updateOptions(options);
 
     expect(options.advantage).toBe(true);
-    expect(options.disadvantage).toBeUndefined();
+    expect(options.disadvantage).toBe(false);
   });
 
   test("death save with advantage.deathSave should be advantage", () => {
@@ -1020,7 +1020,7 @@ describe("DeathSaveReminder advantage flags", () => {
     reminder.updateOptions(options);
 
     expect(options.advantage).toBe(true);
-    expect(options.disadvantage).toBeUndefined();
+    expect(options.disadvantage).toBe(false);
   });
 });
 
@@ -1032,7 +1032,7 @@ describe("DeathSaveReminder disadvantage flags", () => {
     const reminder = new DeathSaveReminder(actor);
     reminder.updateOptions(options);
 
-    expect(options.advantage).toBeUndefined();
+    expect(options.advantage).toBe(false);
     expect(options.disadvantage).toBe(true);
   });
 
@@ -1043,7 +1043,7 @@ describe("DeathSaveReminder disadvantage flags", () => {
     const reminder = new DeathSaveReminder(actor);
     reminder.updateOptions(options);
 
-    expect(options.advantage).toBeUndefined();
+    expect(options.advantage).toBe(false);
     expect(options.disadvantage).toBe(true);
   });
 
@@ -1054,7 +1054,7 @@ describe("DeathSaveReminder disadvantage flags", () => {
     const reminder = new DeathSaveReminder(actor);
     reminder.updateOptions(options);
 
-    expect(options.advantage).toBeUndefined();
+    expect(options.advantage).toBe(false);
     expect(options.disadvantage).toBe(true);
   });
 
@@ -1065,13 +1065,13 @@ describe("DeathSaveReminder disadvantage flags", () => {
     const reminder = new DeathSaveReminder(actor);
     reminder.updateOptions(options);
 
-    expect(options.advantage).toBeUndefined();
+    expect(options.advantage).toBe(false);
     expect(options.disadvantage).toBe(true);
   });
 });
 
 describe("DeathSaveReminder both advantage and disadvantage flags", () => {
-  test("death save with both advantage and disadvantage has both set", () => {
+  test("death save with both advantage and disadvantage should be normal", () => {
     const actor = createActorWithFlags(
       "flags.midi-qol.advantage.ability.save.all",
       "flags.midi-qol.disadvantage.deathSave"
@@ -1081,8 +1081,8 @@ describe("DeathSaveReminder both advantage and disadvantage flags", () => {
     const reminder = new DeathSaveReminder(actor);
     reminder.updateOptions(options);
 
-    expect(options.advantage).toBe(true);
-    expect(options.disadvantage).toBe(true);
+    expect(options.advantage).toBe(false);
+    expect(options.disadvantage).toBe(false);
   });
 });
 
@@ -1095,8 +1095,7 @@ describe("CriticalReminder no legit active effects", () => {
     const reminder = new CriticalReminder(actor, null, activity);
     reminder.updateOptions(options);
 
-    expect(options.advantage).toBeUndefined();
-    expect(options.disadvantage).toBeUndefined();
+    expect(options.isCritical).toBe(false);
   });
 });
 

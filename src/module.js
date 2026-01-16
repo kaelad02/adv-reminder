@@ -6,8 +6,6 @@ import { applySettings, ButtonStyle, initSettings } from "./settings.js";
 import { debug, debugEnabled, log } from "./util.js";
 import DaeIntegration from "./dae-integration.js";
 
-const CIRCLE_INFO = `<i class="fa-solid fa-circle-info"></i> `;
-
 Hooks.once("init", () => {
   log("initializing Advantage Reminder");
 
@@ -100,6 +98,72 @@ Hooks.once("ready", () => {
   if (debugEnabled) window.samplePack = new SamplePackBuilder();
 });
 
+/**
+ * Process the d20 roll sources of advantage/normal/disadvantage
+ */
+Hooks.on("renderD20RollConfigurationDialog", (dialog, html) => {
+  debug("renderD20RollConfigurationDialog hook called");
+
+  const opt = dialog.options["adv-reminder"];
+  if (opt?.sources || !opt?.advSources) return;
+  const advSources = opt.advSources;
+
+  opt.sources = [];
+  const addSources = (icon, prefix, labels) => {
+    if (labels?.length) opt.sources.push({ icon, prefix, labels: labels.join(", ") });
+  };
+
+  if (advSources.override) {
+    let icon, prefix;
+    switch (advSources.override.mode) {
+      case 1:
+        icon = "fas fa-angles-up";
+        prefix = "adv-reminder.Source.Advantage.override";
+        break;
+      case 0:
+        icon = "fas fa-minus";
+        prefix = "adv-reminder.Source.Normal.override";
+        break;
+      case -1:
+        icon = "fas fa-angles-down";
+        prefix = "adv-reminder.Source.Disadvantage.override";
+        break;
+    }
+    addSources(icon, prefix, [advSources.override.label]);
+  } else {
+    if (advSources.advantages?.suppressed?.length)
+      addSources("fas fa-circle-xmark", "adv-reminder.Source.Advantage.suppressed", advSources.advantages.suppressed);
+    else
+      addSources("fas fa-angle-up", "adv-reminder.Source.Advantage.prefix", advSources.advantages?.labels);
+
+    if (advSources.disadvantages?.suppressed?.length)
+      addSources("fas fa-circle-xmark", "adv-reminder.Source.Disadvantage.suppressed", advSources.disadvantages.suppressed);
+    else
+      addSources("fas fa-angle-down", "adv-reminder.Source.Disadvantage.prefix", advSources.disadvantages?.labels);
+  }
+});
+
+/**
+ * Process the damage roll sources of crits
+ */
+Hooks.on("renderDamageRollConfigurationDialog", (dialog, html) => {
+  debug("renderDamageRollConfigurationDialog hook called");
+
+  const opt = dialog.options["adv-reminder"];
+  if (opt?.sources || !opt?.critSources) return;
+  const critSources = opt.critSources;
+
+  opt.sources = [];
+  const addSources = (icon, prefix, labels) => {
+    if (labels?.length) opt.sources.push({ icon, prefix, labels: labels.join(", ") });
+  };
+
+  if (critSources.critical?.suppressed?.length)
+    addSources("fas fa-circle-xmark", "adv-reminder.Source.Critical.suppressed", critSources.critical.suppressed);
+  else
+    addSources("fas fa-bomb", "adv-reminder.Source.Critical.prefix", critSources.critical.labels);
+});
+
 // New roll dialog hook, as of dnd5e v4.0
 Hooks.on("renderRollConfigurationDialog", async (dialog, html) => {
   debug("renderRollConfigurationDialog hook called");
@@ -142,25 +206,15 @@ Hooks.on("renderRollConfigurationDialog", async (dialog, html) => {
 
 async function prepareMessage(dialog) {
   const opt = dialog.options["adv-reminder"];
-  if (!opt) return;
-  if (opt.rendered) return;
+  if (!opt || opt.rendered) return;
 
-  // merge the messages with the advantage/disadvantage from sources
-  const messages = [...(opt.messages ?? [])];
-  const addLabels = (labels, stringId) => {
-    if (labels) {
-      const sources = labels.join(", ");
-      messages.push(CIRCLE_INFO + game.i18n.format(stringId, { sources }));
-    }
-  };
-  addLabels(opt.advantageLabels, "adv-reminder.Source.Adv");
-  addLabels(opt.disadvantageLabels, "adv-reminder.Source.Dis");
-  addLabels(opt.criticalLabels, "adv-reminder.Source.Crit");
-  addLabels(opt.normalLabels, "adv-reminder.Source.Norm");
+  // get the messages and sources
+  const messages = opt.messages ?? [];
+  const sources = opt.sources ?? [];
 
-  if (messages.length) {
+  if (messages.length || sources.length) {
     // build message
-    const message = await renderTemplate("modules/adv-reminder/templates/roll-dialog-messages.hbs", { messages });
+    const message = await renderTemplate("modules/adv-reminder/templates/roll-dialog-messages.hbs", { messages, sources });
     // enrich message, specifically replacing rolls
     const enriched = await TextEditor.enrichHTML(message, {
       secrets: true,
@@ -168,7 +222,6 @@ async function prepareMessage(dialog) {
       links: false,
       rolls: true,
       rollData: dialog.rolls[0]?.data ?? {},
-      async: true,
     });
     debug("messages", messages, "enriched", enriched);
     opt.rendered = true;

@@ -4,5 +4,8 @@
     {{#each messages}}
       <div>{{{this}}}</div>
     {{/each}}
+    {{#each sources}}
+      <div><i class="{{this.icon}}"></i> {{localize this.prefix}} {{this.labels}}</div>
+    {{/each}}
   </div>
 </fieldset>

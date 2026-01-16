@@ -49,11 +49,24 @@
     "Hint": "Se um efeito ativo determinar vant/desv/crít em uma rolagem, mostre seu nome como uma mensagem no diálogo."
   },
   "adv-reminder.Source": {
-    "Adv": "Vantagem de {sources}",
-    "Dis": "Desvantagem de {sources}",
-    "Crit": "Acerto Crítico de from {sources}",
-    "Norm": "Normal de {sources}",
-    "Nat20": "{value} natural"
+    "Advantage": {
+      "override": "Vantagem anulada por",
+      "suppressed": "Vantagem suprimida por",
+      "prefix": "Vantagem de"
+    },
+    "Normal": {
+      "override": "Substituição normal de"
+    },
+    "Disadvantage": {
+      "override": "Anulação da desvantagem por",
+      "suppressed": "Desvantagem suprimida por",
+      "prefix": "Desvantagem de"
+    },
+    "Critical": {
+      "suppressed": "Acerto crítico suprimido por",
+      "prefix": "Acerto Crítico de from",
+      "nat20": "{value} natural"
+    }
   },
   "adv-reminder.UpdateStatusEffects": {
     "Name": "Atualizar Condições",
