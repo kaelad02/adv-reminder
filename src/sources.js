@@ -49,10 +49,10 @@ const LabelMixin = (superClass) => class extends superClass {
         // look for active effects with this status in it, get their names
         const activeEffectNames = actor.appliedEffects
           .filter((e) => e.statuses.some((s) => s === k))
-          .map((e) => e.name);
+          .map((e) => e.link);
         if (activeEffectNames.length) return activeEffectNames;
         // fallback to the status effect's name (mostly for exhaustion)
-        return CONFIG.statusEffects.filter((s) => s.id === k).map((s) => s.name);
+        return `&Reference[${k} apply=false]`;
       });
   }
 }
@@ -138,28 +138,28 @@ class LabelAccumulator extends LabelMixin(AdvantageAccumulator) {
 
   _applyChangeAdd(delta, change) {
     // Add a source of advantage or disadvantage.
-    if (delta === 1) this.counts.advantages.labels.push(change.effect.name);
-    else if (delta === -1) this.counts.disadvantages.labels.push(change.effect.name);
+    if (delta === 1) this.counts.advantages.labels.push(change.effect.link);
+    else if (delta === -1) this.counts.disadvantages.labels.push(change.effect.link);
   }
 
   _applyChangeOverride(delta, change) {
     // Force a given roll mode.
     if (delta === -1 || delta === 0 || delta === 1)
-      this.counts.override = {label: change.effect.name, mode: delta};
+      this.counts.override = {label: change.effect.link, mode: delta};
   }
 
   _applyChangeUpgrade(delta, change) {
     // Upgrade the roll so that it can no longer be penalised by disadvantage.
     if (delta !== 1 && delta !== 0) return;
-    this.counts.disadvantages.suppressed.push(change.effect.name);
-    if (delta === 1) this.counts.advantages.labels.push(change.effect.name);
+    this.counts.disadvantages.suppressed.push(change.effect.link);
+    if (delta === 1) this.counts.advantages.labels.push(change.effect.link);
   }
 
   _applyChangeDowngrade(delta, change) {
     // Downgrade the roll so that it can no longer benefit from advantage.
     if (delta !== -1 && delta !== 0) return;
-    this.counts.advantages.suppressed.push(change.effect.name);
-    if (delta === -1) this.counts.disadvantages.labels.push(change.effect.name);
+    this.counts.advantages.suppressed.push(change.effect.link);
+    if (delta === -1) this.counts.disadvantages.labels.push(change.effect.link);
   }
 
   applyFlags(actorFlags, advKeys, disKeys) {
@@ -204,7 +204,7 @@ const SourceMixin = (superclass) =>
         .flatMap((effect) =>
           // make an object with the effect's label and change's key
           effect.changes.map((change) => ({
-            name: effect.name,
+            link: effect.link,
             key: change.key,
           }))
         )
@@ -212,7 +212,7 @@ const SourceMixin = (superclass) =>
       asArray.forEach((change) => (change.key = change.key.substring(15)));
       return asArray.reduce((accum, curr) => {
         if (!accum[curr.key]) accum[curr.key] = [];
-        accum[curr.key].push(curr.name);
+        accum[curr.key].push(curr.link);
         return accum;
       }, {});
     }
@@ -282,7 +282,7 @@ export class InitiativeSource extends SourceMixin(InitiativeReminder) {
         const hasFlag = effect.changes
           .map(change => change.key)
           .some(key => flagKeys.includes(key));
-        if (hasFlag) accumulator.advantage(effect.name);
+        if (hasFlag) accumulator.advantage(effect.link);
       });
   }
 }

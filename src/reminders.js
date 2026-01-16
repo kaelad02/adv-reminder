@@ -133,7 +133,7 @@ class BaseReminder {
     debug("advConditions", advConditions, "disConditions", disConditions);
 
     // get the underlying adv/dis counts to initialize the accumulator
-    const counts = this._rollModeCounts(this.rollModes);
+    const counts = this._rollModeCounts(this.rollModes, options);
 
     // find matching keys, status effects, and update options
     const accumulator = new this.constructor.AccumulatorClass(counts);
@@ -143,12 +143,17 @@ class BaseReminder {
     accumulator.update(options);
   }
 
-  _rollModeCounts(rollModes) {
-    if (foundry.utils.isEmpty(rollModes)) return {
-      override: null,
-      advantages: { count: 0, suppressed: false },
-      disadvantages: { count: 0, suppressed: false }
-    };
+  _rollModeCounts(rollModes, options) {
+    if (foundry.utils.isEmpty(rollModes)) {
+      const counts = {
+        override: null,
+        advantages: { count: 0, suppressed: false },
+        disadvantages: { count: 0, suppressed: false }
+      };
+      if (options.advantage) counts.advantages.count++;
+      if (options.disadvantage) counts.disadvantages.count++;
+      return counts;
+    }
 
     // TODO handle more than one in 5.1 using combineFields
 
@@ -360,7 +365,7 @@ export class SkillReminder extends AbilityCheckReminder {
         (item) => item.type === "equipment" && item.system.equipped && item.system.properties.has("stealthDisadvantage")
       );
       debug("equipped item that imposes stealth disadvantage", item?.name);
-      accumulator.disadvantage(item?.name);
+      accumulator.disadvantage(item?.link);
     }
   }
 }
