@@ -72,6 +72,77 @@ export class AdvantageAccumulator {
   }
 
   /**
+   * Apply active effects with roll modes.
+   * @param {Actor5e} actor
+   * @param {Object | string[]} rollModes
+   */
+  applyRollModeEffects(actor, rollModes) {
+    // copied parts from Actor#applyActiveEffects, DataField#applyChange, and AdvantageModeField
+
+    const rollModeKeys = Array.isArray(rollModes) ? rollModes : Object.keys(rollModes);
+
+    // Organize non-disabled effects by their application priority
+    const changes = [];
+    for ( const effect of actor.allApplicableEffects() ) {
+      if ( !effect.active ) continue;
+      changes.push(...effect.changes
+        .filter(change => rollModeKeys.includes(change.key))
+        .map(change => {
+          const c = foundry.utils.deepClone(change);
+          c.effect = effect;
+          c.priority = c.priority ?? (c.mode * 10);
+          return c;
+        }));
+    }
+    changes.sort((a, b) => a.priority - b.priority);
+
+    // Apply the roll mode changes
+    for ( let change of changes ) {
+      const delta = Number(change.value);
+      switch ( change.mode ) {
+        case CONST.ACTIVE_EFFECT_MODES.ADD:
+          this._applyChangeAdd(delta, change);
+          break;
+        case CONST.ACTIVE_EFFECT_MODES.OVERRIDE:
+          this._applyChangeOverride(delta, change);
+          break;
+        case CONST.ACTIVE_EFFECT_MODES.UPGRADE:
+          this._applyChangeUpgrade(delta, change);
+          break;
+        case CONST.ACTIVE_EFFECT_MODES.DOWNGRADE:
+          this._applyChangeDowngrade(delta, change);
+          break;
+      }
+    }
+  }
+
+  _applyChangeAdd(delta, change) {
+    // Add a source of advantage or disadvantage.
+    if (delta === 1) this.counts.advantages.count++;
+    else if (delta === -1) this.counts.disadvantages.count++;
+  }
+
+  _applyChangeOverride(delta, change) {
+    // Force a given roll mode.
+    if (delta === -1 || delta === 0 || delta === 1)
+      this.counts.override = delta;
+  }
+
+  _applyChangeUpgrade(delta, change) {
+    // Upgrade the roll so that it can no longer be penalised by disadvantage.
+    if (delta !== 1 && delta !== 0) return;
+    this.counts.disadvantages.suppressed = true;
+    if (delta === 1) this.counts.advantages.count++;
+  }
+
+  _applyChangeDowngrade(delta, change) {
+    // Downgrade the roll so that it can no longer benefit from advantage.
+    if (delta !== -1 && delta !== 0) return;
+    this.counts.advantages.suppressed = true;
+    if (delta === -1) this.counts.disadvantages.count++;
+  }
+
+  /**
    * Set advantage if the label exists.
    * @param {string} label
    */
@@ -292,6 +363,21 @@ export class AbilityCheckReminder extends AbilityBaseReminder {
 }
 
 export class AbilitySaveReminder extends AbilityBaseReminder {
+  constructor(actor, abilityId, activity) {
+    super(actor, abilityId);
+
+    /** @type {string[]} */
+    this.statuses = this._getStatuses(activity);
+  }
+
+  _getStatuses(activity) {
+    if (!activity) return [];
+
+    return activity.effects
+      .map(e => e.effect)
+      .flatMap(e => [...e.statuses, ...e.flags?.dnd5e?.riders?.statuses]);
+  }
+
   /** @override */
   get advantageKeys() {
     return super.advantageKeys.concat([
@@ -320,6 +406,19 @@ export class AbilitySaveReminder extends AbilityBaseReminder {
     conditions.push("advReminderDisadvantageSave");
     if (this.abilityId === "dex") conditions.push("advReminderDisadvantageDexSave");
     return conditions;
+  }
+
+  get statusRollModes() {
+    return this.statuses.map(status => `flags.adv-reminder.statuses.${status}.save.roll.mode`);
+  }
+
+  _customUpdateOptions(accumulator) {
+    super._customUpdateOptions(accumulator);
+
+    // check for advantage based on a status effect
+    const statusRollModes = this.statusRollModes;
+    debug("statusRollModes", statusRollModes);
+    accumulator.applyRollModeEffects(this.actor, statusRollModes);
   }
 }
 

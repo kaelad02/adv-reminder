@@ -3,6 +3,7 @@ export default function commonTestInit() {
 
   globalThis.createActorWithFlags = (...keys) => {
     const actor = {
+      allApplicableEffects: function* () {},
       flags: {},
       hasConditionEffect: () => false,
       system: {},

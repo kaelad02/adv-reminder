@@ -91,51 +91,6 @@ class LabelAccumulator extends LabelMixin(AdvantageAccumulator) {
       .join(" ");
   }
 
-  /**
-   * Apply labels from active effects setting roll modes.
-   * @param actor
-   * @param rollModes
-   */
-  applyRollModeEffects(actor, rollModes) {
-    // copied parts from Actor#applyActiveEffects, DataField#applyChange, and AdvantageModeField
-
-    const rollModeKeys = Object.keys(rollModes);
-
-    // Organize non-disabled effects by their application priority
-    const changes = [];
-    for ( const effect of actor.allApplicableEffects() ) {
-      if ( !effect.active ) continue;
-      changes.push(...effect.changes
-        .filter(change => rollModeKeys.includes(change.key))
-        .map(change => {
-          const c = foundry.utils.deepClone(change);
-          c.effect = effect;
-          c.priority = c.priority ?? (c.mode * 10);
-          return c;
-        }));
-    }
-    changes.sort((a, b) => a.priority - b.priority);
-
-    // Apply the roll mode changes
-    for ( let change of changes ) {
-      const delta = Number(change.value);
-      switch ( change.mode ) {
-        case CONST.ACTIVE_EFFECT_MODES.ADD:
-          this._applyChangeAdd(delta, change);
-          break;
-        case CONST.ACTIVE_EFFECT_MODES.OVERRIDE:
-          this._applyChangeOverride(delta, change);
-          break;
-        case CONST.ACTIVE_EFFECT_MODES.UPGRADE:
-          this._applyChangeUpgrade(delta, change);
-          break;
-        case CONST.ACTIVE_EFFECT_MODES.DOWNGRADE:
-          this._applyChangeDowngrade(delta, change);
-          break;
-      }
-    }
-  }
-
   _applyChangeAdd(delta, change) {
     // Add a source of advantage or disadvantage.
     if (delta === 1) this.counts.advantages.labels.push(change.effect.link);

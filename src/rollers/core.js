@@ -101,9 +101,12 @@ export default class CoreRollerHooks {
 
     if (this.isFastForwarding(config, dialog)) return;
 
+    const messageId = config.event?.currentTarget?.dataset?.messageId;
+    const activity = messageId ? game.messages.get(messageId).getAssociatedActivity() : undefined;
+
     new AbilitySaveMessage(actor, abilityId).addMessage(dialog);
-    if (showSources) new AbilitySaveSource(actor, abilityId).updateOptions(dialog);
-    new AbilitySaveReminder(actor, abilityId).updateOptions(config.rolls[0].options);
+    if (showSources) new AbilitySaveSource(actor, abilityId, activity).updateOptions(dialog);
+    new AbilitySaveReminder(actor, abilityId, activity).updateOptions(config.rolls[0].options);
   }
 
   preRollConcentrationV2(config, dialog, message) {
