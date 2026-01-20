@@ -11,10 +11,7 @@ import commonTestInit from "./common.js";
 
 function createActorWithEffects(...keyValuePairs) {
   const appliedEffects = keyValuePairs.map(createEffect);
-  return {
-    appliedEffects,
-    getRollData: () => ({}),
-  };
+  return { appliedEffects };
 }
 
 function createEffect([key, value]) {
