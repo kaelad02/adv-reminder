@@ -2,6 +2,8 @@ import { debug } from "./util.js";
 
 class BaseMessage {
   constructor(actor, targetActor) {
+    /** @type {Actor5e} */
+    this.actor = actor;
     /** @type {object} */
     this.actorFlags = this._getFlags(actor);
     /** @type {object} */
@@ -38,7 +40,7 @@ class BaseMessage {
     const targetKeys = this.targetKeys;
     if (targetKeys) {
       const targetMessages = Object.entries(this.targetFlags)
-        .filter(([key, messages]) => targetKeys.includes(key))
+        .filter(([key, messages]) => keys.includes(key))
         .flatMap(([key, messages]) => messages);
       messages.push(...targetMessages);
     }
