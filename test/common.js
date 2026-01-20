@@ -12,6 +12,21 @@ export default function commonTestInit() {
     return actor;
   };
 
+  /**
+   * @param {string} changes.key
+   * @param {number} changes.mode
+   * @param {string} changes.value
+   */
+  globalThis.createActorWithRollModes = (...changes) => {
+    return {
+      allApplicableEffects: function* () {
+        if (changes?.length) yield { active: true, changes };
+      },
+      flags: {},
+      system: {},
+    };
+  };
+
   globalThis.CONFIG = {};
   globalThis.CONFIG.DND5E = {};
   globalThis.CONFIG.DND5E.conditionEffects = {};
@@ -198,5 +213,16 @@ export default function commonTestInit() {
       clone[k] = foundry.utils.deepClone(original[k], {strict, _d});
     }
     return clone;
+  };
+
+  globalThis.CONST = {
+    ACTIVE_EFFECT_MODES: {
+      CUSTOM: 0,
+      MULTIPLY: 1,
+      ADD: 2,
+      DOWNGRADE: 3,
+      UPGRADE: 4,
+      OVERRIDE: 5
+    }
   };
 }

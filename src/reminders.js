@@ -375,7 +375,7 @@ export class AbilitySaveReminder extends AbilityBaseReminder {
 
     return activity.effects
       .map(e => e.effect)
-      .flatMap(e => [...e.statuses, ...e.flags?.dnd5e?.riders?.statuses]);
+      .flatMap(e => [...e.statuses, ...e.flags?.dnd5e?.riders?.statuses || []]);
   }
 
   /** @override */

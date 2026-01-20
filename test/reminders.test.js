@@ -644,6 +644,80 @@ describe("AbilitySaveReminder both advantage and disadvantage flags", () => {
   });
 });
 
+describe("AbilitySaveReminder using roll mode", () => {
+  function createActivity(status, rider) {
+    const effect = {
+      statuses: new Set(),
+      flags: {}
+    };
+    if (status) effect.statuses.add(status);
+    if (rider) foundry.utils.setProperty(effect.flags, "dnd5e.riders.statuses", [rider]);
+    return {
+      effects: [ {effect} ]
+    };
+  }
+
+  test("saving throw with activity that has no effects should be normal", () => {
+    const actor = createActorWithRollModes();
+    const activity = createActivity();
+    const options = {};
+
+    const reminder = new AbilitySaveReminder(actor, "con", activity);
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBe(false);
+    expect(options.disadvantage).toBe(false);
+  });
+
+  test("saving throw with activity that has an effect with one status but no flags should be normal", () => {
+    const actor = createActorWithRollModes();
+    const activity = createActivity("poisoned");
+    const options = {};
+
+    const reminder = new AbilitySaveReminder(actor, "con", activity);
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBe(false);
+    expect(options.disadvantage).toBe(false);
+  });
+
+  test("saving throw with activity with a different status should be normal", () => {
+    const actor = createActorWithRollModes({ key: "flags.adv-reminder.statuses.charmed.save.roll.mode", mode: 2, value: "1" });
+    const activity = createActivity("poisoned");
+    const options = {};
+
+    const reminder = new AbilitySaveReminder(actor, "con", activity);
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBe(false);
+    expect(options.disadvantage).toBe(false);
+  });
+
+  test("saving throw with activity with same status should be advantage", () => {
+    const actor = createActorWithRollModes({ key: "flags.adv-reminder.statuses.poisoned.save.roll.mode", mode: 2, value: "1" });
+    const activity = createActivity("poisoned");
+    const options = {};
+
+    const reminder = new AbilitySaveReminder(actor, "con", activity);
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBe(true);
+    expect(options.disadvantage).toBe(false);
+  });
+
+  test("saving throw with activity with same rider should be advantage", () => {
+    const actor = createActorWithRollModes({ key: "flags.adv-reminder.statuses.poisoned.save.roll.mode", mode: 2, value: "1" });
+    const activity = createActivity(undefined, "poisoned");
+    const options = {};
+
+    const reminder = new AbilitySaveReminder(actor, "con", activity);
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBe(true);
+    expect(options.disadvantage).toBe(false);
+  });
+});
+
 describe("SkillReminder no legit active effects", () => {
   test("skill check with no active effects should be normal", () => {
     const actor = createActorWithFlags();
