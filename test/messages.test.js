@@ -10,19 +10,20 @@ import {
 import commonTestInit from "./common.js";
 
 function createActorWithEffects(...keyValuePairs) {
-  const appliedEffects = keyValuePairs.map(createEffect);
-  return { appliedEffects };
+  return {
+    allApplicableEffects: function* () {
+      for (const pair of keyValuePairs) {
+        yield createEffect(pair);
+      }
+    }
+  }
 }
 
 function createEffect([key, value]) {
   return {
+    active: true,
     changes: [
-      {
-        key,
-        value,
-        mode: 0,
-        priority: "0",
-      },
+      { key, value, mode: 0 },
     ]
   };
 }
