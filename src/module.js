@@ -18,20 +18,12 @@ Hooks.once("init", () => {
   else rollerHooks = new CoreRollerHooks();
   rollerHooks.init();
 
-  // register hook(s) to apply flags
-  Hooks.on("applyActiveEffect", applyMessageEffect);
+  // register hook to apply Midi's flags
   if (rollerHooks.shouldApplyMidiActiveEffect()) Hooks.on("applyActiveEffect", applyMidiCustom);
 
   // initialize DAE integration
   new DaeIntegration().init();
 });
-
-function applyMessageEffect(actor, change, current, delta, changes) {
-  if (!change.key.startsWith("flags.adv-reminder.message.") && !change.key.startsWith("flags.adv-reminder.grants.message.")) return;
-
-  if (current) current.push(...delta);
-  else foundry.utils.setProperty(actor, change.key, [delta]);
-}
 
 // Apply Midi-QOL's custom active effects
 function applyMidiCustom(actor, change) {

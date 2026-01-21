@@ -4,6 +4,10 @@
 - feature: update source tracking to only show what's actually affecting the roll: only show override if used, and if advantage is suppressed then show what suppressed it instead of any sources of advantage
 - feature: when showing sources, use links to the active effects or items instead of just showing their name
 
+# 4.3.5
+
+- feature: revert 4.3.3 change to use flags on the actor instead of reading the active effects
+
 # 4.3.4
 
 - feature: refactor preRollDamageV2 hook to set `isCritical` at the config level, not the individual rolls
