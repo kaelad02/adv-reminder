@@ -1,3 +1,7 @@
+# 4.3.5
+
+- feature: revert 4.3.3 change to use flags on the actor instead of reading the active effects
+
 # 4.3.4
 
 - feature: refactor preRollDamageV2 hook to set `isCritical` at the config level, not the individual rolls
