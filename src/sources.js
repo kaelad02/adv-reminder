@@ -187,7 +187,7 @@ const SourceMixin = (superclass) =>
       debug("rollModes", rollModes);
       if (!foundry.utils.isEmpty(rollModes)) {
         accumulator.applyRollModes(this.actor, rollModes);
-        accumulator.applyRollModeEffects(this.actor, rollModes);
+        accumulator.applyRollModeEffects(this.actor, Object.keys(rollModes));
       }
     }
   };

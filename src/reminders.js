@@ -1,4 +1,4 @@
-  import { debug, getApplicableChanges } from "./util.js";
+import { debug, getApplicableChanges } from "./util.js";
 
 /**
  * @typedef AdvantageModeData
@@ -74,13 +74,12 @@ export class AdvantageAccumulator {
   /**
    * Apply active effects with roll modes.
    * @param {Actor5e} actor
-   * @param {Object | string[]} rollModes
+   * @param {string[]} rollModes
    */
   applyRollModeEffects(actor, rollModes) {
     // copied parts from DataField#applyChange, and AdvantageModeField
 
-    const rollModeKeys = Array.isArray(rollModes) ? rollModes : Object.keys(rollModes);
-    const changes = getApplicableChanges(actor, change => rollModeKeys.includes(change.key));
+    const changes = getApplicableChanges(actor, change => rollModes.includes(change.key));
 
     // Apply the roll mode changes
     for ( let change of changes ) {
