@@ -2,19 +2,24 @@ import { debug } from "./util.js";
 
 class BaseMessage {
   constructor(actor, targetActor) {
-    /** @type {object} */
-    this.actorFlags = this._getFlags(actor);
-    /** @type {object} */
-    this.targetFlags = this._getFlags(targetActor);
+    /** @type {Actor5e} */
+    this.actor = actor;
+    /** @type {EffectChangeData[]} */
+    this.changes = this._getActiveEffectKeys(actor);
+    /** @type {EffectChangeData[]} */
+    this.targetChanges = this._getActiveEffectKeys(targetActor);
   }
 
-  _getFlags(actor) {
-    const flags = actor?.flags["adv-reminder"] || {};
-    return foundry.utils.flattenObject(flags);
+  _getActiveEffectKeys(actor) {
+    return actor
+      ? actor.appliedEffects
+          .flatMap((effect) => effect.changes)
+          .sort((a, b) => a.priority - b.priority)
+      : [];
   }
 
   get messageKeys() {
-    return ["message.all"];
+    return ["flags.adv-reminder.message.all"];
   }
 
   get targetKeys() {
@@ -29,17 +34,17 @@ class BaseMessage {
 
     // get messages from the actor and merge
     const keys = this.messageKeys;
-    const actorMessages = Object.entries(this.actorFlags)
-      .filter(([key, messages]) => keys.includes(key))
-      .flatMap(([key, messages]) => messages);
+    const actorMessages = this.changes
+      .filter((change) => keys.includes(change.key))
+      .map((change) => change.value);
     messages.push(...actorMessages);
 
     // get messages from the target and merge
     const targetKeys = this.targetKeys;
     if (targetKeys) {
-      const targetMessages = Object.entries(this.targetFlags)
-        .filter(([key, messages]) => targetKeys.includes(key))
-        .flatMap(([key, messages]) => messages);
+      const targetMessages = this.targetChanges
+        .filter((change) => targetKeys.includes(change.key))
+        .map((change) => change.value);
       messages.push(...targetMessages);
     }
 
@@ -63,18 +68,18 @@ export class AttackMessage extends BaseMessage {
   /** @override */
   get messageKeys() {
     return super.messageKeys.concat(
-      "message.attack.all",
-      `message.attack.${this.actionType}`,
-      `message.attack.${this.abilityId}`
+      "flags.adv-reminder.message.attack.all",
+      `flags.adv-reminder.message.attack.${this.actionType}`,
+      `flags.adv-reminder.message.attack.${this.abilityId}`
     );
   }
 
   /** @override */
   get targetKeys() {
     return [
-      "grants.message.attack.all",
-      `grants.message.attack.${this.actionType}`,
-      `grants.message.attack.${this.abilityId}`,
+      "flags.adv-reminder.grants.message.attack.all",
+      `flags.adv-reminder.grants.message.attack.${this.actionType}`,
+      `flags.adv-reminder.grants.message.attack.${this.abilityId}`,
     ];
   }
 }
@@ -89,7 +94,7 @@ class AbilityBaseMessage extends BaseMessage {
 
   /** @override */
   get messageKeys() {
-    return super.messageKeys.concat("message.ability.all");
+    return super.messageKeys.concat("flags.adv-reminder.message.ability.all");
   }
 }
 
@@ -97,8 +102,8 @@ export class AbilityCheckMessage extends AbilityBaseMessage {
   /** @override */
   get messageKeys() {
     return super.messageKeys.concat(
-      "message.ability.check.all",
-      `message.ability.check.${this.abilityId}`
+      "flags.adv-reminder.message.ability.check.all",
+      `flags.adv-reminder.message.ability.check.${this.abilityId}`
     );
   }
 }
@@ -107,8 +112,8 @@ export class AbilitySaveMessage extends AbilityBaseMessage {
   /** @override */
   get messageKeys() {
     return super.messageKeys.concat(
-      "message.ability.save.all",
-      `message.ability.save.${this.abilityId}`
+      "flags.adv-reminder.message.ability.save.all",
+      `flags.adv-reminder.message.ability.save.${this.abilityId}`
     );
   }
 }
@@ -116,7 +121,7 @@ export class AbilitySaveMessage extends AbilityBaseMessage {
 export class ConcentrationMessage extends AbilitySaveMessage {
   /** @override */
   get messageKeys() {
-    return super.messageKeys.concat("message.ability.concentration");
+    return super.messageKeys.concat("flags.adv-reminder.message.ability.concentration");
   }
 }
 
@@ -131,8 +136,8 @@ export class SkillMessage extends AbilityCheckMessage {
   /** @override */
   get messageKeys() {
     return super.messageKeys.concat(
-      "message.skill.all",
-      `message.skill.${this.skillId}`
+      "flags.adv-reminder.message.skill.all",
+      `flags.adv-reminder.message.skill.${this.skillId}`
     );
   }
 }
@@ -140,7 +145,7 @@ export class SkillMessage extends AbilityCheckMessage {
 export class InitiativeMessage extends AbilityBaseMessage {
   /** @override */
   get messageKeys() {
-    return super.messageKeys.concat("message.initiative");
+    return super.messageKeys.concat("flags.adv-reminder.message.initiative");
   }
 }
 
@@ -152,8 +157,8 @@ export class DeathSaveMessage extends AbilityBaseMessage {
   /** @override */
   get messageKeys() {
     return super.messageKeys.concat(
-      "message.ability.save.all",
-      "message.deathSave"
+      "flags.adv-reminder.message.ability.save.all",
+      "flags.adv-reminder.message.deathSave"
     );
   }
 }
@@ -169,16 +174,16 @@ export class DamageMessage extends BaseMessage {
   /** @override */
   get messageKeys() {
     return super.messageKeys.concat(
-      "message.damage.all",
-      `message.damage.${this.actionType}`
+      "flags.adv-reminder.message.damage.all",
+      `flags.adv-reminder.message.damage.${this.actionType}`
     );
   }
 
   /** @override */
   get targetKeys() {
     return [
-      "grants.message.damage.all",
-      `grants.message.damage.${this.actionType}`,
+      "flags.adv-reminder.grants.message.damage.all",
+      `flags.adv-reminder.grants.message.damage.${this.actionType}`,
     ];
   }
 }

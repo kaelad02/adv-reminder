@@ -5,6 +5,10 @@
 - feature: add support for custom roll mode flags for saving throws with status effects (e.g. Dwarven Resilience and Fey Ancestry): `flags.adv-reminder.statuses.[status].save.roll.mode | Add | 1`
 - feature: when showing sources, use links to the active effects or items instead of just showing their name
 
+# 4.3.5
+
+- feature: revert 4.3.3 change to use flags on the actor instead of reading the active effects
+
 # 4.3.4
 
 - feature: refactor preRollDamageV2 hook to set `isCritical` at the config level, not the individual rolls
