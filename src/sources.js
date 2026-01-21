@@ -10,7 +10,7 @@ import {
   InitiativeReminder,
   SkillReminder,
 } from "./reminders.js";
-import { debug } from "./util.js";
+import { debug, getApplicableChanges } from "./util.js";
 
 /**
  * @typedef LabelModeData
@@ -91,51 +91,6 @@ class LabelAccumulator extends LabelMixin(AdvantageAccumulator) {
       .join(" ");
   }
 
-  /**
-   * Apply labels from active effects setting roll modes.
-   * @param actor
-   * @param rollModes
-   */
-  applyRollModeEffects(actor, rollModes) {
-    // copied parts from Actor#applyActiveEffects, DataField#applyChange, and AdvantageModeField
-
-    const rollModeKeys = Object.keys(rollModes);
-
-    // Organize non-disabled effects by their application priority
-    const changes = [];
-    for ( const effect of actor.allApplicableEffects() ) {
-      if ( !effect.active ) continue;
-      changes.push(...effect.changes
-        .filter(change => rollModeKeys.includes(change.key))
-        .map(change => {
-          const c = foundry.utils.deepClone(change);
-          c.effect = effect;
-          c.priority = c.priority ?? (c.mode * 10);
-          return c;
-        }));
-    }
-    changes.sort((a, b) => a.priority - b.priority);
-
-    // Apply the roll mode changes
-    for ( let change of changes ) {
-      const delta = Number(change.value);
-      switch ( change.mode ) {
-        case CONST.ACTIVE_EFFECT_MODES.ADD:
-          this._applyChangeAdd(delta, change);
-          break;
-        case CONST.ACTIVE_EFFECT_MODES.OVERRIDE:
-          this._applyChangeOverride(delta, change);
-          break;
-        case CONST.ACTIVE_EFFECT_MODES.UPGRADE:
-          this._applyChangeUpgrade(delta, change);
-          break;
-        case CONST.ACTIVE_EFFECT_MODES.DOWNGRADE:
-          this._applyChangeDowngrade(delta, change);
-          break;
-      }
-    }
-  }
-
   _applyChangeAdd(delta, change) {
     // Add a source of advantage or disadvantage.
     if (delta === 1) this.counts.advantages.labels.push(change.effect.link);
@@ -200,21 +155,16 @@ const SourceMixin = (superclass) =>
     _getFlags(actor) {
       if (!actor) return {};
 
-      const asArray = actor.appliedEffects
-        .flatMap((effect) =>
-          // make an object with the effect's label and change's key
-          effect.changes.map((change) => ({
-            link: effect.link,
-            key: change.key,
-          }))
-        )
-        .filter((change) => change.key.startsWith("flags.midi-qol."));
-      asArray.forEach((change) => (change.key = change.key.substring(15)));
-      return asArray.reduce((accum, curr) => {
-        if (!accum[curr.key]) accum[curr.key] = [];
-        accum[curr.key].push(curr.link);
-        return accum;
-      }, {});
+      return getApplicableChanges(actor, (change) => change.key.startsWith("flags.midi-qol."))
+        .map((change) => {
+          change.key = change.key.substring(15);
+          return change;
+        })
+        .reduce((accum, change) => {
+          if (!accum[change.key]) accum[change.key] = [];
+          accum[change.key].push(change.effect.link)
+          return accum;
+        }, {});
     }
 
     static AccumulatorClass = LabelAccumulator;
@@ -237,7 +187,7 @@ const SourceMixin = (superclass) =>
       debug("rollModes", rollModes);
       if (!foundry.utils.isEmpty(rollModes)) {
         accumulator.applyRollModes(this.actor, rollModes);
-        accumulator.applyRollModeEffects(this.actor, rollModes);
+        accumulator.applyRollModeEffects(this.actor, Object.keys(rollModes));
       }
     }
   };

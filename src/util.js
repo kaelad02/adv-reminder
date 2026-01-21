@@ -69,3 +69,29 @@ function _getAllTokenGridSpaces({ width, height, x, y }) {
   }
   return centers;
 }
+
+/**
+ * Get a sorted array of active effect changes that apply to the actor. Can optionally filter it by change key.
+ * @param {Actor5e} actor the Actor
+ * @param {(change: Object) => boolean} filterFn filter on the change
+ * @return {Object[]} array of changes, including a link back to the effect
+ */
+export function getApplicableChanges(actor, filterFn = () => true) {
+  // copied from Actor#applyActiveEffects
+
+  const changes = [];
+  for ( const effect of actor.allApplicableEffects() ) {
+    if ( !effect.active ) continue;
+    changes.push(...effect.changes
+      .filter(filterFn)  // added filter step
+      .map(change => {
+        const c = foundry.utils.deepClone(change);
+        c.effect = effect;
+        c.priority = c.priority ?? (c.mode * 10);
+        return c;
+      }));
+    // removed adding to this.statuses
+  }
+  changes.sort((a, b) => a.priority - b.priority);
+  return changes;
+}

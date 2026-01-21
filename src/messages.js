@@ -1,21 +1,11 @@
-import { debug } from "./util.js";
+import { debug, getApplicableChanges } from "./util.js";
 
 class BaseMessage {
   constructor(actor, targetActor) {
     /** @type {Actor5e} */
     this.actor = actor;
-    /** @type {EffectChangeData[]} */
-    this.changes = this._getActiveEffectKeys(actor);
-    /** @type {EffectChangeData[]} */
-    this.targetChanges = this._getActiveEffectKeys(targetActor);
-  }
-
-  _getActiveEffectKeys(actor) {
-    return actor
-      ? actor.appliedEffects
-          .flatMap((effect) => effect.changes)
-          .sort((a, b) => a.priority - b.priority)
-      : [];
+    /** @type {Actor5e} */
+    this.targetActor = targetActor;
   }
 
   get messageKeys() {
@@ -34,16 +24,14 @@ class BaseMessage {
 
     // get messages from the actor and merge
     const keys = this.messageKeys;
-    const actorMessages = this.changes
-      .filter((change) => keys.includes(change.key))
+    const actorMessages = getApplicableChanges(this.actor, (change) => keys.includes(change.key))
       .map((change) => change.value);
     messages.push(...actorMessages);
 
     // get messages from the target and merge
     const targetKeys = this.targetKeys;
-    if (targetKeys) {
-      const targetMessages = this.targetChanges
-        .filter((change) => targetKeys.includes(change.key))
+    if (targetKeys && this.targetActor) {
+      const targetMessages = getApplicableChanges(this.targetActor, (change) => targetKeys.includes(change.key))
         .map((change) => change.value);
       messages.push(...targetMessages);
     }
