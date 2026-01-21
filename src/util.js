@@ -80,7 +80,7 @@ export function getApplicableChanges(actor, filterFn = () => true) {
   // copied from Actor#applyActiveEffects
 
   const changes = [];
-  for ( const effect of this.allApplicableEffects() ) {
+  for ( const effect of actor.allApplicableEffects() ) {
     if ( !effect.active ) continue;
     changes.push(...effect.changes
       .filter(filterFn)  // added filter step
