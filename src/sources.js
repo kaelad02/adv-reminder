@@ -10,7 +10,7 @@ import {
   InitiativeReminder,
   SkillReminder,
 } from "./reminders.js";
-import { debug } from "./util.js";
+import { debug, getApplicableChanges } from "./util.js";
 
 /**
  * @typedef LabelModeData
@@ -155,21 +155,16 @@ const SourceMixin = (superclass) =>
     _getFlags(actor) {
       if (!actor) return {};
 
-      const asArray = actor.appliedEffects
-        .flatMap((effect) =>
-          // make an object with the effect's label and change's key
-          effect.changes.map((change) => ({
-            link: effect.link,
-            key: change.key,
-          }))
-        )
-        .filter((change) => change.key.startsWith("flags.midi-qol."));
-      asArray.forEach((change) => (change.key = change.key.substring(15)));
-      return asArray.reduce((accum, curr) => {
-        if (!accum[curr.key]) accum[curr.key] = [];
-        accum[curr.key].push(curr.link);
-        return accum;
-      }, {});
+      return getApplicableChanges(actor, (change) => change.key.startsWith("flags.midi-qol."))
+        .map((change) => {
+          change.key = change.key.substring(15);
+          return change;
+        })
+        .reduce((accum, change) => {
+          if (!accum[change.key]) accum[change.key] = [];
+          accum[change.key].push(change.effect.link)
+          return accum;
+        }, {});
     }
 
     static AccumulatorClass = LabelAccumulator;
