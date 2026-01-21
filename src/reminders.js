@@ -1,4 +1,4 @@
-import { debug } from "./util.js";
+  import { debug, getApplicableChanges } from "./util.js";
 
 /**
  * @typedef AdvantageModeData
@@ -77,24 +77,10 @@ export class AdvantageAccumulator {
    * @param {Object | string[]} rollModes
    */
   applyRollModeEffects(actor, rollModes) {
-    // copied parts from Actor#applyActiveEffects, DataField#applyChange, and AdvantageModeField
+    // copied parts from DataField#applyChange, and AdvantageModeField
 
     const rollModeKeys = Array.isArray(rollModes) ? rollModes : Object.keys(rollModes);
-
-    // Organize non-disabled effects by their application priority
-    const changes = [];
-    for ( const effect of actor.allApplicableEffects() ) {
-      if ( !effect.active ) continue;
-      changes.push(...effect.changes
-        .filter(change => rollModeKeys.includes(change.key))
-        .map(change => {
-          const c = foundry.utils.deepClone(change);
-          c.effect = effect;
-          c.priority = c.priority ?? (c.mode * 10);
-          return c;
-        }));
-    }
-    changes.sort((a, b) => a.priority - b.priority);
+    const changes = getApplicableChanges(actor, change => rollModeKeys.includes(change.key));
 
     // Apply the roll mode changes
     for ( let change of changes ) {
