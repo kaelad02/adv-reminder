@@ -4,6 +4,7 @@
 - feature: update source tracking to only show what's actually affecting the roll: only show override if used, and if advantage is suppressed then show what suppressed it instead of any sources of advantage
 - feature: add support for custom roll mode flags for saving throws with status effects (e.g. Dwarven Resilience and Fey Ancestry): `flags.adv-reminder.statuses.[status].save.roll.mode | Add | 1`
 - feature: when showing sources, use links to the active effects or items instead of just showing their name
+- feature: set verified system version to 5.0.4
 
 # 4.3.5
 
