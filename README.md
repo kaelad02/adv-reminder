@@ -39,6 +39,12 @@ In addition to D20 Tests, Advantage Reminder does add some functionality to dama
 - Attacks on targets with certain conditions (e.g. Paralyzed) will be Criticals
 - Supports Midi-QOL flags on both the attacker and target to make Criticals or suppress it for Normal damage (e.g. Adamantine Armor)
 
+## Messages
+
+In addition to active effects adding advantage or disadvantage, you can also add messages to remind you of conditional bonuses or advantage. For example, if you constantly forget to add `1d4` from the Guidance spell, you can add a message on skill rolls to remember to add that. In addition, you can use the deferred inline roll syntax (e.g. `[[/r 1d4]]`) to make it clickable, adding it to the Situational Bonus field.
+
+![Skill Check screenshot with message](docs/skill-message.png?raw=true)
+
 ## Settings
 Some of the features are controlled by settings.
 
@@ -52,12 +58,6 @@ Some of the features are controlled by settings.
 > This is for D&D 5e system version 5.0 and earlier. Version 5.1 adds the ability to add to Advantage and to override it.
 
 If the player holds down one of the Ctrl/Alt/Shift/Meta keys to fast-forward the die roll (e.g. hold Alt to roll with advantage, skipping the roll dialog) then this module WILL NOT do anything. Holding down one of those keys stops the roll dialog from popping up so it's interpreted as overriding what this module does.
-
-## Messages
-
-In addition to active effects adding advantage or disadvantage, you can also add messages to remind you of conditional bonuses or advantage. For example, if you constantly forget to add `1d4` from the Guidance spell, you can add a message on skill rolls to remember to add that. In addition, you can use the deferred inline roll syntax (e.g. `[[/r 1d4]]`) to make it clickable, adding it to the Situational Bonus field.
-
-![Skill Check screenshot with message](docs/skill-message.png?raw=true)
 
 ## Module Compatibility
 
