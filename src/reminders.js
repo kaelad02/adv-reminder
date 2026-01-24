@@ -170,7 +170,12 @@ class BaseReminder {
    */
   _getFlags(actor) {
     const midiFlags = actor?.flags["midi-qol"] || {};
-    return foundry.utils.flattenObject(midiFlags);
+    const flat = foundry.utils.flattenObject(midiFlags);
+    // only keep flags with a true value
+    Object.keys(flat).forEach(key => {
+      if (flat[key] !== true) delete flat[key];
+    });
+    return flat;
   }
 
   static AccumulatorClass = AdvantageAccumulator;

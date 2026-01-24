@@ -1311,3 +1311,35 @@ describe("CriticalReminder both critical and no critical flags", () => {
     expect(options.isCritical).toBe(false);
   });
 });
+
+describe("tests of _getFlags", () => {
+  const createActor = (key, value) => {
+    const actor = { flags: {} };
+    if (key) foundry.utils.setProperty(actor, key, value);
+    return actor;
+  };
+
+  test("returns empty object on actor with no Midi flags", () => {
+    const actor = createActor();
+    const reminder = new AbilityCheckReminder(actor);
+    expect(reminder.actorFlags).toEqual({});
+  });
+
+  test("returns flag with a true value", () => {
+    const actor = createActor("flags.midi-qol.advantage.ability.save.all", true);
+    const reminder = new AbilityCheckReminder(actor);
+    expect(reminder.actorFlags).toEqual({ "advantage.ability.save.all": true });
+  });
+
+  test("returns empty object with a false value", () => {
+    const actor = createActor("flags.midi-qol.advantage.ability.save.all", false);
+    const reminder = new AbilityCheckReminder(actor);
+    expect(reminder.actorFlags).toEqual({});
+  });
+
+  test("returns empty object with a conditional expression", () => {
+    const actor = createActor("flags.midi-qol.advantage.ability.save.all", "attributes.hp.value === attributes.hp.effectiveMax");
+    const reminder = new AbilityCheckReminder(actor);
+    expect(reminder.actorFlags).toEqual({});
+  });
+});
