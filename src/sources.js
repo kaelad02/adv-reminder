@@ -155,7 +155,10 @@ const SourceMixin = (superclass) =>
     _getFlags(actor) {
       if (!actor) return {};
 
-      return getApplicableChanges(actor, (change) => change.key.startsWith("flags.midi-qol."))
+      // the Midi flag has to be true and the flag on the actor must be true (i.e. not overwritten by another change to false)
+      const filterFn = (change) => change.key.startsWith("flags.midi-qol.") &&
+        ["true", "1"].includes(change.value.trim()) && foundry.utils.getProperty(actor, change.key) === true;
+      return getApplicableChanges(actor, filterFn)
         .map((change) => {
           change.key = change.key.substring(15);
           return change;
