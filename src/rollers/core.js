@@ -163,7 +163,7 @@ export default class CoreRollerHooks {
   }
 
   preRollToolV2(config, dialog, message) {
-    debug("preRollToolV2 hook called", config);
+    debug("preRollToolV2 hook called");
 
     // check if we've already processed this roll
     if (config[CoreRollerHooks.PROCESSED_PROP]) return;
