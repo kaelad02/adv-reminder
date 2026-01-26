@@ -442,7 +442,7 @@ export class AbilitySaveReminder extends AbilityBaseReminder {
 export class ConcentrationReminder extends AbilitySaveReminder {
   get rollModes() {
     const modes = super.rollModes;
-    modes["system.attributes.concentration.roll.mode"] = ["DND5E.Concentration"];
+    modes["system.attributes.concentration.roll.mode"] = "DND5E.Concentration";
     return modes;
   }
 }
@@ -530,7 +530,7 @@ export class InitiativeReminder extends AbilityCheckReminder {
     const toolLabel = dnd5e.documents.Trait.keyLabel(this.toolId, { trait: "tool" });
 
     const modes = super.rollModes;
-    modes["system.attributes.init.roll.mode"] = ["DND5E.Initiative"];
+    modes["system.attributes.init.roll.mode"] = "DND5E.Initiative";
     return modes;
   }
 }
@@ -555,7 +555,7 @@ export class DeathSaveReminder extends AbilityBaseReminder {
 
   get rollModes() {
     return {
-      "system.attributes.death.roll.mode": ["DND5E.DeathSave"]
+      "system.attributes.death.roll.mode": "DND5E.DeathSave"
     };
   }
 }

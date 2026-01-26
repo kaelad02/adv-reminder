@@ -73,22 +73,21 @@ class LabelAccumulator extends LabelMixin(AdvantageAccumulator) {
    */
   applyRollModes(actor, rollModes) {
     const source = actor._source;
-    Object.entries(rollModes).forEach(([key, labels]) => {
+    const localize = (l) => {
+      const first = (typeof l === "string") ? game.i18n.localize(l) : game.i18n.format(l.stringId, l.data);
+      return `${first} ${game.i18n.localize("DND5E.AdvantageMode")}`;
+    };
+
+    Object.entries(rollModes).forEach(([key, label]) => {
       const mode = foundry.utils.getProperty(source, key);
       if (mode === 1) {
-        const label = this._rollModeLabel(...labels, "DND5E.AdvantageMode");
+        label = localize(label);
         this.counts.advantages.labels.push(label);
       } else if (mode === -1) {
-        const label = this._rollModeLabel(...labels, "DND5E.AdvantageMode");
+        label = localize(label);
         this.counts.disadvantages.labels.push(label);
       }
     });
-  }
-
-  _rollModeLabel(...labels) {
-    return labels
-      .map(l => game.i18n.localize(l))
-      .join(" ");
   }
 
   _applyChangeAdd(delta, change) {
