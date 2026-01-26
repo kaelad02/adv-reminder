@@ -8,6 +8,7 @@ import {
   DeathSaveMessage,
   InitiativeMessage,
   SkillMessage,
+  ToolMessage,
 } from "../messages.js";
 import {
   AttackReminder,
@@ -18,6 +19,7 @@ import {
   SkillReminder,
   InitiativeReminder,
   ConcentrationReminder,
+  ToolReminder,
 } from "../reminders.js";
 import {
   AbilityCheckSource,
@@ -28,6 +30,7 @@ import {
   DeathSaveSource,
   InitiativeSource,
   SkillSource,
+  ToolSource,
 } from "../sources.js";
 import { showSources } from "../settings.js";
 import { debug, getDistanceToTargetFn, getTarget } from "../util.js";
@@ -61,6 +64,7 @@ export default class CoreRollerHooks {
     Hooks.on("dnd5e.preRollConcentrationV2", this.preRollConcentrationV2.bind(this));
     Hooks.on("dnd5e.preRollAbilityCheckV2", this.preRollAbilityCheckV2.bind(this));
     Hooks.on("dnd5e.preRollSkillV2", this.preRollSkillV2.bind(this));
+    Hooks.on("dnd5e.preRollToolV2", this.preRollToolV2.bind(this));
     Hooks.on("dnd5e.preRollInitiativeDialogV2", this.preRollInitiativeDialogV2.bind(this));
     Hooks.on("dnd5e.preRollDeathSaveV2", this.preRollDeathSaveV2.bind(this));
     Hooks.on("dnd5e.preRollDamageV2", this.preRollDamageV2.bind(this));
@@ -156,6 +160,23 @@ export default class CoreRollerHooks {
     new SkillMessage(actor, ability, skillId).addMessage(dialog);
     if (showSources) new SkillSource(actor, ability, skillId, true).updateOptions(dialog);
     new SkillReminder(actor, ability, skillId, this.checkArmorStealth).updateOptions(config.rolls[0].options);
+  }
+
+  preRollToolV2(config, dialog, message) {
+    debug("preRollToolV2 hook called", config);
+
+    // check if we've already processed this roll
+    if (config[CoreRollerHooks.PROCESSED_PROP]) return;
+    config[CoreRollerHooks.PROCESSED_PROP] = true;
+
+    if (this.isFastForwarding(config, dialog)) return;
+
+    const actor = config.subject;
+    const ability = config.ability;
+    const toolId = config.tool;
+    new ToolMessage(actor, ability, toolId).addMessage(dialog);
+    if (showSources) new ToolSource(actor, ability, toolId).updateOptions(dialog);
+    new ToolReminder(actor, ability, toolId).updateOptions(config.rolls[0].options);
   }
 
   preRollInitiativeDialogV2(config, dialog, message) {

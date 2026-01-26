@@ -9,6 +9,7 @@ import {
   DeathSaveReminder,
   InitiativeReminder,
   SkillReminder,
+  ToolReminder,
 } from "./reminders.js";
 import { debug, getApplicableChanges } from "./util.js";
 
@@ -203,6 +204,8 @@ export class ConcentrationSource extends SourceMixin(ConcentrationReminder) {}
 export class AbilityCheckSource extends SourceMixin(AbilityCheckReminder) {}
 
 export class SkillSource extends SourceMixin(SkillReminder) {}
+
+export class ToolSource extends SourceMixin(ToolReminder) {}
 
 export class InitiativeSource extends SourceMixin(InitiativeReminder) {
   _customUpdateOptions(accumulator) {
