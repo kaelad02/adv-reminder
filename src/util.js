@@ -18,7 +18,7 @@ export const log = (...args) => console.log("adv-reminder |", ...args);
  */
 export function isMinVersion(name, version) {
   const module = game.modules.get(name);
-  return module?.active && isNewerVersion(module.version, version);
+  return module?.active && foundry.utils.isNewerVersion(module.version, version);
 }
 
 /**
