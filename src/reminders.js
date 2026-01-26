@@ -497,6 +497,26 @@ export class SkillReminder extends AbilityCheckReminder {
   }
 }
 
+export class ToolReminder extends AbilityCheckReminder {
+  constructor(actor, abilityId, toolId) {
+    super(actor, abilityId);
+
+    /** @type {string} */
+    this.toolId = toolId;
+  }
+
+  get rollModes() {
+    const toolLabel = dnd5e.documents.Trait.keyLabel(this.toolId, { trait: "tool" });
+
+    const modes = super.rollModes;
+    modes[`system.tools.${this.toolId}.roll.mode`] = {
+      stringId: "DND5E.ROLL.Section",
+      data: { label: toolLabel }
+    };
+    return modes;
+  }
+}
+
 export class InitiativeReminder extends AbilityCheckReminder {
   get advantageConditions() {
     return super.advantageConditions.concat("advReminderAdvantageInitiative");
