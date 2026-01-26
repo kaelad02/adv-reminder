@@ -205,23 +205,28 @@ class BaseReminder {
   }
 
   _rollModeCounts(rollModes, options) {
+    const counts = {
+      override: null,
+      advantages: { count: 0, suppressed: false },
+      disadvantages: { count: 0, suppressed: false }
+    };
     if (foundry.utils.isEmpty(rollModes)) {
-      const counts = {
-        override: null,
-        advantages: { count: 0, suppressed: false },
-        disadvantages: { count: 0, suppressed: false }
-      };
+      // no roll modes, initialize with options instead
       if (options.advantage) counts.advantages.count++;
       if (options.disadvantage) counts.disadvantages.count++;
-      return counts;
+    } else {
+      // copied from AdvantageModeField#combineFields
+      for (const kp of Object.keys(rollModes)) {
+        const c = dnd5e.dataModels.fields.AdvantageModeField.getCounts(this.actor, kp);
+        const src = foundry.utils.getProperty(this.actor._source, kp) ?? 0;
+        if (c.override !== null) counts.override = c.override;
+        if (c.advantages.suppressed) counts.advantages.suppressed = true;
+        if (c.disadvantages.suppressed) counts.disadvantages.suppressed = true;
+        counts.advantages.count += c.advantages.count + Number(src === 1);
+        counts.disadvantages.count += c.disadvantages.count + Number(src === -1);
+      }
     }
-
-    // TODO handle more than one in 5.1 using combineFields
-
-    const path = Object.keys(rollModes)[0];
-    const counts = dnd5e.dataModels.fields.AdvantageModeField.getCounts(this.actor, { key: path });
-    debug("Roll Mode counts actor", path, counts);
-    return foundry.utils.deepClone(counts);
+    return counts;
   }
 
   _customUpdateOptions(accumulator) {}
