@@ -31,9 +31,9 @@ export class ButtonStyle extends DataModel {
 export function initSettings() {
   // Roll Dialog Colors
   game.settings.registerMenu("adv-reminder", "buttonStyle", {
-    name: "adv-reminder.ColorMenu.Name",
-    hint: "adv-reminder.ColorMenu.Hint",
-    label: "adv-reminder.ColorMenu.Label",
+    name: "adv-reminder.ButtonStyle.SETTING.name",
+    hint: "adv-reminder.ButtonStyle.SETTING.hint",
+    label: "adv-reminder.ButtonStyle.SETTING.label",
     icon: "fas fa-palette",
     type: ButtonStyleConfig,
     restricted: false
@@ -161,7 +161,7 @@ class ButtonStyleConfig extends HandlebarsApplicationMixin(ApplicationV2) {
       contentClasses: ["standard-form"],
       contentTag: "form",
       icon: "fas fa-palette",
-      title: "adv-reminder.ColorMenu.Label"
+      title: "adv-reminder.ButtonStyle.SETTING.label"
     },
     position: {
       width: 480,
@@ -198,7 +198,7 @@ class ButtonStyleConfig extends HandlebarsApplicationMixin(ApplicationV2) {
         break;
       case "footer":
         context.buttons = [
-          { type: "button", action: "test", icon: "fas fa-eye", label: "adv-reminder.ColorMenu.Test" }
+          { type: "button", action: "test", icon: "fas fa-eye", label: "adv-reminder.ButtonStyle.SETTING.test" }
         ];
         break;
     }
