@@ -1,12 +1,12 @@
 {
   "adv-reminder.AutoFail": "Échec automatique",
-  "adv-reminder.ColorMenu": {
-    "Name": "Couleurs de la boîte de jet de dés",
-    "Hint": "Modifier les couleurs des messages et des boutons par défaut des boîtes de jet de dés",
-    "Label": "Configurer les couleurs",
-    "Test": "Montrer un exemple"
-  },
   "adv-reminder.ButtonStyle": {
+    "SETTING": {
+      "name": "Style de bouton",
+      "hint": "Modifier le style du bouton par défaut dans les boîtes de dialogue de lancement de dés.",
+      "label": "Configurer le style",
+      "test": "Montrer un exemple"
+    },
     "FIELDS": {
       "wide": {
         "label": "Élargir le bouton par défaut",

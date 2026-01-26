@@ -2,6 +2,7 @@
 
 - feature: add some checks to reminders and sources that the Midi flag is actually true, mainly for some edge cases
 - feature: support conditional expressions when using Midi for sources (i.e. only show source if it evaluated true)
+- feature: rename Roll Dialog Colors setting menu to Button Style and update hint
 
 # 5.0.0
 

@@ -2,12 +2,14 @@
   "adv-reminder.AutoFail": "Falha Automática",
   "adv-reminder.Messages": "Mensagens",
   "adv-reminder.ColorMenu": {
-    "Name": "Cores do Diálogo de Rolagem",
-    "Hint": "Mude as cores das menssagens e botões padrão nos diálogos de rolagem.",
-    "Label": "Configurar Cores",
-    "Test": "Mostrar Amostra de Rolagem"
   },
   "adv-reminder.ButtonStyle": {
+    "SETTING": {
+      "name": "Estilo do botão",
+      "hint": "Altere o estilo do botão padrão nas caixas de diálogo de rolagem.",
+      "label": "Configurar Estilo",
+      "test": "Mostrar Amostra de Rolagem"
+    },
     "FIELDS": {
       "wide": {
         "label": "Ampliar botão padrão",

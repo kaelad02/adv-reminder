@@ -1,13 +1,13 @@
 {
   "adv-reminder.AutoFail": "Auto fail",
   "adv-reminder.Messages": "Messages",
-  "adv-reminder.ColorMenu": {
-    "Name": "Roll Dialog Colors",
-    "Hint": "Change the colors of messages and default buttons on roll dialogs",
-    "Label": "Configure Colors",
-    "Test": "Show Sample Roll"
-  },
   "adv-reminder.ButtonStyle": {
+    "SETTING": {
+      "name": "Button Style",
+      "hint": "Change the style of the default button on roll dialogs",
+      "label": "Configure Style",
+      "test": "Show Sample Roll"
+    },
     "FIELDS": {
       "wide": {
         "label": "Widen Default Button",
