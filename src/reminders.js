@@ -350,6 +350,17 @@ export class AbilityCheckReminder extends AbilityBaseReminder {
     conditions.push("advReminderDisadvantageAbility");
     return conditions;
   }
+
+  get rollModes() {
+    const abilityLabel = CONFIG.DND5E.abilities[this.abilityId]?.label ?? "";
+
+    const modes = {};
+    modes[`system.abilities.${this.abilityId}.check.roll.mode`] = {
+      stringId: "DND5E.ABILITY.Configure.CheckLabel",
+      data: { ability: abilityLabel }
+    };
+    return modes;
+  }
 }
 
 export class AbilitySaveReminder extends AbilityBaseReminder {
@@ -398,6 +409,17 @@ export class AbilitySaveReminder extends AbilityBaseReminder {
     return conditions;
   }
 
+  get rollModes() {
+    const abilityLabel = CONFIG.DND5E.abilities[this.abilityId]?.label ?? "";
+
+    const modes = {};
+    modes[`system.abilities.${this.abilityId}.save.roll.mode`] = {
+      stringId: "DND5E.ABILITY.Configure.SaveLabel",
+      data: { ability: abilityLabel }
+    };
+    return modes;
+  }
+
   get statusRollModes() {
     return this.statuses.map(status => `flags.adv-reminder.statuses.${status}.save.roll.mode`);
   }
@@ -414,9 +436,9 @@ export class AbilitySaveReminder extends AbilityBaseReminder {
 
 export class ConcentrationReminder extends AbilitySaveReminder {
   get rollModes() {
-    return {
-      "system.attributes.concentration.roll.mode": ["DND5E.Concentration"]
-    };
+    const modes = super.rollModes;
+    modes["system.attributes.concentration.roll.mode"] = ["DND5E.Concentration"];
+    return modes;
   }
 }
 
@@ -445,6 +467,17 @@ export class SkillReminder extends AbilityCheckReminder {
     ]);
   }
 
+  get rollModes() {
+    const skillLabel = CONFIG.DND5E.skills[this.skillId]?.label ?? "";
+
+    const modes = super.rollModes;
+    modes[`system.skills.${this.skillId}.roll.mode`] = {
+      stringId: "DND5E.ROLL.Section",
+      data: { label: skillLabel }
+    };
+    return modes;
+  }
+
   _customUpdateOptions(accumulator) {
     super._customUpdateOptions(accumulator);
 
@@ -466,6 +499,14 @@ export class InitiativeReminder extends AbilityCheckReminder {
 
   get disadvantageConditions() {
     return super.disadvantageConditions.concat("advReminderDisadvantageInitiative");
+  }
+
+  get rollModes() {
+    const toolLabel = dnd5e.documents.Trait.keyLabel(this.toolId, { trait: "tool" });
+
+    const modes = super.rollModes;
+    modes["system.attributes.init.roll.mode"] = ["DND5E.Initiative"];
+    return modes;
   }
 }
 
