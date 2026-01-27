@@ -230,12 +230,13 @@ export default class CoreRollerHooks {
   }
 
   /**
-   * Check if the roll is being fast-forwarded. Copied from the system's D20Roll#applyKeybindings function.
+   * Determine if messages will be shown or if reminders should be processed.
+   * Copied from the system's D20Roll#applyKeybindings function.
    * @param {Event} event the triggering event
    * @param {boolean} configure whether or not to show the dialog
-   * @returns {boolean} true if they are fast-forwarding, false otherwise
+   * @returns {Object}
    */
-  isFastForwarding({ event }, { configure } = {}) {
+  applyKeybindings({ event }, { configure }) {
     debug("before checking FF, configure:", configure);
     const keys = {
       normal: dnd5e.utils.areKeysPressed(event, "skipDialogNormal"),
@@ -243,7 +244,13 @@ export default class CoreRollerHooks {
       disadvantage: dnd5e.utils.areKeysPressed(event, "skipDialogDisadvantage")
     };
     configure ??= !Object.values(keys).some(k => k);
-    if (!configure) debug("fast-forwarding the roll, stop processing");
-    return !configure;
+    if (!configure) debug("fast-forwarding the roll, skip messages");
+
+    // check for forced advantage, disadvantage, or normal with combinations of two keys
+    const forcedRollMode = (keys.normal && keys.advantage) || (keys.normal && keys.disadvantage) ||
+      (keys.advantage && keys.disadvantage);
+    if (forcedRollMode) debug("forced adv/dis/norm, skip reminders");
+
+    return { messages: configure, reminder: !forcedRollMode };
   }
 }
