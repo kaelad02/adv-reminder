@@ -211,11 +211,12 @@ export class InitiativeSource extends SourceMixin(InitiativeReminder) {
   _customUpdateOptions(accumulator) {
     super._customUpdateOptions(accumulator);
 
-    // Handle system-defined flags (i.e. Special Traits) that give advantage to initiative
-    const flags = ["initiativeAdv"];
-    if (game.settings.get("dnd5e", "rulesVersion") === "modern") flags.push("remarkableAthlete");
-    this._applyFlagSource(accumulator, flags);
-    this._applyFlagEffects(accumulator, flags);
+    // Handle system-defined flag (i.e. Special Traits) that gives advantage to initiative
+    if (game.settings.get("dnd5e", "rulesVersion") === "modern") {
+      const flags = ["remarkableAthlete"];
+      this._applyFlagSource(accumulator, flags);
+      this._applyFlagEffects(accumulator, flags);
+    }
   }
 
   /**
