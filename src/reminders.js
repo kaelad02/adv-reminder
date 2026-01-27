@@ -527,8 +527,6 @@ export class InitiativeReminder extends AbilityCheckReminder {
   }
 
   get rollModes() {
-    const toolLabel = dnd5e.documents.Trait.keyLabel(this.toolId, { trait: "tool" });
-
     const modes = super.rollModes;
     modes["system.attributes.init.roll.mode"] = "DND5E.Initiative";
     return modes;
