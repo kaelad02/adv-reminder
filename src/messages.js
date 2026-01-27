@@ -130,6 +130,22 @@ export class SkillMessage extends AbilityCheckMessage {
   }
 }
 
+export class ToolMessage extends AbilityCheckMessage {
+  constructor(actor, abilityId, toolId) {
+    super(actor, abilityId);
+
+    /** @type {string} */
+    this.toolId = toolId;
+  }
+
+  get messageKeys() {
+    return super.messageKeys.concat(
+      "flags.adv-reminder.message.tool.all",
+      `flags.adv-reminder.message.tool.${this.toolId}`
+    );
+  }
+}
+
 export class InitiativeMessage extends AbilityBaseMessage {
   /** @override */
   get messageKeys() {

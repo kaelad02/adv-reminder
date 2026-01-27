@@ -7,6 +7,7 @@ import {
   DeathSaveMessage,
   InitiativeMessage,
   SkillMessage,
+  ToolMessage,
 } from "../messages.js";
 import {
   AbilityCheckSource,
@@ -17,6 +18,7 @@ import {
   DeathSaveSource,
   InitiativeSource,
   SkillSource,
+  ToolSource,
 } from "../sources.js";
 import { showSources } from "../settings.js";
 import { debug, getTarget } from "../util.js";
@@ -164,6 +166,22 @@ export default class MidiRollerHooks extends CoreRollerHooks {
     const skillId = config.skill;
     new SkillMessage(actor, ability, skillId).addMessage(dialog);
     if (showSources) new MidiSkillSource(actor, ability, skillId, true).updateOptions(dialog);
+  }
+
+  preRollToolV2(config, dialog, message) {
+    debug("preRollToolV2 hook called");
+
+    // check if we've already processed this roll
+    if (config[CoreRollerHooks.PROCESSED_PROP]) return;
+    config[CoreRollerHooks.PROCESSED_PROP] = true;
+
+    if (this.isFastForwarding(config, dialog)) return;
+
+    const actor = config.subject;
+    const ability = config.ability;
+    const toolId = config.tool;
+    new ToolMessage(actor, ability, toolId).addMessage(dialog);
+    if (showSources) new ToolSource(actor, ability, toolId).updateOptions(dialog);
   }
 
   preRollInitiativeDialogV2(config, dialog, message) {

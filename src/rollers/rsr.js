@@ -8,6 +8,7 @@ import {
   DeathSaveMessage,
   InitiativeMessage,
   SkillMessage,
+  ToolMessage,
 } from "../messages.js";
 import {
   AttackReminder,
@@ -17,6 +18,7 @@ import {
   DeathSaveReminder,
   SkillReminder,
   InitiativeReminder,
+  ToolReminder,
 } from "../reminders.js";
 import {
   AbilityCheckSource,
@@ -27,6 +29,7 @@ import {
   DeathSaveSource,
   InitiativeSource,
   SkillSource,
+  ToolSource,
 } from "../sources.js";
 import { showSources } from "../settings.js";
 import { debug, getDistanceToTargetFn, getTarget } from "../util.js";
@@ -128,6 +131,25 @@ export default class ReadySetRollHooks extends CoreRollerHooks {
 
     if (this._doReminder(config))
       new SkillReminder(actor, ability, skillId, this.checkArmorStealth).updateOptions(config.rolls[0].options);
+  }
+
+  preRollToolV2(config, dialog, message) {
+    debug("preRollToolV2 hook called");
+
+    // check if we've already processed this roll
+    if (config[CoreRollerHooks.PROCESSED_PROP]) return;
+    config[CoreRollerHooks.PROCESSED_PROP] = true;
+
+    const actor = config.subject;
+    const ability = config.ability;
+    const toolId = config.tool;
+    if (this._doMessages(config)) {
+      new ToolMessage(actor, ability, toolId).addMessage(dialog);
+      if (showSources) new ToolSource(actor, ability, toolId).updateOptions(dialog);
+    }
+
+    if (this._doReminder(config))
+      new ToolReminder(actor, ability, toolId).updateOptions(config.rolls[0].options);
   }
 
   preRollInitiativeDialogV2(config, dialog, message) {
