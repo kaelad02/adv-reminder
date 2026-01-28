@@ -13,6 +13,7 @@ import {
   AttackReminder,
   AbilityCheckReminder,
   AbilitySaveReminder,
+  ConcentrationReminder,
   CriticalReminder,
   DeathSaveReminder,
   SkillReminder,
@@ -86,12 +87,13 @@ export default class ReadySetRollHooks extends CoreRollerHooks {
     if (config[CoreRollerHooks.PROCESSED_PROP]) return;
     config[CoreRollerHooks.PROCESSED_PROP] = true;
 
+    const actor = config.subject;
+    const abilityId = config.ability;
     if (this._doMessages(dialog)) {
-      const actor = config.subject;
-      new ConcentrationMessage(actor, config.ability).addMessage(dialog);
-      if (showSources) new ConcentrationSource(actor, config.ability).updateOptions(dialog);
+      new ConcentrationMessage(actor, abilityId).addMessage(dialog);
+      if (showSources) new ConcentrationSource(actor, abilityId).updateOptions(dialog);
     }
-    // don't need a reminder, the system will set advantage/disadvantage
+    if (this._doReminder(message)) new ConcentrationReminder(actor, abilityId).updateOptions(config.rolls[0].options);
   }
 
   preRollAbilityCheckV2(config, dialog, message) {
