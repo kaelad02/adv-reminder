@@ -42,6 +42,9 @@ export default class ReadySetRollHooks extends CoreRollerHooks {
     Hooks.once("setup", () => {
       super.init();
     });
+
+    // workaround to display crits properly in RSR's custom chat message
+    Hooks.on("preUpdateChatMessage", this.preUpdateChatMessage.bind(this));
   }
 
   preRollAttackV2(config, dialog, message) {
@@ -51,12 +54,12 @@ export default class ReadySetRollHooks extends CoreRollerHooks {
     const distanceFn = getDistanceToTargetFn(message.data.speaker);
     const activity = config.subject;
 
-    if (this._doMessages(dialog)) {
+    if (this._doMessages(config, dialog)) {
       new AttackMessage(activity.actor, target, activity).addMessage(dialog);
       if (showSources) new AttackSource(activity.actor, target, activity, distanceFn).updateOptions(dialog);
     }
 
-    if (this._doReminder(message))
+    if (this._doReminder(config, dialog, message))
       new AttackReminder(activity.actor, target, activity, distanceFn).updateOptions(config.rolls[0].options);
   }
 
@@ -173,21 +176,41 @@ export default class ReadySetRollHooks extends CoreRollerHooks {
   preRollDamageV2(config, dialog, message) {
     debug("preRollDamageV2 hook called");
 
+    const target = getTarget();
+    const distanceFn = getDistanceToTargetFn(message.data.speaker);
     const activity = config.subject;
 
     // damage/healing enricher doesn't have an activity, skip
     if (!activity) return;
 
-    const target = getTarget();
-    const distanceFn = getDistanceToTargetFn(message.data.speaker);
-
-    if (this._doMessages(dialog)) {
+    if (this._doMessages(config, dialog)) {
       new DamageMessage(activity.actor, target, activity).addMessage(dialog);
       if (showSources) new CriticalSource(activity.actor, target, activity, distanceFn, config.event).updateOptions(dialog);
+    }
+    if (this._doReminder(config, dialog, message)) {
       new CriticalReminder(activity.actor, target, activity, distanceFn).updateOptions(config);
-
+      // for RSR, copy to rolls too
+      for (const roll of config.rolls) {
+        roll.options.isCritical = config.isCritical;
+      }
       // workaround for https://github.com/foundryvtt/dnd5e/issues/5455
       dialog.options.defaultButton = config.isCritical ? "critical" : "normal";
+    }
+  }
+
+  preUpdateChatMessage(message, changed, options, userId) {
+    debug("preUpdateChatMessage hook called");
+
+    // update rsr flags with roll settings
+    if (changed.rolls) {
+      for (const roll of changed.rolls) {
+        if (roll instanceof dnd5e.dice.D20Roll) {
+          foundry.utils.setProperty(changed, "flags.rsr5e.advantage", roll.hasAdvantage);
+          foundry.utils.setProperty(changed, "flags.rsr5e.disadvantage", roll.hasDisadvantage);
+        }
+        if (roll instanceof dnd5e.dice.DamageRoll)
+          foundry.utils.setProperty(changed, "flags.rsr5e.isCritical", roll.isCritical);
+      }
     }
   }
 
@@ -200,9 +223,13 @@ export default class ReadySetRollHooks extends CoreRollerHooks {
     const rsrFlags = message.data?.flags?.rsr5e;
     if (rsrFlags) {
       // RSR Quick roll enabled, do reminders if adv/dis was not set
-      if (rsrFlags.advantage) debug("advantage already set, skip reminder checks");
-      if (rsrFlags.disadvantage) debug("disadvantage already set, skip reminder checks");
-      return !(rsrFlags.advantage || rsrFlags.disadvantage);
+      if (config.advantage || rsrFlags.advantage) {
+        debug("advantage already set, skip reminder checks");
+        return false;
+      } else if (config.disadvantage || rsrFlags.disadvantage) {
+        debug("disadvantage already set, skip reminder checks");
+        return false;
+      } else return true;
     } else {
       // RSR quick roll not enabled, do normal FF check
       return !this.isFastForwarding(config, dialog);
