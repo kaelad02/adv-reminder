@@ -13,6 +13,7 @@ import {
   AttackReminder,
   AbilityCheckReminder,
   AbilitySaveReminder,
+  ConcentrationReminder,
   CriticalReminder,
   DeathSaveReminder,
   SkillReminder,
@@ -41,6 +42,9 @@ export default class ReadySetRollHooks extends CoreRollerHooks {
     Hooks.once("setup", () => {
       super.init();
     });
+
+    // workaround to display crits properly in RSR's custom chat message
+    Hooks.on("preUpdateChatMessage", this.preUpdateChatMessage.bind(this));
   }
 
   preRollAttackV2(config, dialog, message) {
@@ -50,12 +54,12 @@ export default class ReadySetRollHooks extends CoreRollerHooks {
     const distanceFn = getDistanceToTargetFn(message.data.speaker);
     const activity = config.subject;
 
-    if (this._doMessages(config)) {
+    if (this._doMessages(config, dialog)) {
       new AttackMessage(activity.actor, target, activity).addMessage(dialog);
       if (showSources) new AttackSource(activity.actor, target, activity, distanceFn).updateOptions(dialog);
     }
 
-    if (this._doReminder(config))
+    if (this._doReminder(config, dialog, message))
       new AttackReminder(activity.actor, target, activity, distanceFn).updateOptions(config.rolls[0].options);
   }
 
@@ -71,12 +75,13 @@ export default class ReadySetRollHooks extends CoreRollerHooks {
     const failChecker = new AbilitySaveFail(actor, abilityId);
     if (failChecker.fails(message)) return false;
 
-    if (this._doMessages(config)) {
+    if (this._doMessages(config, dialog)) {
       new AbilitySaveMessage(actor, abilityId).addMessage(dialog);
       if (showSources) new AbilitySaveSource(actor, abilityId).updateOptions(dialog);
     }
 
-    if (this._doReminder(config)) new AbilitySaveReminder(actor, abilityId).updateOptions(config.rolls[0].options);
+    if (this._doReminder(config, dialog, message))
+      new AbilitySaveReminder(actor, abilityId).updateOptions(config.rolls[0].options);
   }
 
   preRollConcentrationV2(config, dialog, message) {
@@ -86,12 +91,14 @@ export default class ReadySetRollHooks extends CoreRollerHooks {
     if (config[CoreRollerHooks.PROCESSED_PROP]) return;
     config[CoreRollerHooks.PROCESSED_PROP] = true;
 
-    if (this._doMessages(config)) {
-      const actor = config.subject;
-      new ConcentrationMessage(actor, config.ability).addMessage(dialog);
-      if (showSources) new ConcentrationSource(actor, config.ability).updateOptions(dialog);
+    const actor = config.subject;
+    const abilityId = config.ability;
+    if (this._doMessages(config, dialog)) {
+      new ConcentrationMessage(actor, abilityId).addMessage(dialog);
+      if (showSources) new ConcentrationSource(actor, abilityId).updateOptions(dialog);
     }
-    // don't need a reminder, the system will set advantage/disadvantage
+    if (this._doReminder(config, dialog, message))
+      new ConcentrationReminder(actor, abilityId).updateOptions(config.rolls[0].options);
   }
 
   preRollAbilityCheckV2(config, dialog, message) {
@@ -103,12 +110,13 @@ export default class ReadySetRollHooks extends CoreRollerHooks {
 
     const actor = config.subject;
     const abilityId = config.ability;
-    if (this._doMessages(config)) {
+    if (this._doMessages(config, dialog)) {
       new AbilityCheckMessage(actor, abilityId).addMessage(dialog);
       if (showSources) new AbilityCheckSource(actor, abilityId).updateOptions(dialog);
     }
 
-    if (this._doReminder(config)) new AbilityCheckReminder(actor, abilityId).updateOptions(config.rolls[0].options);
+    if (this._doReminder(config, dialog, message))
+      new AbilityCheckReminder(actor, abilityId).updateOptions(config.rolls[0].options);
   }
 
   preRollSkillV2(config, dialog, message) {
@@ -121,12 +129,12 @@ export default class ReadySetRollHooks extends CoreRollerHooks {
     const actor = config.subject;
     const ability = config.ability;
     const skillId = config.skill;
-    if (this._doMessages(config)) {
+    if (this._doMessages(config, dialog)) {
       new SkillMessage(actor, ability, skillId).addMessage(dialog);
       if (showSources) new SkillSource(actor, ability, skillId, true).updateOptions(dialog);
     }
 
-    if (this._doReminder(config))
+    if (this._doReminder(config, dialog, message))
       new SkillReminder(actor, ability, skillId, this.checkArmorStealth).updateOptions(config.rolls[0].options);
   }
 
@@ -139,12 +147,12 @@ export default class ReadySetRollHooks extends CoreRollerHooks {
 
     const actor = config.subject;
     const abilityId = actor.system.attributes?.init?.ability || CONFIG.DND5E.defaultAbilities.initiative;
-    if (this._doMessages(config)) {
+    if (this._doMessages(config, dialog)) {
       new InitiativeMessage(actor, abilityId).addMessage(dialog);
       if (showSources) new InitiativeSource(actor, abilityId).updateOptions(dialog);
     }
 
-    if (this._doReminder(config))
+    if (this._doReminder(config, dialog, message))
       new InitiativeReminder(actor, abilityId).updateOptions(config.rolls[0].options);
   }
 
@@ -156,43 +164,75 @@ export default class ReadySetRollHooks extends CoreRollerHooks {
     config[CoreRollerHooks.PROCESSED_PROP] = true;
 
     const actor = config.subject;
-    if (this._doMessages(config)) {
+    if (this._doMessages(config, dialog)) {
       new DeathSaveMessage(actor).addMessage(dialog);
       if (showSources) new DeathSaveSource(actor).updateOptions(dialog);
     }
 
-    if (this._doReminder(config)) new DeathSaveReminder(actor).updateOptions(config.rolls[0].options);
+    if (this._doReminder(config, dialog, message))
+      new DeathSaveReminder(actor).updateOptions(config.rolls[0].options);
   }
 
   preRollDamageV2(config, dialog, message) {
     debug("preRollDamageV2 hook called");
 
+    const target = getTarget();
+    const distanceFn = getDistanceToTargetFn(message.data.speaker);
     const activity = config.subject;
 
     // damage/healing enricher doesn't have an activity, skip
     if (!activity) return;
 
-    const target = getTarget();
-    const distanceFn = getDistanceToTargetFn(message.data.speaker);
-
-    if (this._doMessages(config)) {
+    if (this._doMessages(config, dialog)) {
       new DamageMessage(activity.actor, target, activity).addMessage(dialog);
       if (showSources) new CriticalSource(activity.actor, target, activity, distanceFn, config.event).updateOptions(dialog);
+    }
+    if (this._doReminder(config, dialog, message)) {
       new CriticalReminder(activity.actor, target, activity, distanceFn).updateOptions(config);
-
+      // for RSR, copy to rolls too
+      for (const roll of config.rolls) {
+        roll.options.isCritical = config.isCritical;
+      }
       // workaround for https://github.com/foundryvtt/dnd5e/issues/5455
       dialog.options.defaultButton = config.isCritical ? "critical" : "normal";
     }
   }
 
-  _doMessages({ fastForward = false }) {
-    if (fastForward) debug("fast-forwarding the roll, skip messages");
-    return !fastForward;
+  preUpdateChatMessage(message, changed, options, userId) {
+    debug("preUpdateChatMessage hook called");
+
+    // update rsr flags with roll settings
+    if (changed.rolls) {
+      for (const roll of changed.rolls) {
+        if (roll instanceof dnd5e.dice.D20Roll) {
+          foundry.utils.setProperty(changed, "flags.rsr5e.advantage", roll.hasAdvantage);
+          foundry.utils.setProperty(changed, "flags.rsr5e.disadvantage", roll.hasDisadvantage);
+        }
+        if (roll instanceof dnd5e.dice.DamageRoll)
+          foundry.utils.setProperty(changed, "flags.rsr5e.isCritical", roll.isCritical);
+      }
+    }
   }
 
-  _doReminder({ advantage = false, disadvantage = false }) {
-    if (advantage) debug("advantage already set, skip reminder checks");
-    if (disadvantage) debug("disadvantage already set, skip reminder checks");
-    return !(advantage || disadvantage);
+  _doMessages(config, dialog) {
+    // normal FF check works if RSR Quick roll is enabled or not
+    return !this.isFastForwarding(config, dialog);
+  }
+
+  _doReminder(config, dialog, message) {
+    const rsrFlags = message.data?.flags?.rsr5e;
+    if (rsrFlags) {
+      // RSR Quick roll enabled, do reminders if adv/dis was not set
+      if (config.advantage || rsrFlags.advantage) {
+        debug("advantage already set, skip reminder checks");
+        return false;
+      } else if (config.disadvantage || rsrFlags.disadvantage) {
+        debug("disadvantage already set, skip reminder checks");
+        return false;
+      } else return true;
+    } else {
+      // RSR quick roll not enabled, do normal FF check
+      return !this.isFastForwarding(config, dialog);
+    }
   }
 }
