@@ -71,5 +71,4 @@ If the player holds down one of the Ctrl/Alt/Shift/Meta keys to fast-forward the
 [Ready Set Roll for D&D5e](https://foundryvtt.com/packages/ready-set-roll-5e) This module works with Ready Set Roll with the following notes:
 
 - This module will apply advantage/disadvantage on checks even if RSR is configured for quick rolls. This is skipped if you hold down one of the roll modifier keys to manually apply advantage/disadvantage (similar to core behavior). 
-- Effects for critical hits work but not those that cancel crits because of how early this module has to set the `isCrit` flag
 - Does not show messages if RSR is configured for quick rolls since there is no dialog to show them
