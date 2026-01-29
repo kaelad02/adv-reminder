@@ -1,6 +1,6 @@
 # 5.0.2
 
-- feature: update RSR compatibility with more accurate message, source, and reminder processing
+- feature: update RSR compatibility with more accurate message, source, and reminder processing, tested with version 3.5.0
 - feature: update RSR compatibility with critical hits, if a reminder set `isCritical` the RSR chat message correctly shows it
 
 # 5.0.1
