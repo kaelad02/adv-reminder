@@ -73,7 +73,7 @@ function updateConditionEffects() {
   ce.advReminderGrantAdjacentAttack = new Set(["prone"]);
 
   if (game.settings.get("dnd5e", "rulesVersion") === "legacy")
-    ce.advReminderGrantDisadvantageAttack.add("exhaustion-3");
+    ce.advReminderDisadvantageAttack.add("exhaustion-3");
 }
 
 Hooks.once("ready", () => {
