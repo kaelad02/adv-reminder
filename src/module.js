@@ -71,6 +71,8 @@ function updateConditionEffects() {
   ce.advReminderGrantDisadvantageAttack = new Set(["dodging", "hidden", "invisible"]);
   // if adjacent, grant advantage on the attack, else grant disadvantage
   ce.advReminderGrantAdjacentAttack = new Set(["prone"]);
+  // the system doesn't add Frightened, probably because it requires light of sight, but I did, so add it back
+  ce.abilityCheckDisadvantage.add("frightened");
 
   if (game.settings.get("dnd5e", "rulesVersion") === "legacy")
     ce.advReminderDisadvantageAttack.add("exhaustion-3");
