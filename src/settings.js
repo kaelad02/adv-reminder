@@ -64,7 +64,7 @@ export function initSettings() {
     config: true,
     requiresReload: true,
     type: Boolean,
-    default: false,
+    default: true,
   });
 
   // Hidden debugMode setting

@@ -350,12 +350,6 @@ export class AbilityCheckReminder extends AbilityBaseReminder {
     ]);
   }
 
-  get disadvantageConditions() {
-    const conditions = super.disadvantageConditions;
-    conditions.push("advReminderDisadvantageAbility");
-    return conditions;
-  }
-
   get rollModes() {
     const abilityLabel = CONFIG.DND5E.abilities[this.abilityId]?.label ?? "";
 
@@ -404,13 +398,6 @@ export class AbilitySaveReminder extends AbilityBaseReminder {
   get advantageConditions() {
     const conditions = [];
     if (this.abilityId === "dex") conditions.push("advReminderAdvantageDexSave");
-    return conditions;
-  }
-
-  get disadvantageConditions() {
-    const conditions = super.disadvantageConditions;
-    conditions.push("advReminderDisadvantageSave");
-    if (this.abilityId === "dex") conditions.push("advReminderDisadvantageDexSave");
     return conditions;
   }
 
@@ -518,14 +505,6 @@ export class ToolReminder extends AbilityCheckReminder {
 }
 
 export class InitiativeReminder extends AbilityCheckReminder {
-  get advantageConditions() {
-    return super.advantageConditions.concat("advReminderAdvantageInitiative");
-  }
-
-  get disadvantageConditions() {
-    return super.disadvantageConditions.concat("advReminderDisadvantageInitiative");
-  }
-
   get rollModes() {
     const modes = super.rollModes;
     modes["system.attributes.init.roll.mode"] = "DND5E.Initiative";
