@@ -197,17 +197,35 @@ const SourceMixin = (superclass) =>
 
 export class AttackSource extends SourceMixin(AttackReminder) {}
 
-export class AbilitySaveSource extends SourceMixin(AbilitySaveReminder) {}
+export class AbilitySaveSource extends SourceMixin(AbilitySaveReminder) {
+  get disadvantageConditions() {
+    const conditions = ["abilitySaveDisadvantage"];
+    if (this.abilityId === "dex") conditions.push("dexteritySaveDisadvantage");
+    return super.disadvantageConditions.concat(conditions);
+  }
+}
 
 export class ConcentrationSource extends SourceMixin(ConcentrationReminder) {}
 
-export class AbilityCheckSource extends SourceMixin(AbilityCheckReminder) {}
+export class AbilityCheckSource extends SourceMixin(AbilityCheckReminder) {
+  get disadvantageConditions() {
+    return super.disadvantageConditions.concat("abilityCheckDisadvantage");
+  }
+}
 
 export class SkillSource extends SourceMixin(SkillReminder) {}
 
 export class ToolSource extends SourceMixin(ToolReminder) {}
 
 export class InitiativeSource extends SourceMixin(InitiativeReminder) {
+  get advantageConditions() {
+    return super.advantageConditions.concat("initiativeAdvantage");
+  }
+
+  get disadvantageConditions() {
+    return super.disadvantageConditions.concat("initiativeDisadvantage");
+  }
+
   _customUpdateOptions(accumulator) {
     super._customUpdateOptions(accumulator);
 
