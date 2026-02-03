@@ -440,8 +440,6 @@ export class SkillReminder extends AbilityCheckReminder {
 
     /** @type {string} */
     this.skillId = skillId;
-    /** @type {Item5e[]} */
-    this.items = actor.items;
   }
 
   /** @override */
