@@ -45,19 +45,9 @@ export default class CoreRollerHooks {
   static PROCESSED_PROP = "adv-reminder-processed";
 
   /**
-   * If true, check armor for stealth checks.
-   * @type {boolean}
-   */
-  checkArmorStealth;
-
-  /**
    * Initialize the hooks.
    */
   init() {
-    // DAE version 0.8.81 added support for "impose stealth disadvantage"
-    this.checkArmorStealth = !game.modules.get("dae")?.active;
-    debug("checkArmorStealth", this.checkArmorStealth);
-
     // register all the dnd5e.pre hooks
     Hooks.on("dnd5e.preRollAttackV2", this.preRollAttackV2.bind(this));
     Hooks.on("dnd5e.preRollSavingThrowV2", this.preRollSavingThrowV2.bind(this));
@@ -158,8 +148,8 @@ export default class CoreRollerHooks {
     const ability = config.ability;
     const skillId = config.skill;
     new SkillMessage(actor, ability, skillId).addMessage(dialog);
-    if (showSources) new SkillSource(actor, ability, skillId, true).updateOptions(dialog);
-    new SkillReminder(actor, ability, skillId, this.checkArmorStealth).updateOptions(config.rolls[0].options);
+    if (showSources) new SkillSource(actor, ability, skillId).updateOptions(dialog);
+    new SkillReminder(actor, ability, skillId).updateOptions(config.rolls[0].options);
   }
 
   preRollToolV2(config, dialog, message) {

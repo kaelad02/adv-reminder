@@ -213,7 +213,21 @@ export class AbilityCheckSource extends SourceMixin(AbilityCheckReminder) {
   }
 }
 
-export class SkillSource extends SourceMixin(SkillReminder) {}
+export class SkillSource extends SourceMixin(SkillReminder) {
+  _customUpdateOptions(accumulator) {
+    super._customUpdateOptions(accumulator);
+
+    // similar to what AttributesFields#prepareArmorClass does
+    // Check for stealth disadvantage from armor
+    if (this.skillId === "ste") {
+      const armors = this.actor.itemTypes.equipment
+        .filter(equip => equip.system.equipped && equip.system.type.value in CONFIG.DND5E.armorTypes)
+        .filter(equip => equip.system.type.value !== "shield");
+      if (armors[0]?.system.properties.has("stealthDisadvantage"))
+        accumulator.disadvantage(armors[0].link);
+    }
+  }
+}
 
 export class ToolSource extends SourceMixin(ToolReminder) {}
 

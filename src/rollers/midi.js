@@ -165,7 +165,7 @@ export default class MidiRollerHooks extends CoreRollerHooks {
     const ability = config.ability;
     const skillId = config.skill;
     new SkillMessage(actor, ability, skillId).addMessage(dialog);
-    if (showSources) new MidiSkillSource(actor, ability, skillId, true).updateOptions(dialog);
+    if (showSources) new MidiSkillSource(actor, ability, skillId).updateOptions(dialog);
   }
 
   preRollToolV2(config, dialog, message) {

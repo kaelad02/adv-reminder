@@ -435,15 +435,11 @@ export class ConcentrationReminder extends AbilitySaveReminder {
 }
 
 export class SkillReminder extends AbilityCheckReminder {
-  constructor(actor, abilityId, skillId, checkArmorStealth = true) {
+  constructor(actor, abilityId, skillId) {
     super(actor, abilityId);
 
     /** @type {string} */
     this.skillId = skillId;
-    /** @type {Item5e[]} */
-    this.items = actor.items;
-    /** @type {boolean} */
-    this.checkArmorStealth = checkArmorStealth;
   }
 
   /** @override */
@@ -468,19 +464,6 @@ export class SkillReminder extends AbilityCheckReminder {
       data: { label: skillLabel }
     };
     return modes;
-  }
-
-  _customUpdateOptions(accumulator) {
-    super._customUpdateOptions(accumulator);
-
-    // Check if the actor is wearing armor that imposes stealth disadvantage
-    if (this.checkArmorStealth && this.skillId === "ste") {
-      const item = this.items.find(
-        (item) => item.type === "equipment" && item.system.equipped && item.system.properties.has("stealthDisadvantage")
-      );
-      debug("equipped item that imposes stealth disadvantage", item?.name);
-      accumulator.disadvantage(item?.link);
-    }
   }
 }
 
