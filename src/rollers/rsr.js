@@ -134,11 +134,11 @@ export default class ReadySetRollHooks extends CoreRollerHooks {
     const skillId = config.skill;
     if (this._doMessages(config, dialog)) {
       new SkillMessage(actor, ability, skillId).addMessage(dialog);
-      if (showSources) new SkillSource(actor, ability, skillId, true).updateOptions(dialog);
+      if (showSources) new SkillSource(actor, ability, skillId).updateOptions(dialog);
     }
 
     if (this._doReminder(config, dialog, message))
-      new SkillReminder(actor, ability, skillId, this.checkArmorStealth).updateOptions(config.rolls[0].options);
+      new SkillReminder(actor, ability, skillId).updateOptions(config.rolls[0].options);
   }
 
   preRollToolV2(config, dialog, message) {
