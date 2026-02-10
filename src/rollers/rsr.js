@@ -132,13 +132,15 @@ export default class ReadySetRollHooks extends CoreRollerHooks {
     const actor = config.subject;
     const ability = config.ability;
     const skillId = config.skill;
+    const doubleProf = this.isDoubleProf(config);
+    const pace = dnd5e.dataModels.shared.MovementField.getTravelPaceMode(config.pace, config.skill);
     if (this._doMessages(config, dialog)) {
       new SkillMessage(actor, ability, skillId).addMessage(dialog);
-      if (showSources) new SkillSource(actor, ability, skillId).updateOptions(dialog);
+      if (showSources) new SkillSource(actor, ability, skillId, doubleProf, pace).updateOptions(dialog);
     }
 
     if (this._doReminder(config, dialog, message))
-      new SkillReminder(actor, ability, skillId).updateOptions(config.rolls[0].options);
+      new SkillReminder(actor, ability, skillId, doubleProf, pace).updateOptions(config.rolls[0].options);
   }
 
   preRollToolV2(config, dialog, message) {
@@ -151,13 +153,14 @@ export default class ReadySetRollHooks extends CoreRollerHooks {
     const actor = config.subject;
     const ability = config.ability;
     const toolId = config.tool;
+    const doubleProf = this.isDoubleProf(config);
     if (this._doMessages(config)) {
       new ToolMessage(actor, ability, toolId).addMessage(dialog);
-      if (showSources) new ToolSource(actor, ability, toolId).updateOptions(dialog);
+      if (showSources) new ToolSource(actor, ability, toolId, doubleProf).updateOptions(dialog);
     }
 
     if (this._doReminder(config))
-      new ToolReminder(actor, ability, toolId).updateOptions(config.rolls[0].options);
+      new ToolReminder(actor, ability, toolId, doubleProf).updateOptions(config.rolls[0].options);
   }
 
   preRollInitiativeDialogV2(config, dialog, message) {

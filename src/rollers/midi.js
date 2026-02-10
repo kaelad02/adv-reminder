@@ -164,8 +164,10 @@ export default class MidiRollerHooks extends CoreRollerHooks {
     const actor = config.subject;
     const ability = config.ability;
     const skillId = config.skill;
+    const doubleProf = this.isDoubleProf(config);
+    const pace = dnd5e.dataModels.shared.MovementField.getTravelPaceMode(config.pace, config.skill);
     new SkillMessage(actor, ability, skillId).addMessage(dialog);
-    if (showSources) new MidiSkillSource(actor, ability, skillId).updateOptions(dialog);
+    if (showSources) new MidiSkillSource(actor, ability, skillId, doubleProf, pace).updateOptions(dialog);
   }
 
   preRollToolV2(config, dialog, message) {
@@ -180,8 +182,9 @@ export default class MidiRollerHooks extends CoreRollerHooks {
     const actor = config.subject;
     const ability = config.ability;
     const toolId = config.tool;
+    const doubleProf = this.isDoubleProf(config);
     new ToolMessage(actor, ability, toolId).addMessage(dialog);
-    if (showSources) new ToolSource(actor, ability, toolId).updateOptions(dialog);
+    if (showSources) new ToolSource(actor, ability, toolId, doubleProf).updateOptions(dialog);
   }
 
   preRollInitiativeDialogV2(config, dialog, message) {

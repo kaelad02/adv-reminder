@@ -52,7 +52,8 @@
     "Advantage": {
       "override": "Advantage Override from",
       "suppressed": "Advantage Suppressed by",
-      "prefix": "Advantage from"
+      "prefix": "Advantage from",
+      "doubleProf": "Double Proficiency"
     },
     "Normal": {
       "override": "Normal Override from"

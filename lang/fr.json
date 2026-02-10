@@ -51,7 +51,8 @@
     "Advantage": {
       "override": "Source de la priorité d'avantage :",
       "suppressed": "Source de l'avantage supprimé :",
-      "prefix": "Source de l'avantage :"
+      "prefix": "Source de l'avantage :",
+      "doubleProf": "Double compétence"
     },
     "Normal": {
       "override": "Source de la priorité normal :"
