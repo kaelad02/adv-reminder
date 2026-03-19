@@ -3,7 +3,7 @@
   "adv-reminder.ButtonStyle": {
     "SETTING": {
       "name": "Style de bouton",
-      "hint": "Modifier le style du bouton par défaut dans les boîtes de dialogue de lancement de dés.",
+      "hint": "Modifier le style du bouton par défaut dans les boîtes de dialogue de jet de dés.",
       "label": "Configurer le style",
       "test": "Montrer un exemple"
     },
@@ -14,7 +14,7 @@
       },
       "color": {
         "label": "Couleur des boutons par défaut",
-        "hint": "Modifie la couleur du bouton par défaut dans les boîtes de dialogue de lancement de dés.."
+        "hint": "Modifie la couleur du bouton par défaut dans les boîtes de dialogue de jet de dés.."
       },
       "custom": {
         "label": "Couleurs personnalisées",
@@ -69,6 +69,6 @@
   },
   "adv-reminder.UpdateStatusEffects": {
     "Name": "Activer les effets de condition",
-    "Hint": "Appliquez les adv / dis / crit critiques en fonction des conditions du système (par exemple, appliquez un désavantage aux attaques en cas d'empoisonnement). Cette option n'est pas recommandée si vous utilisez un autre module pour modifier ou remplacer les effets de statut."
+    "Hint": "Appliquez les adv / dis / crit critiques en fonction des états du système (par exemple, appliquez un désavantage aux attaques en cas d'empoisonnement). Cette option n'est pas recommandée si vous utilisez un autre module pour modifier ou remplacer les effets de statut."
   }
 }
