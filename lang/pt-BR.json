@@ -54,8 +54,7 @@
     "Advantage": {
       "override": "Vantagem anulada por",
       "suppressed": "Vantagem suprimida por",
-      "prefix": "Vantagem de",
-      "doubleProf": "Proficiência Dupla"
+      "prefix": "Vantagem de"
     },
     "Normal": {
       "override": "Substituição normal de"
