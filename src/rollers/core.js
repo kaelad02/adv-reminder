@@ -147,9 +147,11 @@ export default class CoreRollerHooks {
     const actor = config.subject;
     const ability = config.ability;
     const skillId = config.skill;
+    const doubleProf = this.isDoubleProf(config);
+    const pace = dnd5e.dataModels.shared.MovementField.getTravelPaceMode(config.pace, config.skill);
     new SkillMessage(actor, ability, skillId).addMessage(dialog);
-    if (showSources) new SkillSource(actor, ability, skillId).updateOptions(dialog);
-    new SkillReminder(actor, ability, skillId).updateOptions(config.rolls[0].options);
+    if (showSources) new SkillSource(actor, ability, skillId, doubleProf, pace).updateOptions(dialog);
+    new SkillReminder(actor, ability, skillId, doubleProf, pace).updateOptions(config.rolls[0].options);
   }
 
   preRollToolV2(config, dialog, message) {
@@ -164,9 +166,10 @@ export default class CoreRollerHooks {
     const actor = config.subject;
     const ability = config.ability;
     const toolId = config.tool;
+    const doubleProf = this.isDoubleProf(config);
     new ToolMessage(actor, ability, toolId).addMessage(dialog);
-    if (showSources) new ToolSource(actor, ability, toolId).updateOptions(dialog);
-    new ToolReminder(actor, ability, toolId).updateOptions(config.rolls[0].options);
+    if (showSources) new ToolSource(actor, ability, toolId, doubleProf).updateOptions(dialog);
+    new ToolReminder(actor, ability, toolId, doubleProf).updateOptions(config.rolls[0].options);
   }
 
   preRollInitiativeDialogV2(config, dialog, message) {
@@ -235,5 +238,13 @@ export default class CoreRollerHooks {
     configure ??= !Object.values(keys).some(k => k);
     if (!configure) debug("fast-forwarding the roll, stop processing");
     return !configure;
+  }
+
+  isDoubleProf(config) {
+    const actor = config.subject;
+    const skill = actor.system.skills?.[config.skill];
+    const tool = actor.system.tools?.[config.tool];
+    debug("isDoubleProf", skill, tool);
+    return !!skill?.prof.hasProficiency && !!tool?.prof.hasProficiency;
   }
 }
