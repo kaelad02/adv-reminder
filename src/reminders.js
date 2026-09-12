@@ -435,15 +435,15 @@ export class ConcentrationReminder extends AbilitySaveReminder {
 }
 
 export class SkillReminder extends AbilityCheckReminder {
-  constructor(actor, abilityId, skillId, checkArmorStealth = true) {
+  constructor(actor, abilityId, skillId, doubleProf, pace) {
     super(actor, abilityId);
 
     /** @type {string} */
     this.skillId = skillId;
-    /** @type {Item5e[]} */
-    this.items = actor.items;
     /** @type {boolean} */
-    this.checkArmorStealth = checkArmorStealth;
+    this.doubleProf = doubleProf;
+    /** @type {{ advantage: boolean, disadvantage: boolean }} */
+    this.pace = pace;
   }
 
   /** @override */
@@ -473,23 +473,23 @@ export class SkillReminder extends AbilityCheckReminder {
   _customUpdateOptions(accumulator) {
     super._customUpdateOptions(accumulator);
 
-    // Check if the actor is wearing armor that imposes stealth disadvantage
-    if (this.checkArmorStealth && this.skillId === "ste") {
-      const item = this.items.find(
-        (item) => item.type === "equipment" && item.system.equipped && item.system.properties.has("stealthDisadvantage")
-      );
-      debug("equipped item that imposes stealth disadvantage", item?.name);
-      accumulator.disadvantage(item?.link);
+    if (this.doubleProf) {
+      const label = game.i18n.localize("adv-reminder.Source.Advantage.doubleProf");
+      accumulator.advantage(label);
     }
+    if (this.pace?.advantage) accumulator.advantage("&Reference[travelpace]");
+    if (this.pace?.disadvantage) accumulator.disadvantage("&Reference[travelpace]");
   }
 }
 
 export class ToolReminder extends AbilityCheckReminder {
-  constructor(actor, abilityId, toolId) {
+  constructor(actor, abilityId, toolId, doubleProf) {
     super(actor, abilityId);
 
     /** @type {string} */
     this.toolId = toolId;
+    /** @type {boolean} */
+    this.doubleProf = doubleProf;
   }
 
   get rollModes() {
@@ -501,6 +501,15 @@ export class ToolReminder extends AbilityCheckReminder {
       data: { label: toolLabel }
     };
     return modes;
+  }
+
+  _customUpdateOptions(accumulator) {
+    super._customUpdateOptions(accumulator);
+
+    if (this.doubleProf) {
+      const label = game.i18n.localize("adv-reminder.Source.Advantage.doubleProf");
+      accumulator.advantage(label);
+    }
   }
 }
 
