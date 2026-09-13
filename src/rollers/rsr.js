@@ -241,7 +241,7 @@ export default class ReadySetRollHooks extends CoreRollerHooks {
 
   _doMessages(config, dialog) {
     // normal FF check works if RSR Quick roll is enabled or not
-    return !this.isFastForwarding(config, dialog);
+    return this.applyKeybindings(config, dialog).messages;
   }
 
   _doReminder(config, dialog, message) {
@@ -257,7 +257,7 @@ export default class ReadySetRollHooks extends CoreRollerHooks {
       } else return true;
     } else {
       // RSR quick roll not enabled, do normal FF check
-      return !this.isFastForwarding(config, dialog);
+      return this.applyKeybindings(config, dialog).reminder;
     }
   }
 }

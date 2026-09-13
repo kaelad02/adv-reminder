@@ -247,4 +247,12 @@ export default class MidiRollerHooks extends CoreRollerHooks {
       source.updateOptions(dialog);
     }
   }
+
+  /**
+   * For Midi, we only process messages, so call the newer `applyKeybindings` function and just return `messages`.
+   * @returns {boolean}
+   */
+  isFastForwarding(config, dialog) {
+    return !this.applyKeybindings(config, dialog).messages;
+  }
 }
