@@ -253,6 +253,6 @@ export default class MidiRollerHooks extends CoreRollerHooks {
    * @returns {boolean}
    */
   isFastForwarding(config, dialog) {
-    return this.applyKeybindings(config, dialog).messages;
+    return !this.applyKeybindings(config, dialog).messages;
   }
 }
