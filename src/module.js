@@ -6,6 +6,8 @@ import { applySettings, ButtonStyle, initSettings } from "./settings.js";
 import { debug, debugEnabled, log } from "./util.js";
 import DaeIntegration from "./dae-integration.js";
 
+const TextEditor = foundry.applications.ux.TextEditor.implementation;
+
 Hooks.once("init", () => {
   log("initializing Advantage Reminder");
 
@@ -199,7 +201,7 @@ async function prepareMessage(dialog) {
 
   if (messages.length || sources.length) {
     // build message
-    const message = await renderTemplate("modules/adv-reminder/templates/roll-dialog-messages.hbs", { messages, sources });
+    const message = await foundry.applications.handlebars.renderTemplate("modules/adv-reminder/templates/roll-dialog-messages.hbs", { messages, sources });
     // enrich message, specifically replacing rolls
     const enriched = await TextEditor.enrichHTML(message, {
       secrets: true,
