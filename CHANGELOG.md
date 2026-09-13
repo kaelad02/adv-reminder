@@ -1,3 +1,7 @@
+# 4.2.7
+
+- feature: remove machine translations
+
 # 4.2.6
 
 - feature: [#104](https://github.com/kaelad02/adv-reminder/pull/104) improve the button style configuration with separate custom background and text colors
