@@ -247,7 +247,7 @@ export default class CoreRollerHooks {
    * Copied from the system's D20Roll#applyKeybindings function.
    * @param {Event} event the triggering event
    * @param {boolean} configure whether or not to show the dialog
-   * @returns {Object}
+   * @returns {{messages: boolean, reminder: boolean}}
    */
   applyKeybindings({ event }, { configure }) {
     debug("before checking FF, configure:", configure);
