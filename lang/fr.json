@@ -2,31 +2,7 @@
   "adv-reminder.AutoFail": "Échec automatique",
   "adv-reminder.ButtonStyle": {
     "SETTING": {
-      "name": "Style de bouton",
-      "hint": "Modifier le style du bouton par défaut dans les boîtes de dialogue de lancement de dés.",
-      "label": "Configurer le style",
       "test": "Montrer un exemple"
-    },
-    "FIELDS": {
-      "wide": {
-        "label": "Élargir le bouton par défaut",
-        "hint": "Élargissez le bouton par défaut afin de mettre en évidence le bouton sur lequel il faut cliquer.."
-      },
-      "color": {
-        "label": "Couleur des boutons par défaut",
-        "hint": "Modifie la couleur du bouton par défaut dans les boîtes de dialogue de lancement de dés.."
-      },
-      "custom": {
-        "label": "Couleurs personnalisées",
-        "buttonColor": {
-          "label": "Couleur du bouton",
-          "hint": "La couleur d'arrière-plan du bouton par défaut."
-        },
-        "textColor": {
-          "label": "Couleur du texte",
-          "hint": "La couleur du texte du bouton par défaut. Laissez ce champ vide pour ne pas la modifier."
-        }
-      }
     },
     "COLORS": {
       "default": {
@@ -49,26 +25,13 @@
   },
   "adv-reminder.Source": {
     "Advantage": {
-      "override": "Source de la priorité d'avantage :",
-      "suppressed": "Source de l'avantage supprimé :",
       "prefix": "Source de l'avantage :"
     },
-    "Normal": {
-      "override": "Source de la priorité normal :"
-    },
     "Disadvantage": {
-      "override": "Source de la priorité désavantage :",
-      "suppressed": "Source du désavantage supprimé :",
       "prefix": "Source du désavantage :"
     },
     "Critical": {
-      "suppressed": "Source du coup critique supprimé :",
-      "prefix": "Source du coup critique :",
-      "nat20": "{value} naturel"
+      "prefix": "Source du coup critique :"
     }
-  },
-  "adv-reminder.UpdateStatusEffects": {
-    "Name": "Activer les effets de condition",
-    "Hint": "Appliquez les adv / dis / crit critiques en fonction des conditions du système (par exemple, appliquez un désavantage aux attaques en cas d'empoisonnement). Cette option n'est pas recommandée si vous utilisez un autre module pour modifier ou remplacer les effets de statut."
   }
 }

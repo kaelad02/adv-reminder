@@ -4,33 +4,6 @@
   "adv-reminder.ColorMenu": {
   },
   "adv-reminder.ButtonStyle": {
-    "SETTING": {
-      "name": "Estilo do botão",
-      "hint": "Altere o estilo do botão padrão nas caixas de diálogo de rolagem.",
-      "label": "Configurar Estilo",
-      "test": "Mostrar Amostra de Rolagem"
-    },
-    "FIELDS": {
-      "wide": {
-        "label": "Ampliar botão padrão",
-        "hint": "Aumente a largura do botão padrão para enfatizar qual botão deve ser clicado."
-      },
-      "color": {
-        "label": "Cor Padrão do Botão",
-        "hint": "Altera a cor do botão padrão nas caixas de diálogo de rolagem."
-      },
-      "custom": {
-        "label": "Cores Personalizadas",
-        "buttonColor": {
-          "label": "Cor do botão",
-          "hint": "A cor de fundo do botão padrão."
-        },
-        "textColor": {
-          "label": "Cor do texto",
-          "hint": "A cor do texto do botão padrão. Deixe em branco para não alterá-la."
-        }
-      }
-    },
     "COLORS": {
       "default": {
         "label": "Padrão"

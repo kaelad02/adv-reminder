@@ -48,6 +48,10 @@
 - feature: add support for Death Save advantage roll mode
 - note: major refactoring to support advantage roll mode everywhere, preparing for future updates
 
+# 4.2.7
+
+- feature: remove machine translations
+
 # 4.2.6
 
 - feature: [#104](https://github.com/kaelad02/adv-reminder/pull/104) improve the button style configuration with separate custom background and text colors
@@ -75,7 +79,7 @@
 
 # 4.2.1
 
-- bug fix: set minimum system version to 4.1.0
+- bug fix: set minimim system version to 4.1.0
 
 # 4.2.0
 
