@@ -1,3 +1,7 @@
+# 5.0.3
+
+- feature: remove machine translations
+
 # 5.0.2
 
 - feature: update RSR compatibility with more accurate message, source, and reminder processing, tested with version 3.5.0
