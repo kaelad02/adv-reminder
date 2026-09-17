@@ -1,3 +1,16 @@
+# 5.1.0
+
+- feature: makes the minimum Foundry version 13.341 and dnd5e system 5.1.0
+- feature: support roll modes on ability checks and saving throws
+- feature: combine roll modes (e.g. adv on Str check but dis on Athletics)
+- feature: add handling for Tool checks
+- feature: remove some `CONFIG.DND5E.conditionEffects` additions that the system now handles
+- feature: update "fast forward" optimizations since key presses changed a bit
+- feature: change `updateStatusEffects` setting to default true
+- feature: let system now handle "disadvantage to Stealth from armor" checks
+- feature: support source for skill/tool double proficiency and travel pace
+- feature: address new v13 deprecations
+
 # 5.0.3
 
 - feature: remove machine translations
