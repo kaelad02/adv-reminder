@@ -5,7 +5,7 @@
   "authors": [{ "name": "kaelad", "discord": "kaelad#1693" }],
   "version": "0.1",
   "compatibility": {
-    "minimum": "12.331",
+    "minimum": "13.341",
     "verified": "13"
   },
   "relationships": {
@@ -13,8 +13,8 @@
       {
         "id": "dnd5e",
         "compatibility": {
-          "minimum": "4.2.0",
-          "verified": "5.0.4"
+          "minimum": "5.1.0",
+          "verified": "5.1.9"
         }
       }
     ]

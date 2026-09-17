@@ -9,6 +9,7 @@ import {
   DeathSaveReminder,
   InitiativeReminder,
   SkillReminder,
+  ToolReminder,
 } from "./reminders.js";
 import { debug, getApplicableChanges } from "./util.js";
 
@@ -73,22 +74,21 @@ class LabelAccumulator extends LabelMixin(AdvantageAccumulator) {
    */
   applyRollModes(actor, rollModes) {
     const source = actor._source;
-    Object.entries(rollModes).forEach(([key, labels]) => {
+    const localize = (l) => {
+      const first = (typeof l === "string") ? game.i18n.localize(l) : game.i18n.format(l.stringId, l.data);
+      return `${first} ${game.i18n.localize("DND5E.AdvantageMode")}`;
+    };
+
+    Object.entries(rollModes).forEach(([key, label]) => {
       const mode = foundry.utils.getProperty(source, key);
       if (mode === 1) {
-        const label = this._rollModeLabel(...labels, "DND5E.AdvantageMode");
+        label = localize(label);
         this.counts.advantages.labels.push(label);
       } else if (mode === -1) {
-        const label = this._rollModeLabel(...labels, "DND5E.AdvantageMode");
+        label = localize(label);
         this.counts.disadvantages.labels.push(label);
       }
     });
-  }
-
-  _rollModeLabel(...labels) {
-    return labels
-      .map(l => game.i18n.localize(l))
-      .join(" ");
   }
 
   _applyChangeAdd(delta, change) {
@@ -197,23 +197,58 @@ const SourceMixin = (superclass) =>
 
 export class AttackSource extends SourceMixin(AttackReminder) {}
 
-export class AbilitySaveSource extends SourceMixin(AbilitySaveReminder) {}
+export class AbilitySaveSource extends SourceMixin(AbilitySaveReminder) {
+  get disadvantageConditions() {
+    const conditions = ["abilitySaveDisadvantage"];
+    if (this.abilityId === "dex") conditions.push("dexteritySaveDisadvantage");
+    return super.disadvantageConditions.concat(conditions);
+  }
+}
 
 export class ConcentrationSource extends SourceMixin(ConcentrationReminder) {}
 
-export class AbilityCheckSource extends SourceMixin(AbilityCheckReminder) {}
+export class AbilityCheckSource extends SourceMixin(AbilityCheckReminder) {
+  get disadvantageConditions() {
+    return super.disadvantageConditions.concat("abilityCheckDisadvantage");
+  }
+}
 
-export class SkillSource extends SourceMixin(SkillReminder) {}
-
-export class InitiativeSource extends SourceMixin(InitiativeReminder) {
+export class SkillSource extends SourceMixin(SkillReminder) {
   _customUpdateOptions(accumulator) {
     super._customUpdateOptions(accumulator);
 
-    // Handle system-defined flags (i.e. Special Traits) that give advantage to initiative
-    const flags = ["initiativeAdv"];
-    if (game.settings.get("dnd5e", "rulesVersion") === "modern") flags.push("remarkableAthlete");
-    this._applyFlagSource(accumulator, flags);
-    this._applyFlagEffects(accumulator, flags);
+    // similar to what AttributesFields#prepareArmorClass does
+    // Check for stealth disadvantage from armor
+    if (this.skillId === "ste") {
+      const armors = this.actor.itemTypes.equipment
+        .filter(equip => equip.system.equipped && equip.system.type.value in CONFIG.DND5E.armorTypes)
+        .filter(equip => equip.system.type.value !== "shield");
+      if (armors[0]?.system.properties.has("stealthDisadvantage"))
+        accumulator.disadvantage(armors[0].link);
+    }
+  }
+}
+
+export class ToolSource extends SourceMixin(ToolReminder) {}
+
+export class InitiativeSource extends SourceMixin(InitiativeReminder) {
+  get advantageConditions() {
+    return super.advantageConditions.concat("initiativeAdvantage");
+  }
+
+  get disadvantageConditions() {
+    return super.disadvantageConditions.concat("initiativeDisadvantage");
+  }
+
+  _customUpdateOptions(accumulator) {
+    super._customUpdateOptions(accumulator);
+
+    // Handle system-defined flag (i.e. Special Traits) that gives advantage to initiative
+    if (game.settings.get("dnd5e", "rulesVersion") === "modern") {
+      const flags = ["remarkableAthlete"];
+      this._applyFlagSource(accumulator, flags);
+      this._applyFlagEffects(accumulator, flags);
+    }
   }
 
   /**

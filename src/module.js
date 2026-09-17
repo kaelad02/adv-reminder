@@ -6,6 +6,8 @@ import { applySettings, ButtonStyle, initSettings } from "./settings.js";
 import { debug, debugEnabled, log } from "./util.js";
 import DaeIntegration from "./dae-integration.js";
 
+const TextEditor = foundry.applications.ux.TextEditor.implementation;
+
 Hooks.once("init", () => {
   log("initializing Advantage Reminder");
 
@@ -63,9 +65,6 @@ function updateConditionEffects() {
   ce.advReminderAdvantageAttack = new Set(["hiding", "invisible"]);
   ce.advReminderAdvantageDexSave = new Set(["dodging"]); 
   ce.advReminderDisadvantageAttack = new Set(["blinded", "frightened", "poisoned", "prone", "restrained"]);
-  ce.advReminderDisadvantageAbility = new Set(["frightened", "poisoned"]);
-  ce.advReminderDisadvantageSave = new Set();
-  ce.advReminderDisadvantageDexSave = new Set(["restrained"]);
   ce.advReminderDisadvantagePhysicalRolls = new Set(["heavilyEncumbered"]);
   ce.advReminderFailDexSave = new Set(["paralyzed", "petrified", "stunned", "unconscious"]);
   ce.advReminderFailStrSave = new Set(["paralyzed", "petrified", "stunned", "unconscious"]);
@@ -74,15 +73,11 @@ function updateConditionEffects() {
   ce.advReminderGrantDisadvantageAttack = new Set(["dodging", "hidden", "invisible"]);
   // if adjacent, grant advantage on the attack, else grant disadvantage
   ce.advReminderGrantAdjacentAttack = new Set(["prone"]);
+  // the system doesn't add Frightened, probably because it requires light of sight, but I did, so add it back
+  ce.abilityCheckDisadvantage.add("frightened");
 
-  if (game.settings.get("dnd5e", "rulesVersion") === "legacy") {
-    ce.advReminderDisadvantageAbility.add("exhaustion-1");
-    ce.advReminderDisadvantageSave.add("exhaustion-3");
-    ce.advReminderGrantDisadvantageAttack.add("exhaustion-3");
-  } else {
-    ce.advReminderAdvantageInitiative = new Set(["invisible"]);
-    ce.advReminderDisadvantageInitiative = new Set(["incapacitated", "surprised"]);
-  }
+  if (game.settings.get("dnd5e", "rulesVersion") === "legacy")
+    ce.advReminderDisadvantageAttack.add("exhaustion-3");
 }
 
 Hooks.once("ready", () => {
@@ -206,7 +201,7 @@ async function prepareMessage(dialog) {
 
   if (messages.length || sources.length) {
     // build message
-    const message = await renderTemplate("modules/adv-reminder/templates/roll-dialog-messages.hbs", { messages, sources });
+    const message = await foundry.applications.handlebars.renderTemplate("modules/adv-reminder/templates/roll-dialog-messages.hbs", { messages, sources });
     // enrich message, specifically replacing rolls
     const enriched = await TextEditor.enrichHTML(message, {
       secrets: true,

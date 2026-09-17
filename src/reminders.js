@@ -205,23 +205,28 @@ class BaseReminder {
   }
 
   _rollModeCounts(rollModes, options) {
+    const counts = {
+      override: null,
+      advantages: { count: 0, suppressed: false },
+      disadvantages: { count: 0, suppressed: false }
+    };
     if (foundry.utils.isEmpty(rollModes)) {
-      const counts = {
-        override: null,
-        advantages: { count: 0, suppressed: false },
-        disadvantages: { count: 0, suppressed: false }
-      };
+      // no roll modes, initialize with options instead
       if (options.advantage) counts.advantages.count++;
       if (options.disadvantage) counts.disadvantages.count++;
-      return counts;
+    } else {
+      // copied from AdvantageModeField#combineFields
+      for (const kp of Object.keys(rollModes)) {
+        const c = dnd5e.dataModels.fields.AdvantageModeField.getCounts(this.actor, kp);
+        const src = foundry.utils.getProperty(this.actor._source, kp) ?? 0;
+        if (c.override !== null) counts.override = c.override;
+        if (c.advantages.suppressed) counts.advantages.suppressed = true;
+        if (c.disadvantages.suppressed) counts.disadvantages.suppressed = true;
+        counts.advantages.count += c.advantages.count + Number(src === 1);
+        counts.disadvantages.count += c.disadvantages.count + Number(src === -1);
+      }
     }
-
-    // TODO handle more than one in 5.1 using combineFields
-
-    const path = Object.keys(rollModes)[0];
-    const counts = dnd5e.dataModels.fields.AdvantageModeField.getCounts(this.actor, { key: path });
-    debug("Roll Mode counts actor", path, counts);
-    return foundry.utils.deepClone(counts);
+    return counts;
   }
 
   _customUpdateOptions(accumulator) {}
@@ -345,10 +350,15 @@ export class AbilityCheckReminder extends AbilityBaseReminder {
     ]);
   }
 
-  get disadvantageConditions() {
-    const conditions = super.disadvantageConditions;
-    conditions.push("advReminderDisadvantageAbility");
-    return conditions;
+  get rollModes() {
+    const abilityLabel = CONFIG.DND5E.abilities[this.abilityId]?.label ?? "";
+
+    const modes = {};
+    modes[`system.abilities.${this.abilityId}.check.roll.mode`] = {
+      stringId: "DND5E.ABILITY.Configure.CheckLabel",
+      data: { ability: abilityLabel }
+    };
+    return modes;
   }
 }
 
@@ -391,11 +401,15 @@ export class AbilitySaveReminder extends AbilityBaseReminder {
     return conditions;
   }
 
-  get disadvantageConditions() {
-    const conditions = super.disadvantageConditions;
-    conditions.push("advReminderDisadvantageSave");
-    if (this.abilityId === "dex") conditions.push("advReminderDisadvantageDexSave");
-    return conditions;
+  get rollModes() {
+    const abilityLabel = CONFIG.DND5E.abilities[this.abilityId]?.label ?? "";
+
+    const modes = {};
+    modes[`system.abilities.${this.abilityId}.save.roll.mode`] = {
+      stringId: "DND5E.ABILITY.Configure.SaveLabel",
+      data: { ability: abilityLabel }
+    };
+    return modes;
   }
 
   get statusRollModes() {
@@ -414,22 +428,22 @@ export class AbilitySaveReminder extends AbilityBaseReminder {
 
 export class ConcentrationReminder extends AbilitySaveReminder {
   get rollModes() {
-    return {
-      "system.attributes.concentration.roll.mode": ["DND5E.Concentration"]
-    };
+    const modes = super.rollModes;
+    modes["system.attributes.concentration.roll.mode"] = "DND5E.Concentration";
+    return modes;
   }
 }
 
 export class SkillReminder extends AbilityCheckReminder {
-  constructor(actor, abilityId, skillId, checkArmorStealth = true) {
+  constructor(actor, abilityId, skillId, doubleProf, pace) {
     super(actor, abilityId);
 
     /** @type {string} */
     this.skillId = skillId;
-    /** @type {Item5e[]} */
-    this.items = actor.items;
     /** @type {boolean} */
-    this.checkArmorStealth = checkArmorStealth;
+    this.doubleProf = doubleProf;
+    /** @type {{ advantage: boolean, disadvantage: boolean }} */
+    this.pace = pace;
   }
 
   /** @override */
@@ -445,27 +459,65 @@ export class SkillReminder extends AbilityCheckReminder {
     ]);
   }
 
+  get rollModes() {
+    const skillLabel = CONFIG.DND5E.skills[this.skillId]?.label ?? "";
+
+    const modes = super.rollModes;
+    modes[`system.skills.${this.skillId}.roll.mode`] = {
+      stringId: "DND5E.ROLL.Section",
+      data: { label: skillLabel }
+    };
+    return modes;
+  }
+
   _customUpdateOptions(accumulator) {
     super._customUpdateOptions(accumulator);
 
-    // Check if the actor is wearing armor that imposes stealth disadvantage
-    if (this.checkArmorStealth && this.skillId === "ste") {
-      const item = this.items.find(
-        (item) => item.type === "equipment" && item.system.equipped && item.system.properties.has("stealthDisadvantage")
-      );
-      debug("equipped item that imposes stealth disadvantage", item?.name);
-      accumulator.disadvantage(item?.link);
+    if (this.doubleProf) {
+      const label = game.i18n.localize("adv-reminder.Source.Advantage.doubleProf");
+      accumulator.advantage(label);
+    }
+    if (this.pace?.advantage) accumulator.advantage("&Reference[travelpace]");
+    if (this.pace?.disadvantage) accumulator.disadvantage("&Reference[travelpace]");
+  }
+}
+
+export class ToolReminder extends AbilityCheckReminder {
+  constructor(actor, abilityId, toolId, doubleProf) {
+    super(actor, abilityId);
+
+    /** @type {string} */
+    this.toolId = toolId;
+    /** @type {boolean} */
+    this.doubleProf = doubleProf;
+  }
+
+  get rollModes() {
+    const toolLabel = dnd5e.documents.Trait.keyLabel(this.toolId, { trait: "tool" });
+
+    const modes = super.rollModes;
+    modes[`system.tools.${this.toolId}.roll.mode`] = {
+      stringId: "DND5E.ROLL.Section",
+      data: { label: toolLabel }
+    };
+    return modes;
+  }
+
+  _customUpdateOptions(accumulator) {
+    super._customUpdateOptions(accumulator);
+
+    if (this.doubleProf) {
+      const label = game.i18n.localize("adv-reminder.Source.Advantage.doubleProf");
+      accumulator.advantage(label);
     }
   }
 }
 
 export class InitiativeReminder extends AbilityCheckReminder {
-  get advantageConditions() {
-    return super.advantageConditions.concat("advReminderAdvantageInitiative");
-  }
-
-  get disadvantageConditions() {
-    return super.disadvantageConditions.concat("advReminderDisadvantageInitiative");
+  get rollModes() {
+    const modes = super.rollModes;
+    modes["system.attributes.init.roll.mode"] = "DND5E.Initiative";
+    return modes;
   }
 }
 
@@ -489,7 +541,7 @@ export class DeathSaveReminder extends AbilityBaseReminder {
 
   get rollModes() {
     return {
-      "system.attributes.death.roll.mode": ["DND5E.DeathSave"]
+      "system.attributes.death.roll.mode": "DND5E.DeathSave"
     };
   }
 }

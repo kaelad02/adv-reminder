@@ -7,6 +7,7 @@ export default function commonTestInit() {
       flags: {},
       hasConditionEffect: () => false,
       system: {},
+      _source: {},
     };
     keys.forEach((k) => foundry.utils.setProperty(actor, k, true));
     return actor;
@@ -24,12 +25,24 @@ export default function commonTestInit() {
       },
       flags: {},
       system: {},
+      _source: {},
     };
   };
 
   globalThis.CONFIG = {};
   globalThis.CONFIG.DND5E = {};
   globalThis.CONFIG.DND5E.conditionEffects = {};
+  globalThis.CONFIG.DND5E.abilities = {
+    str: { label: "Strength" },
+    dex: { label: "Dexterity" },
+    con: { label: "Constitution" },
+    int: { label: "Intelligence" },
+    wis: { label: "Wisdom" },
+    cha: { label: "Charisma" }
+  };
+  globalThis.CONFIG.DND5E.skills = {
+    prc: { label: "Perception" }
+  };
 
   // for reminders
   globalThis.dnd5e = {
@@ -56,8 +69,9 @@ export default function commonTestInit() {
     }
   };
 
-  dnd5e.dataModels.fields.AdvantageModeField.getCounts = function (model, change) {
-    const parentKey = change.key.substring(0, change.key.lastIndexOf("."));
+  dnd5e.dataModels.fields.AdvantageModeField.getCounts = function (model, keyPath) {
+    keyPath = foundry.utils.getType(keyPath) === "Object" ? keyPath.key : keyPath;
+    const parentKey = keyPath.substring(0, keyPath.lastIndexOf("."));
     const roll = foundry.utils.getProperty(model, parentKey) ?? {};
     return roll.modeCounts ??= {
       override: null,

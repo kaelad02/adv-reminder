@@ -8,6 +8,7 @@ import {
   DeathSaveMessage,
   InitiativeMessage,
   SkillMessage,
+  ToolMessage,
 } from "../messages.js";
 import {
   AttackReminder,
@@ -18,6 +19,7 @@ import {
   SkillReminder,
   InitiativeReminder,
   ConcentrationReminder,
+  ToolReminder,
 } from "../reminders.js";
 import {
   AbilityCheckSource,
@@ -28,6 +30,7 @@ import {
   DeathSaveSource,
   InitiativeSource,
   SkillSource,
+  ToolSource,
 } from "../sources.js";
 import { showSources } from "../settings.js";
 import { debug, getDistanceToTargetFn, getTarget } from "../util.js";
@@ -42,25 +45,16 @@ export default class CoreRollerHooks {
   static PROCESSED_PROP = "adv-reminder-processed";
 
   /**
-   * If true, check armor for stealth checks.
-   * @type {boolean}
-   */
-  checkArmorStealth;
-
-  /**
    * Initialize the hooks.
    */
   init() {
-    // DAE version 0.8.81 added support for "impose stealth disadvantage"
-    this.checkArmorStealth = !game.modules.get("dae")?.active;
-    debug("checkArmorStealth", this.checkArmorStealth);
-
     // register all the dnd5e.pre hooks
     Hooks.on("dnd5e.preRollAttackV2", this.preRollAttackV2.bind(this));
     Hooks.on("dnd5e.preRollSavingThrowV2", this.preRollSavingThrowV2.bind(this));
     Hooks.on("dnd5e.preRollConcentrationV2", this.preRollConcentrationV2.bind(this));
     Hooks.on("dnd5e.preRollAbilityCheckV2", this.preRollAbilityCheckV2.bind(this));
     Hooks.on("dnd5e.preRollSkillV2", this.preRollSkillV2.bind(this));
+    Hooks.on("dnd5e.preRollToolV2", this.preRollToolV2.bind(this));
     Hooks.on("dnd5e.preRollInitiativeDialogV2", this.preRollInitiativeDialogV2.bind(this));
     Hooks.on("dnd5e.preRollDeathSaveV2", this.preRollDeathSaveV2.bind(this));
     Hooks.on("dnd5e.preRollDamageV2", this.preRollDamageV2.bind(this));
@@ -77,14 +71,16 @@ export default class CoreRollerHooks {
   preRollAttackV2(config, dialog, message) {
     debug("preRollAttackV2 hook called", config, dialog, message);
 
-    if (this.isFastForwarding(config, dialog)) return;
+    const { messages, reminder } = this.applyKeybindings(config, dialog);
     const target = getTarget();
     const distanceFn = getDistanceToTargetFn(message.data.speaker);
     const activity = config.subject;
 
-    new AttackMessage(activity.actor, target, activity).addMessage(dialog);
-    if (showSources) new AttackSource(activity.actor, target, activity, distanceFn).updateOptions(dialog);
-    new AttackReminder(activity.actor, target, activity, distanceFn).updateOptions(config.rolls[0].options);
+    if (messages) {
+      new AttackMessage(activity.actor, target, activity).addMessage(dialog);
+      if (showSources) new AttackSource(activity.actor, target, activity, distanceFn).updateOptions(dialog);
+    }
+    if (reminder) new AttackReminder(activity.actor, target, activity, distanceFn).updateOptions(config.rolls[0].options);
   }
 
   preRollSavingThrowV2(config, dialog, message) {
@@ -99,14 +95,16 @@ export default class CoreRollerHooks {
     const failChecker = new AbilitySaveFail(actor, abilityId);
     if (failChecker.fails(message)) return false;
 
-    if (this.isFastForwarding(config, dialog)) return;
+    const { messages, reminder } = this.applyKeybindings(config, dialog);
 
     const messageId = config.event?.currentTarget?.dataset?.messageId;
     const activity = messageId ? game.messages.get(messageId).getAssociatedActivity() : undefined;
 
-    new AbilitySaveMessage(actor, abilityId).addMessage(dialog);
-    if (showSources) new AbilitySaveSource(actor, abilityId, activity).updateOptions(dialog);
-    new AbilitySaveReminder(actor, abilityId, activity).updateOptions(config.rolls[0].options);
+    if (messages) {
+      new AbilitySaveMessage(actor, abilityId).addMessage(dialog);
+      if (showSources) new AbilitySaveSource(actor, abilityId, activity).updateOptions(dialog);
+    }
+    if (reminder) new AbilitySaveReminder(actor, abilityId, activity).updateOptions(config.rolls[0].options);
   }
 
   preRollConcentrationV2(config, dialog, message) {
@@ -116,13 +114,15 @@ export default class CoreRollerHooks {
     if (config[CoreRollerHooks.PROCESSED_PROP]) return;
     config[CoreRollerHooks.PROCESSED_PROP] = true;
 
-    if (this.isFastForwarding(config, dialog)) return;
+    const { messages, reminder } = this.applyKeybindings(config, dialog);
 
     const actor = config.subject;
     const abilityId = config.ability;
-    new ConcentrationMessage(actor, abilityId).addMessage(dialog);
-    if (showSources) new ConcentrationSource(actor, abilityId).updateOptions(dialog);
-    new ConcentrationReminder(actor, abilityId).updateOptions(config.rolls[0].options);
+    if (messages) {
+      new ConcentrationMessage(actor, abilityId).addMessage(dialog);
+      if (showSources) new ConcentrationSource(actor, abilityId).updateOptions(dialog);
+    }
+    if (reminder) new ConcentrationReminder(actor, abilityId).updateOptions(config.rolls[0].options);
   }
 
   preRollAbilityCheckV2(config, dialog, message) {
@@ -132,13 +132,15 @@ export default class CoreRollerHooks {
     if (config[CoreRollerHooks.PROCESSED_PROP]) return;
     config[CoreRollerHooks.PROCESSED_PROP] = true;
 
-    if (this.isFastForwarding(config, dialog)) return;
+    const { messages, reminder } = this.applyKeybindings(config, dialog);
 
     const actor = config.subject;
     const abilityId = config.ability;
-    new AbilityCheckMessage(actor, abilityId).addMessage(dialog);
-    if (showSources) new AbilityCheckSource(actor, abilityId).updateOptions(dialog);
-    new AbilityCheckReminder(actor, abilityId).updateOptions(config.rolls[0].options);
+    if (messages) {
+      new AbilityCheckMessage(actor, abilityId).addMessage(dialog);
+      if (showSources) new AbilityCheckSource(actor, abilityId).updateOptions(dialog);
+    }
+    if (reminder) new AbilityCheckReminder(actor, abilityId).updateOptions(config.rolls[0].options);
   }
 
   preRollSkillV2(config, dialog, message) {
@@ -148,14 +150,38 @@ export default class CoreRollerHooks {
     if (config[CoreRollerHooks.PROCESSED_PROP]) return;
     config[CoreRollerHooks.PROCESSED_PROP] = true;
 
-    if (this.isFastForwarding(config, dialog)) return;
+    const { messages, reminder } = this.applyKeybindings(config, dialog);
 
     const actor = config.subject;
     const ability = config.ability;
     const skillId = config.skill;
-    new SkillMessage(actor, ability, skillId).addMessage(dialog);
-    if (showSources) new SkillSource(actor, ability, skillId, true).updateOptions(dialog);
-    new SkillReminder(actor, ability, skillId, this.checkArmorStealth).updateOptions(config.rolls[0].options);
+    const doubleProf = this.isDoubleProf(config);
+    const pace = dnd5e.dataModels.shared.MovementField.getTravelPaceMode(config.pace, config.skill);
+    if (messages) {
+      new SkillMessage(actor, ability, skillId).addMessage(dialog);
+      if (showSources) new SkillSource(actor, ability, skillId, doubleProf, pace).updateOptions(dialog);
+    }
+    if (reminder) new SkillReminder(actor, ability, skillId, doubleProf, pace).updateOptions(config.rolls[0].options);
+  }
+
+  preRollToolV2(config, dialog, message) {
+    debug("preRollToolV2 hook called");
+
+    // check if we've already processed this roll
+    if (config[CoreRollerHooks.PROCESSED_PROP]) return;
+    config[CoreRollerHooks.PROCESSED_PROP] = true;
+
+    const { messages, reminder } = this.applyKeybindings(config, dialog);
+
+    const actor = config.subject;
+    const ability = config.ability;
+    const toolId = config.tool;
+    const doubleProf = this.isDoubleProf(config);
+    if (messages) {
+      new ToolMessage(actor, ability, toolId).addMessage(dialog);
+      if (showSources) new ToolSource(actor, ability, toolId, doubleProf).updateOptions(dialog);
+    }
+    if (reminder) new ToolReminder(actor, ability, toolId, doubleProf).updateOptions(config.rolls[0].options);
   }
 
   preRollInitiativeDialogV2(config, dialog, message) {
@@ -165,13 +191,15 @@ export default class CoreRollerHooks {
     if (config[CoreRollerHooks.PROCESSED_PROP]) return;
     config[CoreRollerHooks.PROCESSED_PROP] = true;
 
-    if (this.isFastForwarding(config, dialog)) return;
+    const { messages, reminder } = this.applyKeybindings(config, dialog);
 
     const actor = config.subject;
     const abilityId = actor.system.attributes?.init?.ability || CONFIG.DND5E.defaultAbilities.initiative;
-    new InitiativeMessage(actor, abilityId).addMessage(dialog);
-    if (showSources) new InitiativeSource(actor, abilityId).updateOptions(dialog);
-    new InitiativeReminder(actor, abilityId).updateOptions(config.rolls[0].options);
+    if (messages) {
+      new InitiativeMessage(actor, abilityId).addMessage(dialog);
+      if (showSources) new InitiativeSource(actor, abilityId).updateOptions(dialog);
+    }
+    if (reminder) new InitiativeReminder(actor, abilityId).updateOptions(config.rolls[0].options);
   }
 
   preRollDeathSaveV2(config, dialog, message) {
@@ -181,18 +209,20 @@ export default class CoreRollerHooks {
     if (config[CoreRollerHooks.PROCESSED_PROP]) return;
     config[CoreRollerHooks.PROCESSED_PROP] = true;
 
-    if (this.isFastForwarding(config, dialog)) return;
+    const { messages, reminder } = this.applyKeybindings(config, dialog);
 
     const actor = config.subject;
-    new DeathSaveMessage(actor).addMessage(dialog);
-    if (showSources) new DeathSaveSource(actor).updateOptions(dialog);
-    new DeathSaveReminder(actor).updateOptions(config.rolls[0].options);
+    if (messages) {
+      new DeathSaveMessage(actor).addMessage(dialog);
+      if (showSources) new DeathSaveSource(actor).updateOptions(dialog);
+    }
+    if (reminder) new DeathSaveReminder(actor).updateOptions(config.rolls[0].options);
   }
 
   preRollDamageV2(config, dialog, message) {
     debug("preRollDamageV2 hook called", config, dialog, message);
 
-    if (this.isFastForwarding(config, dialog)) return;
+    const { messages, reminder } = this.applyKeybindings(config, dialog);
     const target = getTarget();
     const distanceFn = getDistanceToTargetFn(message.data.speaker);
     const activity = config.subject;
@@ -200,21 +230,26 @@ export default class CoreRollerHooks {
     // damage/healing enricher doesn't have an activity, skip
     if (!activity) return;
 
-    new DamageMessage(activity.actor, target, activity).addMessage(dialog);
-    if (showSources) new CriticalSource(activity.actor, target, activity, distanceFn, config.event).updateOptions(dialog);
-    new CriticalReminder(activity.actor, target, activity, distanceFn).updateOptions(config);
+    if (messages) {
+      new DamageMessage(activity.actor, target, activity).addMessage(dialog);
+      if (showSources) new CriticalSource(activity.actor, target, activity, distanceFn, config.event).updateOptions(dialog);
+    }
+    if (reminder) {
+      new CriticalReminder(activity.actor, target, activity, distanceFn).updateOptions(config);
 
-    // workaround for https://github.com/foundryvtt/dnd5e/issues/5455
-    dialog.options.defaultButton = config.isCritical ? "critical" : "normal";
+      // workaround for https://github.com/foundryvtt/dnd5e/issues/5455
+      dialog.options.defaultButton = config.isCritical ? "critical" : "normal";
+    }
   }
 
   /**
-   * Check if the roll is being fast-forwarded. Copied from the system's D20Roll#applyKeybindings function.
+   * Determine if messages will be shown or if reminders should be processed.
+   * Copied from the system's D20Roll#applyKeybindings function.
    * @param {Event} event the triggering event
    * @param {boolean} configure whether or not to show the dialog
-   * @returns {boolean} true if they are fast-forwarding, false otherwise
+   * @returns {{messages: boolean, reminder: boolean}}
    */
-  isFastForwarding({ event }, { configure } = {}) {
+  applyKeybindings({ event }, { configure }) {
     debug("before checking FF, configure:", configure);
     const keys = {
       normal: dnd5e.utils.areKeysPressed(event, "skipDialogNormal"),
@@ -222,7 +257,21 @@ export default class CoreRollerHooks {
       disadvantage: dnd5e.utils.areKeysPressed(event, "skipDialogDisadvantage")
     };
     configure ??= !Object.values(keys).some(k => k);
-    if (!configure) debug("fast-forwarding the roll, stop processing");
-    return !configure;
+    if (!configure) debug("fast-forwarding the roll, skip messages");
+
+    // check for forced advantage, disadvantage, or normal with combinations of two keys
+    const forcedRollMode = (keys.normal && keys.advantage) || (keys.normal && keys.disadvantage) ||
+      (keys.advantage && keys.disadvantage);
+    if (forcedRollMode) debug("forced adv/dis/norm, skip reminders");
+
+    return { messages: configure, reminder: !forcedRollMode };
+  }
+
+  isDoubleProf(config) {
+    const actor = config.subject;
+    const skill = actor.system.skills?.[config.skill];
+    const tool = actor.system.tools?.[config.tool];
+    debug("isDoubleProf", skill, tool);
+    return !!skill?.prof.hasProficiency && !!tool?.prof.hasProficiency;
   }
 }

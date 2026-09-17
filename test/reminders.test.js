@@ -729,48 +729,6 @@ describe("SkillReminder no legit active effects", () => {
     expect(options.advantage).toBe(false);
     expect(options.disadvantage).toBe(false);
   });
-
-  test("Stealth check with armor that imposes disadvantage but wrong type", () => {
-    const actor = createActorWithFlags();
-    actor.items = [
-      {
-        name: "Scale Mail",
-        type: "spell",
-        system: {
-          equipped: true,
-          properties: new Set(["stealthDisadvantage"]),
-        },
-      },
-    ];
-    const options = {};
-
-    const reminder = new SkillReminder(actor, "dex", "ste");
-    reminder.updateOptions(options);
-
-    expect(options.advantage).toBe(false);
-    expect(options.disadvantage).toBe(false);
-  });
-
-  test("Stealth check with armor that imposes disadvantage but not equipped", () => {
-    const actor = createActorWithFlags();
-    actor.items = [
-      {
-        name: "Scale Mail",
-        type: "equipment",
-        system: {
-          equipped: false,
-          properties: new Set(["stealthDisadvantage"]),
-        },
-      },
-    ];
-    const options = {};
-
-    const reminder = new SkillReminder(actor, "dex", "ste");
-    reminder.updateOptions(options);
-
-    expect(options.advantage).toBe(false);
-    expect(options.disadvantage).toBe(false);
-  });
 });
 
 describe("SkillReminder advantage flags", () => {
@@ -946,49 +904,6 @@ describe("SkillReminder disadvantage flags", () => {
     const options = {};
 
     const reminder = new SkillReminder(actor, "int", "arc");
-    reminder.updateOptions(options);
-
-    expect(options.advantage).toBe(false);
-    expect(options.disadvantage).toBe(false);
-  });
-
-  test("Stealth check with armor that imposes disadvantage", () => {
-    const actor = createActorWithFlags();
-    actor.items = [
-      {
-        name: "Scale Mail",
-        type: "equipment",
-        system: {
-          equipped: true,
-          properties: new Set(["stealthDisadvantage"]),
-        },
-        link: "@UUID[fake-uuid]{Scale Mail}",
-      },
-    ];
-    const options = {};
-
-    const reminder = new SkillReminder(actor, "dex", "ste");
-    reminder.updateOptions(options);
-
-    expect(options.advantage).toBe(false);
-    expect(options.disadvantage).toBe(true);
-  });
-
-  test("Stealth check with armor that imposes disadvantage but checking is off", () => {
-    const actor = createActorWithFlags();
-    actor.items = [
-      {
-        name: "Scale Mail",
-        type: "equipment",
-        system: {
-          equipped: true,
-          properties: new Set(["stealthDisadvantage"]),
-        },
-      },
-    ];
-    const options = {};
-
-    const reminder = new SkillReminder(actor, "dex", "ste", false);
     reminder.updateOptions(options);
 
     expect(options.advantage).toBe(false);

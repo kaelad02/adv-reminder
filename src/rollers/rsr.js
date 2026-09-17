@@ -8,6 +8,7 @@ import {
   DeathSaveMessage,
   InitiativeMessage,
   SkillMessage,
+  ToolMessage,
 } from "../messages.js";
 import {
   AttackReminder,
@@ -18,6 +19,7 @@ import {
   DeathSaveReminder,
   SkillReminder,
   InitiativeReminder,
+  ToolReminder,
 } from "../reminders.js";
 import {
   AbilityCheckSource,
@@ -28,6 +30,7 @@ import {
   DeathSaveSource,
   InitiativeSource,
   SkillSource,
+  ToolSource,
 } from "../sources.js";
 import { showSources } from "../settings.js";
 import { debug, getDistanceToTargetFn, getTarget } from "../util.js";
@@ -129,13 +132,35 @@ export default class ReadySetRollHooks extends CoreRollerHooks {
     const actor = config.subject;
     const ability = config.ability;
     const skillId = config.skill;
+    const doubleProf = this.isDoubleProf(config);
+    const pace = dnd5e.dataModels.shared.MovementField.getTravelPaceMode(config.pace, config.skill);
     if (this._doMessages(config, dialog)) {
       new SkillMessage(actor, ability, skillId).addMessage(dialog);
-      if (showSources) new SkillSource(actor, ability, skillId, true).updateOptions(dialog);
+      if (showSources) new SkillSource(actor, ability, skillId, doubleProf, pace).updateOptions(dialog);
     }
 
     if (this._doReminder(config, dialog, message))
-      new SkillReminder(actor, ability, skillId, this.checkArmorStealth).updateOptions(config.rolls[0].options);
+      new SkillReminder(actor, ability, skillId, doubleProf, pace).updateOptions(config.rolls[0].options);
+  }
+
+  preRollToolV2(config, dialog, message) {
+    debug("preRollToolV2 hook called");
+
+    // check if we've already processed this roll
+    if (config[CoreRollerHooks.PROCESSED_PROP]) return;
+    config[CoreRollerHooks.PROCESSED_PROP] = true;
+
+    const actor = config.subject;
+    const ability = config.ability;
+    const toolId = config.tool;
+    const doubleProf = this.isDoubleProf(config);
+    if (this._doMessages(config)) {
+      new ToolMessage(actor, ability, toolId).addMessage(dialog);
+      if (showSources) new ToolSource(actor, ability, toolId, doubleProf).updateOptions(dialog);
+    }
+
+    if (this._doReminder(config))
+      new ToolReminder(actor, ability, toolId, doubleProf).updateOptions(config.rolls[0].options);
   }
 
   preRollInitiativeDialogV2(config, dialog, message) {
@@ -216,7 +241,7 @@ export default class ReadySetRollHooks extends CoreRollerHooks {
 
   _doMessages(config, dialog) {
     // normal FF check works if RSR Quick roll is enabled or not
-    return !this.isFastForwarding(config, dialog);
+    return this.applyKeybindings(config, dialog).messages;
   }
 
   _doReminder(config, dialog, message) {
@@ -232,7 +257,7 @@ export default class ReadySetRollHooks extends CoreRollerHooks {
       } else return true;
     } else {
       // RSR quick roll not enabled, do normal FF check
-      return !this.isFastForwarding(config, dialog);
+      return this.applyKeybindings(config, dialog).reminder;
     }
   }
 }

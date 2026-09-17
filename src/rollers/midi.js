@@ -7,6 +7,7 @@ import {
   DeathSaveMessage,
   InitiativeMessage,
   SkillMessage,
+  ToolMessage,
 } from "../messages.js";
 import {
   AbilityCheckSource,
@@ -17,6 +18,7 @@ import {
   DeathSaveSource,
   InitiativeSource,
   SkillSource,
+  ToolSource,
 } from "../sources.js";
 import { showSources } from "../settings.js";
 import { debug, getTarget } from "../util.js";
@@ -162,8 +164,27 @@ export default class MidiRollerHooks extends CoreRollerHooks {
     const actor = config.subject;
     const ability = config.ability;
     const skillId = config.skill;
+    const doubleProf = this.isDoubleProf(config);
+    const pace = dnd5e.dataModels.shared.MovementField.getTravelPaceMode(config.pace, config.skill);
     new SkillMessage(actor, ability, skillId).addMessage(dialog);
-    if (showSources) new MidiSkillSource(actor, ability, skillId, true).updateOptions(dialog);
+    if (showSources) new MidiSkillSource(actor, ability, skillId, doubleProf, pace).updateOptions(dialog);
+  }
+
+  preRollToolV2(config, dialog, message) {
+    debug("preRollToolV2 hook called");
+
+    // check if we've already processed this roll
+    if (config[CoreRollerHooks.PROCESSED_PROP]) return;
+    config[CoreRollerHooks.PROCESSED_PROP] = true;
+
+    if (this.isFastForwarding(config, dialog)) return;
+
+    const actor = config.subject;
+    const ability = config.ability;
+    const toolId = config.tool;
+    const doubleProf = this.isDoubleProf(config);
+    new ToolMessage(actor, ability, toolId).addMessage(dialog);
+    if (showSources) new ToolSource(actor, ability, toolId, doubleProf).updateOptions(dialog);
   }
 
   preRollInitiativeDialogV2(config, dialog, message) {
@@ -225,5 +246,13 @@ export default class MidiRollerHooks extends CoreRollerHooks {
       };
       source.updateOptions(dialog);
     }
+  }
+
+  /**
+   * For Midi, we only process messages, so call the newer `applyKeybindings` function and just return `messages`.
+   * @returns {boolean}
+   */
+  isFastForwarding(config, dialog) {
+    return !this.applyKeybindings(config, dialog).messages;
   }
 }
