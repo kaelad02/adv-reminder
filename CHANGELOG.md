@@ -1,5 +1,6 @@
 # 5.1.1
 
+- feature: verified with dnd5e system 5.2.5
 - bug fix: [#127](https://github.com/kaelad02/adv-reminder/issues/127) Midi changed the check and save keys, support both until dnd5e 5.2 is no longer supported
 
 # 5.1.0
