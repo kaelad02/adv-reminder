@@ -338,8 +338,8 @@ describe("AbilityCheckReminder advantage flags", () => {
     expect(options.disadvantage).toBe(false);
   });
 
-  test("ability check with advantage.ability.check.all should be advantage", () => {
-    const actor = createActorWithFlags("flags.midi-qol.advantage.ability.check.all");
+  test("ability check with advantage.check.all should be advantage", () => {
+    const actor = createActorWithFlags("flags.midi-qol.advantage.check.all");
     const options = {};
 
     const reminder = new AbilityCheckReminder(actor, "str");
@@ -349,8 +349,8 @@ describe("AbilityCheckReminder advantage flags", () => {
     expect(options.disadvantage).toBe(false);
   });
 
-  test("ability check with advantage.ability.check.str should be advantage for str check", () => {
-    const actor = createActorWithFlags("flags.midi-qol.advantage.ability.check.str");
+  test("ability check with advantage.check.str should be advantage for str check", () => {
+    const actor = createActorWithFlags("flags.midi-qol.advantage.check.str");
     const options = {};
 
     const reminder = new AbilityCheckReminder(actor, "str");
@@ -360,8 +360,8 @@ describe("AbilityCheckReminder advantage flags", () => {
     expect(options.disadvantage).toBe(false);
   });
 
-  test("ability check with advantage.ability.check.str should be normal for con check", () => {
-    const actor = createActorWithFlags("flags.midi-qol.advantage.ability.check.str");
+  test("ability check with advantage.check.str should be normal for con check", () => {
+    const actor = createActorWithFlags("flags.midi-qol.advantage.check.str");
     const options = {};
 
     const reminder = new AbilityCheckReminder(actor, "con");
@@ -395,8 +395,8 @@ describe("AbilityCheckReminder disadvantage flags", () => {
     expect(options.disadvantage).toBe(true);
   });
 
-  test("ability check with disadvantage.ability.check.all should be disadvantage", () => {
-    const actor = createActorWithFlags("flags.midi-qol.disadvantage.ability.check.all");
+  test("ability check with disadvantage.check.all should be disadvantage", () => {
+    const actor = createActorWithFlags("flags.midi-qol.disadvantage.check.all");
     const options = {};
 
     const reminder = new AbilityCheckReminder(actor, "str");
@@ -406,8 +406,8 @@ describe("AbilityCheckReminder disadvantage flags", () => {
     expect(options.disadvantage).toBe(true);
   });
 
-  test("ability check with disadvantage.ability.check.str should be disadvantage for str check", () => {
-    const actor = createActorWithFlags("flags.midi-qol.disadvantage.ability.check.str");
+  test("ability check with disadvantage.check.str should be disadvantage for str check", () => {
+    const actor = createActorWithFlags("flags.midi-qol.disadvantage.check.str");
     const options = {};
 
     const reminder = new AbilityCheckReminder(actor, "str");
@@ -417,8 +417,8 @@ describe("AbilityCheckReminder disadvantage flags", () => {
     expect(options.disadvantage).toBe(true);
   });
 
-  test("ability check with disadvantage.ability.check.str should be normal for con check", () => {
-    const actor = createActorWithFlags("flags.midi-qol.disadvantage.ability.check.str");
+  test("ability check with disadvantage.check.str should be normal for con check", () => {
+    const actor = createActorWithFlags("flags.midi-qol.disadvantage.check.str");
     const options = {};
 
     const reminder = new AbilityCheckReminder(actor, "con");
@@ -432,8 +432,8 @@ describe("AbilityCheckReminder disadvantage flags", () => {
 describe("AbilityCheckReminder both advantage and disadvantage flags", () => {
   test("ability check with both advantage and disadvantage should be normal", () => {
     const actor = createActorWithFlags(
-      "flags.midi-qol.advantage.ability.check.all",
-      "flags.midi-qol.disadvantage.ability.check.cha"
+      "flags.midi-qol.advantage.check.all",
+      "flags.midi-qol.disadvantage.check.cha"
     );
     const options = {};
 
@@ -446,8 +446,8 @@ describe("AbilityCheckReminder both advantage and disadvantage flags", () => {
 
   test("ability check with wrong advantage and same disadvantage should be disadvantage", () => {
     const actor = createActorWithFlags(
-      "flags.midi-qol.advantage.ability.check.str",
-      "flags.midi-qol.disadvantage.ability.check.cha"
+      "flags.midi-qol.advantage.check.str",
+      "flags.midi-qol.disadvantage.check.cha"
     );
     const options = {};
 
@@ -460,8 +460,8 @@ describe("AbilityCheckReminder both advantage and disadvantage flags", () => {
 
   test("ability check with same advantage and wrong disadvantage should be advantage", () => {
     const actor = createActorWithFlags(
-      "flags.midi-qol.advantage.ability.check.str",
-      "flags.midi-qol.disadvantage.ability.check.cha"
+      "flags.midi-qol.advantage.check.str",
+      "flags.midi-qol.disadvantage.check.cha"
     );
     const options = {};
 
@@ -509,8 +509,8 @@ describe("AbilitySaveReminder advantage flags", () => {
     expect(options.disadvantage).toBe(false);
   });
 
-  test("saving throw with advantage.ability.save.all should be advantage", () => {
-    const actor = createActorWithFlags("flags.midi-qol.advantage.ability.save.all");
+  test("saving throw with advantage.save.all should be advantage", () => {
+    const actor = createActorWithFlags("flags.midi-qol.advantage.save.all");
     const options = {};
 
     const reminder = new AbilitySaveReminder(actor, "wis");
@@ -520,8 +520,8 @@ describe("AbilitySaveReminder advantage flags", () => {
     expect(options.disadvantage).toBe(false);
   });
 
-  test("saving throw with advantage.ability.save.wis should be advantage for wis save", () => {
-    const actor = createActorWithFlags("flags.midi-qol.advantage.ability.save.wis");
+  test("saving throw with advantage.save.wis should be advantage for wis save", () => {
+    const actor = createActorWithFlags("flags.midi-qol.advantage.save.wis");
     const options = {};
 
     const reminder = new AbilitySaveReminder(actor, "wis");
@@ -531,8 +531,8 @@ describe("AbilitySaveReminder advantage flags", () => {
     expect(options.disadvantage).toBe(false);
   });
 
-  test("saving throw with advantage.ability.save.wis should be normal for dex save", () => {
-    const actor = createActorWithFlags("flags.midi-qol.advantage.ability.save.wis");
+  test("saving throw with advantage.save.wis should be normal for dex save", () => {
+    const actor = createActorWithFlags("flags.midi-qol.advantage.save.wis");
     const options = {};
 
     const reminder = new AbilitySaveReminder(actor, "dex");
@@ -566,8 +566,8 @@ describe("AbilitySaveReminder disadvantage flags", () => {
     expect(options.disadvantage).toBe(true);
   });
 
-  test("saving throw with disadvantage.ability.save.all should be disadvantage", () => {
-    const actor = createActorWithFlags("flags.midi-qol.disadvantage.ability.save.all");
+  test("saving throw with disadvantage.save.all should be disadvantage", () => {
+    const actor = createActorWithFlags("flags.midi-qol.disadvantage.save.all");
     const options = {};
 
     const reminder = new AbilitySaveReminder(actor, "wis");
@@ -577,8 +577,8 @@ describe("AbilitySaveReminder disadvantage flags", () => {
     expect(options.disadvantage).toBe(true);
   });
 
-  test("saving throw with disadvantage.ability.save.wis should be disadvantage for wis save", () => {
-    const actor = createActorWithFlags("flags.midi-qol.disadvantage.ability.save.wis");
+  test("saving throw with disadvantage.save.wis should be disadvantage for wis save", () => {
+    const actor = createActorWithFlags("flags.midi-qol.disadvantage.save.wis");
     const options = {};
 
     const reminder = new AbilitySaveReminder(actor, "wis");
@@ -588,8 +588,8 @@ describe("AbilitySaveReminder disadvantage flags", () => {
     expect(options.disadvantage).toBe(true);
   });
 
-  test("saving throw with disadvantage.ability.save.wis should be normal for con save", () => {
-    const actor = createActorWithFlags("flags.midi-qol.disadvantage.ability.save.wis");
+  test("saving throw with disadvantage.save.wis should be normal for con save", () => {
+    const actor = createActorWithFlags("flags.midi-qol.disadvantage.save.wis");
     const options = {};
 
     const reminder = new AbilitySaveReminder(actor, "con");
@@ -603,8 +603,8 @@ describe("AbilitySaveReminder disadvantage flags", () => {
 describe("AbilitySaveReminder both advantage and disadvantage flags", () => {
   test("saving throw with both advantage and disadvantage should be normal", () => {
     const actor = createActorWithFlags(
-      "flags.midi-qol.advantage.ability.save.all",
-      "flags.midi-qol.disadvantage.ability.save.dex"
+      "flags.midi-qol.advantage.save.all",
+      "flags.midi-qol.disadvantage.save.dex"
     );
     const options = {};
 
@@ -617,8 +617,8 @@ describe("AbilitySaveReminder both advantage and disadvantage flags", () => {
 
   test("saving throw with wrong advantage and same disadvantage should be disadvantage", () => {
     const actor = createActorWithFlags(
-      "flags.midi-qol.advantage.ability.save.str",
-      "flags.midi-qol.disadvantage.ability.save.cha"
+      "flags.midi-qol.advantage.save.str",
+      "flags.midi-qol.disadvantage.save.cha"
     );
     const options = {};
 
@@ -631,8 +631,8 @@ describe("AbilitySaveReminder both advantage and disadvantage flags", () => {
 
   test("saving throw with same advantage and wrong disadvantage should be advantage", () => {
     const actor = createActorWithFlags(
-      "flags.midi-qol.advantage.ability.save.str",
-      "flags.midi-qol.disadvantage.ability.save.cha"
+      "flags.midi-qol.advantage.save.str",
+      "flags.midi-qol.disadvantage.save.cha"
     );
     const options = {};
 
@@ -754,8 +754,8 @@ describe("SkillReminder advantage flags", () => {
     expect(options.disadvantage).toBe(false);
   });
 
-  test("skill check with advantage.ability.check.all should be advantage", () => {
-    const actor = createActorWithFlags("flags.midi-qol.advantage.ability.check.all");
+  test("skill check with advantage.check.all should be advantage", () => {
+    const actor = createActorWithFlags("flags.midi-qol.advantage.check.all");
     const options = {};
 
     const reminder = new SkillReminder(actor, "wis", "prc");
@@ -765,8 +765,8 @@ describe("SkillReminder advantage flags", () => {
     expect(options.disadvantage).toBe(false);
   });
 
-  test("skill check with advantage.ability.check.wis should be advantage for prc check", () => {
-    const actor = createActorWithFlags("flags.midi-qol.advantage.ability.check.wis");
+  test("skill check with advantage.check.wis should be advantage for prc check", () => {
+    const actor = createActorWithFlags("flags.midi-qol.advantage.check.wis");
     const options = {};
 
     const reminder = new SkillReminder(actor, "wis", "prc");
@@ -776,8 +776,8 @@ describe("SkillReminder advantage flags", () => {
     expect(options.disadvantage).toBe(false);
   });
 
-  test("skill check with advantage.ability.check.wis should be normal for arc check", () => {
-    const actor = createActorWithFlags("flags.midi-qol.advantage.ability.check.wis");
+  test("skill check with advantage.check.wis should be normal for arc check", () => {
+    const actor = createActorWithFlags("flags.midi-qol.advantage.check.wis");
     const options = {};
 
     const reminder = new SkillReminder(actor, "int", "arc");
@@ -844,8 +844,8 @@ describe("SkillReminder disadvantage flags", () => {
     expect(options.disadvantage).toBe(true);
   });
 
-  test("skill check with disadvantage.ability.check.all should be disadvantage", () => {
-    const actor = createActorWithFlags("flags.midi-qol.disadvantage.ability.check.all");
+  test("skill check with disadvantage.check.all should be disadvantage", () => {
+    const actor = createActorWithFlags("flags.midi-qol.disadvantage.check.all");
     const options = {};
 
     const reminder = new SkillReminder(actor, "wis", "prc");
@@ -855,8 +855,8 @@ describe("SkillReminder disadvantage flags", () => {
     expect(options.disadvantage).toBe(true);
   });
 
-  test("skill check with disadvantage.ability.check.wis should be disadvantage for prc check", () => {
-    const actor = createActorWithFlags("flags.midi-qol.disadvantage.ability.check.wis");
+  test("skill check with disadvantage.check.wis should be disadvantage for prc check", () => {
+    const actor = createActorWithFlags("flags.midi-qol.disadvantage.check.wis");
     const options = {};
 
     const reminder = new SkillReminder(actor, "wis", "prc");
@@ -866,8 +866,8 @@ describe("SkillReminder disadvantage flags", () => {
     expect(options.disadvantage).toBe(true);
   });
 
-  test("skill check with disadvantage.ability.check.wis should be normal for arc check", () => {
-    const actor = createActorWithFlags("flags.midi-qol.disadvantage.ability.check.wis");
+  test("skill check with disadvantage.check.wis should be normal for arc check", () => {
+    const actor = createActorWithFlags("flags.midi-qol.disadvantage.check.wis");
     const options = {};
 
     const reminder = new SkillReminder(actor, "int", "arc");
@@ -991,8 +991,8 @@ describe("DeathSaveReminder advantage flags", () => {
     expect(options.disadvantage).toBe(false);
   });
 
-  test("death save with advantage.ability.save.all should be advantage", () => {
-    const actor = createActorWithFlags("flags.midi-qol.advantage.ability.save.all");
+  test("death save with advantage.save.all should be advantage", () => {
+    const actor = createActorWithFlags("flags.midi-qol.advantage.save.all");
     const options = {};
 
     const reminder = new DeathSaveReminder(actor);
@@ -1037,8 +1037,8 @@ describe("DeathSaveReminder disadvantage flags", () => {
     expect(options.disadvantage).toBe(true);
   });
 
-  test("death save with disadvantage.ability.save.all should be disadvantage", () => {
-    const actor = createActorWithFlags("flags.midi-qol.disadvantage.ability.save.all");
+  test("death save with disadvantage.save.all should be disadvantage", () => {
+    const actor = createActorWithFlags("flags.midi-qol.disadvantage.save.all");
     const options = {};
 
     const reminder = new DeathSaveReminder(actor);
@@ -1063,7 +1063,7 @@ describe("DeathSaveReminder disadvantage flags", () => {
 describe("DeathSaveReminder both advantage and disadvantage flags", () => {
   test("death save with both advantage and disadvantage should be normal", () => {
     const actor = createActorWithFlags(
-      "flags.midi-qol.advantage.ability.save.all",
+      "flags.midi-qol.advantage.save.all",
       "flags.midi-qol.disadvantage.deathSave"
     );
     const options = {};
@@ -1241,19 +1241,19 @@ describe("tests of _getFlags", () => {
   });
 
   test("returns flag with a true value", () => {
-    const actor = createActor("flags.midi-qol.advantage.ability.save.all", true);
+    const actor = createActor("flags.midi-qol.advantage.save.all", true);
     const reminder = new AbilityCheckReminder(actor);
-    expect(reminder.actorFlags).toEqual({ "advantage.ability.save.all": true });
+    expect(reminder.actorFlags).toEqual({ "advantage.save.all": true });
   });
 
   test("returns empty object with a false value", () => {
-    const actor = createActor("flags.midi-qol.advantage.ability.save.all", false);
+    const actor = createActor("flags.midi-qol.advantage.save.all", false);
     const reminder = new AbilityCheckReminder(actor);
     expect(reminder.actorFlags).toEqual({});
   });
 
   test("returns empty object with a conditional expression", () => {
-    const actor = createActor("flags.midi-qol.advantage.ability.save.all", "attributes.hp.value === attributes.hp.effectiveMax");
+    const actor = createActor("flags.midi-qol.advantage.save.all", "attributes.hp.value === attributes.hp.effectiveMax");
     const reminder = new AbilityCheckReminder(actor);
     expect(reminder.actorFlags).toEqual({});
   });

@@ -14,7 +14,7 @@
         "id": "dnd5e",
         "compatibility": {
           "minimum": "5.1.0",
-          "verified": "5.1.9"
+          "verified": "5.2.5"
         }
       }
     ]

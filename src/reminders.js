@@ -337,6 +337,9 @@ export class AbilityCheckReminder extends AbilityBaseReminder {
   /** @override */
   get advantageKeys() {
     return super.advantageKeys.concat([
+      "advantage.check.all",
+      `advantage.check.${this.abilityId}`,
+      // TODO Midi 13.0.49 deprecated these, remove after 5.2.x is not supported
       "advantage.ability.check.all",
       `advantage.ability.check.${this.abilityId}`,
     ]);
@@ -345,6 +348,9 @@ export class AbilityCheckReminder extends AbilityBaseReminder {
   /** @override */
   get disadvantageKeys() {
     return super.disadvantageKeys.concat([
+      "disadvantage.check.all",
+      `disadvantage.check.${this.abilityId}`,
+      // TODO Midi 13.0.49 deprecated these, remove after 5.2.x is not supported
       "disadvantage.ability.check.all",
       `disadvantage.ability.check.${this.abilityId}`,
     ]);
@@ -381,6 +387,9 @@ export class AbilitySaveReminder extends AbilityBaseReminder {
   /** @override */
   get advantageKeys() {
     return super.advantageKeys.concat([
+      "advantage.save.all",
+      `advantage.save.${this.abilityId}`,
+      // TODO Midi 13.0.49 deprecated these, remove after 5.2.x is not supported
       "advantage.ability.save.all",
       `advantage.ability.save.${this.abilityId}`,
     ]);
@@ -389,6 +398,9 @@ export class AbilitySaveReminder extends AbilityBaseReminder {
   /** @override */
   get disadvantageKeys() {
     return super.disadvantageKeys.concat([
+      "disadvantage.save.all",
+      `disadvantage.save.${this.abilityId}`,
+      // TODO Midi 13.0.49 deprecated these, remove after 5.2.x is not supported
       "disadvantage.ability.save.all",
       `disadvantage.ability.save.${this.abilityId}`,
     ]);
@@ -528,14 +540,21 @@ export class DeathSaveReminder extends AbilityBaseReminder {
 
   /** @override */
   get advantageKeys() {
-    return super.advantageKeys.concat(["advantage.ability.save.all", "advantage.deathSave"]);
+    return super.advantageKeys.concat([
+      "advantage.save.all",
+      "advantage.deathSave",
+      // TODO Midi 13.0.49 deprecated this, remove after 5.2.x is not supported
+      "advantage.ability.save.all",
+    ]);
   }
 
   /** @override */
   get disadvantageKeys() {
     return super.disadvantageKeys.concat([
-      "disadvantage.ability.save.all",
+      "disadvantage.save.all",
       "disadvantage.deathSave",
+      // TODO Midi 13.0.49 deprecated this, remove after 5.2.x is not supported
+      "disadvantage.ability.save.all",
     ]);
   }
 
