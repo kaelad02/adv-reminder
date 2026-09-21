@@ -1,3 +1,7 @@
+# 5.1.2
+
+- feature: address one more v13 deprecation
+
 # 5.1.1
 
 - feature: verified with dnd5e system 5.2.5
