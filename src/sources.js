@@ -318,11 +318,11 @@ class CriticalLabelAccumulator extends LabelMixin(CriticalAccumulator) {
 }
 
 export class CriticalSource extends SourceMixin(CriticalReminder) {
-  constructor(actor, targetActor, activity, distanceFn, event) {
+  constructor(actor, targetActor, activity, distanceFn, originMessageId) {
     super(actor, targetActor, activity, distanceFn);
 
-    /** @type {Event} */
-    this.event = event;
+    /** @type {string|undefined} the chat message the damage was rolled from */
+    this.originMessageId = originMessageId;
   }
 
   static AccumulatorClass = CriticalLabelAccumulator;
@@ -347,7 +347,7 @@ export class CriticalSource extends SourceMixin(CriticalReminder) {
 
   _applyNat20(counts) {
     // check if the preceding attack roll was a critical hit
-    const messageId = this.event?.currentTarget?.dataset?.messageId;
+    const messageId = this.originMessageId;
     if (messageId) {
       const lastAttack = dnd5e.registry.messages.get(messageId, "attack").pop();
       const isCritical = lastAttack?.rolls[0]?.isCritical;

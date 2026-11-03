@@ -33,7 +33,7 @@ import {
   ToolSource,
 } from "../sources.js";
 import { showSources } from "../settings.js";
-import { debug, getDistanceToTargetFn, getTarget } from "../util.js";
+import { debug, getDistanceToTargetFn, getOriginMessageId, getTarget } from "../util.js";
 import CoreRollerHooks from "./core.js";
 
 /**
@@ -78,13 +78,16 @@ export default class ReadySetRollHooks extends CoreRollerHooks {
     const failChecker = new AbilitySaveFail(actor, abilityId);
     if (failChecker.fails(message)) return false;
 
+    const messageId = getOriginMessageId(config.event, message);
+    const activity = messageId ? game.messages.get(messageId)?.getAssociatedActivity() : undefined;
+
     if (this._doMessages(config, dialog)) {
       new AbilitySaveMessage(actor, abilityId).addMessage(dialog);
-      if (showSources) new AbilitySaveSource(actor, abilityId).updateOptions(dialog);
+      if (showSources) new AbilitySaveSource(actor, abilityId, activity).updateOptions(dialog);
     }
 
     if (this._doReminder(config, dialog, message))
-      new AbilitySaveReminder(actor, abilityId).updateOptions(config.rolls[0].options);
+      new AbilitySaveReminder(actor, abilityId, activity).updateOptions(config.rolls[0].options);
   }
 
   preRollConcentrationV2(config, dialog, message) {
@@ -214,7 +217,7 @@ export default class ReadySetRollHooks extends CoreRollerHooks {
 
     if (this._doMessages(config, dialog)) {
       new DamageMessage(activity.actor, target, activity).addMessage(dialog);
-      if (showSources) new CriticalSource(activity.actor, target, activity, distanceFn, config.event).updateOptions(dialog);
+      if (showSources) new CriticalSource(activity.actor, target, activity, distanceFn, getOriginMessageId(config.event, message)).updateOptions(dialog);
     }
     if (this._doReminder(config, dialog, message)) {
       new CriticalReminder(activity.actor, target, activity, distanceFn).updateOptions(config);

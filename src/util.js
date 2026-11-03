@@ -36,6 +36,18 @@ export function hasMultipleTargets() {
 }
 
 /**
+ * Get the ID of the chat message a roll was made from (e.g. the save or damage button on an activity's card).
+ * Same lookup as dnd5e: the message's origin first, then the clicked element. Never use `event.currentTarget`, which
+ * is null once the click has been dispatched, e.g. for the second target of a save.
+ * @param {Event} [event] the triggering event
+ * @param {object} [message] the roll's message configuration
+ * @returns {string|undefined}
+ */
+export function getOriginMessageId(event, message) {
+  return message?.data?.system?.origin ?? event?.target?.closest?.("[data-message-id]")?.dataset?.messageId;
+}
+
+/**
  * The distance, in the scene's units, at which a target counts as adjacent: one grid space.
  * @returns {number}
  */

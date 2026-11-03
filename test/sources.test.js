@@ -51,3 +51,16 @@ describe("CriticalSource grants.critical.range", () => {
     expect(dialog.options["adv-reminder"].critSources.critical.labels).toEqual([]);
   });
 });
+
+describe("CriticalSource natural 20", () => {
+  test("a critical attack in the originating message is shown as a source", () => {
+    const attack = { rolls: [{ isCritical: true, d20: { total: 20 } }] };
+    dnd5e.registry = { messages: { get: (id, type) => (id === "attack1" && type === "attack" ? [attack] : []) } };
+    const actor = createActorWithEffects();
+    const dialog = {};
+
+    new CriticalSource(actor, null, { actionType: "mwak" }, () => 5, "attack1").updateOptions(dialog);
+
+    expect(dialog.options["adv-reminder"].critSources.critical.labels).toEqual(["adv-reminder.Source.Critical.nat20"]);
+  });
+});

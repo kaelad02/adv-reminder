@@ -33,7 +33,7 @@ import {
   ToolSource,
 } from "../sources.js";
 import { showSources } from "../settings.js";
-import { debug, getDistanceToTargetFn, getTarget } from "../util.js";
+import { debug, getDistanceToTargetFn, getOriginMessageId, getTarget } from "../util.js";
 
 /**
  * Setup the dnd5e.preRoll hooks for use with the core roller.
@@ -97,7 +97,7 @@ export default class CoreRollerHooks {
 
     const { messages, reminder } = this.applyKeybindings(config, dialog);
 
-    const messageId = config.event?.currentTarget?.dataset?.messageId;
+    const messageId = getOriginMessageId(config.event, message);
     const activity = messageId ? game.messages.get(messageId)?.getAssociatedActivity() : undefined;
 
     if (messages) {
@@ -236,7 +236,7 @@ export default class CoreRollerHooks {
 
     if (messages) {
       new DamageMessage(activity.actor, target, activity).addMessage(dialog);
-      if (showSources) new CriticalSource(activity.actor, target, activity, distanceFn, config.event).updateOptions(dialog);
+      if (showSources) new CriticalSource(activity.actor, target, activity, distanceFn, getOriginMessageId(config.event, message)).updateOptions(dialog);
     }
     if (reminder) {
       new CriticalReminder(activity.actor, target, activity, distanceFn).updateOptions(config);

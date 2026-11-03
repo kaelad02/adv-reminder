@@ -64,3 +64,25 @@ describe.each([
     expect(results).toContain(false);
   });
 });
+
+describe("CoreRollerHooks saving throw from a chat card", () => {
+  // dnd5e rolls the save for each target in turn, so for the second target the click event is no longer dispatching
+  // and its currentTarget is null: only the message's origin identifies the activity
+  test("a save against a status uses the activity of the originating message", () => {
+    const actor = createActorWithRollModes({
+      key: "flags.adv-reminder.statuses.poisoned.save.roll.mode",
+      type: "add",
+      value: "1",
+    });
+    actor.hasConditionEffect = () => false;
+    const activity = { effects: [{ effect: { statuses: ["poisoned"], flags: {} } }] };
+    game.messages = new Map([["origin1", { getAssociatedActivity: () => activity }]]);
+    const config = createRollConfig(actor, { ability: "con", event: { currentTarget: null, target: null } });
+    const dialog = { configure: true, options: {} };
+    const message = { data: { system: { origin: "origin1" } } };
+
+    new CoreRollerHooks().preRollSavingThrowV2(config, dialog, message);
+
+    expect(config.rolls[0].options.advantage).toBe(true);
+  });
+});
