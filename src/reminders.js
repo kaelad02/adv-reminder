@@ -613,20 +613,18 @@ export class CriticalReminder extends BaseReminder {
     /** @type {function} */
     this.distanceFn = distanceFn;
 
-    // get the Range directly from the actor's flags
-    if (targetActor) {
-      const grantsCriticalRange =
-        foundry.utils.getProperty(targetActor, "flags.midi-qol.grants.critical.range") || -Infinity;
-      this._adjustRange(distanceFn, grantsCriticalRange);
-    }
+    // the range is a distance, not a boolean, so _getFlags drops it: read it directly from the target
+    const range = targetActor ? foundry.utils.getProperty(targetActor, "flags.midi-qol.grants.critical.range") : null;
+    if (range !== null && range !== undefined && Number.isFinite(Number(range))) this._applyRange(distanceFn, Number(range));
   }
 
-  _adjustRange(distanceFn, grantsCriticalRange) {
-    // adjust the Range flag to look like a boolean like the rest
-    if ("grants.critical.range" in this.targetFlags) {
-      const distance = distanceFn();
-      this.targetFlags["grants.critical.range"] = distance <= grantsCriticalRange;
-    }
+  /**
+   * Turn the target's critical range into a flag like the others, set if the attacker is within range.
+   * @param {function} distanceFn
+   * @param {number} range
+   */
+  _applyRange(distanceFn, range) {
+    this.targetFlags["grants.critical.range"] = distanceFn() <= range;
   }
 
   static AccumulatorClass = CriticalAccumulator;

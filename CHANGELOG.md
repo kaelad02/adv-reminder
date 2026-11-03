@@ -21,6 +21,7 @@
 - refactor: the sample pack builder moved to `utils/` and is no longer part of the released module
 - docs: rewrote the fast-forward section of the README for dnd5e 6
 - deprecated: the Midi `advantage.ability.check/save.*` keys (and their disadvantage counterparts) will be removed in 7.0.0, use `advantage.check/save.*` instead
+- bug fix: `flags.midi-qol.grants.critical.range` never made a hit critical nor showed as a source, because only boolean flags were read
 - bug fix: Midi `fail` flags (e.g. `fail.all`, `fail.ability.save.con`) were ignored on concentration saves
 - bug fix: with Ready Set Roll active, tool checks threw an error and were not processed
 - note: the Ready Set Roll integration has not been tested with Foundry V14 and dnd5e 6 yet

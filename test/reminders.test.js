@@ -1273,3 +1273,47 @@ describe("tests of _getFlags", () => {
     expect(reminder.actorFlags).toEqual({});
   });
 });
+
+describe("CriticalReminder grants.critical.range", () => {
+  function createTargetWithRange(range) {
+    const target = createActorWithFlags();
+    foundry.utils.setProperty(target, "flags.midi-qol.grants.critical.range", range);
+    return target;
+  }
+
+  test("damage roll within the target's critical range should be critical", () => {
+    const actor = createActorWithFlags();
+    const target = createTargetWithRange(5);
+    const activity = createActivity("mwak", "str");
+    const options = {};
+
+    const reminder = new CriticalReminder(actor, target, activity, () => 5);
+    reminder.updateOptions(options);
+
+    expect(options.isCritical).toBe(true);
+  });
+
+  test("damage roll within a range stored as a string should be critical", () => {
+    const actor = createActorWithFlags();
+    const target = createTargetWithRange("10");
+    const activity = createActivity("mwak", "str");
+    const options = {};
+
+    const reminder = new CriticalReminder(actor, target, activity, () => 5);
+    reminder.updateOptions(options);
+
+    expect(options.isCritical).toBe(true);
+  });
+
+  test("damage roll outside the target's critical range should be normal", () => {
+    const actor = createActorWithFlags();
+    const target = createTargetWithRange(5);
+    const activity = createActivity("mwak", "str");
+    const options = {};
+
+    const reminder = new CriticalReminder(actor, target, activity, () => 10);
+    reminder.updateOptions(options);
+
+    expect(options.isCritical).toBe(false);
+  });
+});

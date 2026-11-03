@@ -329,17 +329,14 @@ export class CriticalSource extends SourceMixin(CriticalReminder) {
 
   static UpdateMessage = "checking for crit/normal effects to display their source";
 
-  _adjustRange(distanceFn, grantsCriticalRange) {
-    // check if the range applies, remove flag if not
-    if ("grants.critical.range" in this.targetFlags) {
-      const distance = distanceFn();
-      if (distance > grantsCriticalRange) delete this.targetFlags["grants.critical.range"];
-    }
+  _applyRange(distanceFn, range) {
+    // within range, the effects that set the range are the sources
+    if (distanceFn() > range) return;
+    const links = getApplicableChanges(this.targetActor, (change) => change.key === "flags.midi-qol.grants.critical.range")
+      .map((change) => change.effect.link);
+    if (links.length) this.targetFlags["grants.critical.range"] = links;
   }
 
-  /**
-   * @returns {CriticalLabelModeData}
-   */
   _initCounts(isCritical) {
     const counts = {
       critical: { labels: [], suppressed: [] }
