@@ -18,6 +18,12 @@
 - feature: with several targets, target-based reminders are skipped and the roll dialog says so
 - feature: active effect changes follow the V14 rules: changes without a key or for the token are ignored, and `ActiveEffect#shouldApplyChange` is respected
 - feature: button style colors are set on the roll dialog itself, so they also work in detached windows
+- bug fix: with the core roller, a conditional Midi fail flag (e.g. `@abilities.str.value < 10`) made every saving throw fail automatically; only flags set to `true` or `1` count, as for advantage and disadvantage
+- bug fix: Midi flags set with a change type other than Custom (e.g. `Override | 1`) were ignored
+- bug fix: the messages could disappear from a roll dialog rendered again while they were prepared
+- bug fix: clicking a roll in a message no longer follows its link
+- removes the workaround for dnd5e#5455, fixed in dnd5e 6
+- tests: an end-to-end audit drives a real Foundry world with Playwright (`npm run test:e2e`, see `test/e2e/README.md`)
 - bug fix: with the "player", "green" or custom button style without a text color, the default button text was forced to near-black (unreadable on dark colors and in the dark theme); now only the colors that are set are overridden
 - feature: the DAE editor and field browser list every message key (tool, concentration, initiative and the target `grants.message.*` keys were missing), generated from the message classes, and use the V14 `custom` change type
 - feature: Italian translation
