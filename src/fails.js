@@ -41,7 +41,11 @@ class BaseFail {
       failKeys.reduce((accum, curr) => actorFlags[curr] || accum, false) ||
       this.actor.hasConditionEffect(this.failCondition);
     if (shouldFail) {
-      this.toMessage(message.data, message.rollMode);
+      // the roll is cancelled either way, but never fail silently if the chat message can't be created
+      this.toMessage(message.data, message.rollMode).catch((err) => {
+        console.error("adv-reminder | failed to create the auto-fail chat message", err);
+        ui.notifications.error("adv-reminder.AutoFailMessageError", { localize: true });
+      });
     }
     return shouldFail;
   }
@@ -53,7 +57,7 @@ class BaseFail {
     const chatData = foundry.utils.mergeObject(
       {
         author: game.user.id,
-        type: CONST.CHAT_MESSAGE_STYLES.OTHER,
+        style: CONST.CHAT_MESSAGE_STYLES.OTHER,
         content,
       },
       messageData
