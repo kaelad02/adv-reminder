@@ -225,8 +225,6 @@ export default class ReadySetRollHooks extends CoreRollerHooks {
       for (const roll of config.rolls) {
         roll.options.isCritical = config.isCritical;
       }
-      // workaround for https://github.com/foundryvtt/dnd5e/issues/5455
-      dialog.options.defaultButton = config.isCritical ? "critical" : "normal";
     }
   }
 
