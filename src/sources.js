@@ -11,7 +11,7 @@ import {
   SkillReminder,
   ToolReminder,
 } from "./reminders.js";
-import { debug, getApplicableChanges } from "./util.js";
+import { debug, getApplicableChanges, isFlagSet } from "./util.js";
 
 /**
  * @typedef LabelModeData
@@ -175,9 +175,10 @@ const SourceMixin = (superclass) =>
     _getFlags(actor) {
       if (!actor) return {};
 
-      // the Midi flag has to be true and the flag on the actor must be true (i.e. not overwritten by another change to false)
+      // the change must set the Midi flag and the flag on the actor must still be set (i.e. not overwritten by another
+      // change to false)
       const filterFn = (change) => change.key.startsWith("flags.midi-qol.") &&
-        ["true", "1"].includes(String(change.value).trim()) && foundry.utils.getProperty(actor, change.key) === true;
+        isFlagSet(change.value) && isFlagSet(foundry.utils.getProperty(actor, change.key));
       return getApplicableChanges(actor, filterFn)
         .map((change) => {
           change.key = change.key.substring(15);

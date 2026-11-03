@@ -1,5 +1,5 @@
 import { beforeAll, beforeEach, describe, expect, jest, test } from "@jest/globals";
-import { getAdjacentDistance, getApplicableChanges, getDistanceToTargetFn, getTarget, measureTokenDistance } from "../src/util.js";
+import { getAdjacentDistance, getApplicableChanges, getDistanceToTargetFn, getTarget, isFlagSet, measureTokenDistance } from "../src/util.js";
 import commonTestInit from "./common.js";
 
 /**
@@ -338,5 +338,15 @@ describe("getAdjacentDistance", () => {
     globalThis.canvas = { scene: { grid: { distance: 2 } } };
 
     expect(getAdjacentDistance(() => 0)).toBe(2);
+  });
+});
+
+describe("isFlagSet", () => {
+  test.each([true, 1, "1", "true", " true "])("%p is set", (value) => {
+    expect(isFlagSet(value)).toBe(true);
+  });
+
+  test.each([false, 0, "0", "false", "", undefined, null, "@abilities.str.value < 10", 2, {}])("%p is not set", (value) => {
+    expect(isFlagSet(value)).toBe(false);
   });
 });

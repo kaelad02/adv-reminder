@@ -1334,3 +1334,27 @@ describe("CriticalReminder grants.critical.range", () => {
     expect(options.isCritical).toBe(false);
   });
 });
+
+describe("Midi flag values", () => {
+  test.each(["1", 1, "true"])("ability check with an advantage flag set to %p should have advantage", (value) => {
+    const actor = createActorWithFlags();
+    foundry.utils.setProperty(actor, "flags.midi-qol.advantage.ability.check.all", value);
+    const options = {};
+
+    new AbilityCheckReminder(actor, "str").updateOptions(options);
+
+    expect(options.advantage).toBe(true);
+    expect(options.disadvantage).toBe(false);
+  });
+
+  test("ability check with a conditional advantage flag should be normal", () => {
+    const actor = createActorWithFlags();
+    foundry.utils.setProperty(actor, "flags.midi-qol.advantage.ability.check.all", "@abilities.str.value < 10");
+    const options = {};
+
+    new AbilityCheckReminder(actor, "str").updateOptions(options);
+
+    expect(options.advantage).toBe(false);
+    expect(options.disadvantage).toBe(false);
+  });
+});

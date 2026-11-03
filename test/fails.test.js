@@ -125,3 +125,27 @@ describe("AbilitySaveFail chat message", () => {
     consoleError.mockRestore();
   });
 });
+
+describe("AbilitySaveFail flag values", () => {
+  test.each(["1", 1, "true"])("saving throw with a fail flag set to %p should fail", async (value) => {
+    const actor = createActorWithFlags();
+    foundry.utils.setProperty(actor, "flags.midi-qol.fail.ability.save.dex", value);
+
+    const failChecker = new AbilitySaveFail(actor, "dex");
+    const spies = mockFailChecker(failChecker);
+
+    expect(await failChecker.fails({})).toBe(true);
+    spies.forEach((spy) => expect(spy).toHaveBeenCalled());
+  });
+
+  test.each(["@abilities.str.value < 10", "0", false])("saving throw with a fail flag set to %p should not fail", async (value) => {
+    const actor = createActorWithFlags();
+    foundry.utils.setProperty(actor, "flags.midi-qol.fail.ability.save.dex", value);
+
+    const failChecker = new AbilitySaveFail(actor, "dex");
+    const spies = mockFailChecker(failChecker);
+
+    expect(await failChecker.fails({})).toBe(false);
+    spies.forEach((spy) => expect(spy).not.toHaveBeenCalled());
+  });
+});

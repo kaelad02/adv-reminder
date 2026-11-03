@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from "@jest/globals";
-import { AbilitySaveSource, CriticalSource } from "../src/sources";
+import { AbilityCheckSource, AbilitySaveSource, CriticalSource } from "../src/sources";
 import commonTestInit from "./common.js";
 
 beforeAll(() => {
@@ -88,6 +88,33 @@ describe("AbilitySaveSource subtract", () => {
     const dialog = {};
 
     new AbilitySaveSource(actor, "con", { effects: [{ effect: { statuses: ["poisoned"] } }] }).updateOptions(dialog);
+
+    expect(dialog.options["adv-reminder"].advSources.advantages.labels).toEqual([]);
+  });
+});
+
+describe("AbilityCheckSource Midi flag values", () => {
+  test("an advantage flag set to \"1\" with the Override change type is a source", () => {
+    const key = "flags.midi-qol.advantage.ability.check.all";
+    const actor = createActorWithEffects(createEffect("@UUID[Effect.A]", { key, type: "override", value: "1" }));
+    foundry.utils.setProperty(actor, key, "1");
+    const dialog = {};
+
+    new AbilityCheckSource(actor, "str").updateOptions(dialog);
+
+    expect(dialog.options["adv-reminder"].advSources.advantages.labels).toEqual(["@UUID[Effect.A]"]);
+  });
+
+  test("an advantage flag overwritten to false by a later change is not a source", () => {
+    const key = "flags.midi-qol.advantage.ability.check.all";
+    const actor = createActorWithEffects(
+      createEffect("@UUID[Effect.A]", { key, type: "custom", value: "1" }),
+      createEffect("@UUID[Effect.B]", { key, type: "override", value: "0" }),
+    );
+    foundry.utils.setProperty(actor, key, "0");
+    const dialog = {};
+
+    new AbilityCheckSource(actor, "str").updateOptions(dialog);
 
     expect(dialog.options["adv-reminder"].advSources.advantages.labels).toEqual([]);
   });

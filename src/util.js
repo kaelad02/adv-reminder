@@ -19,6 +19,17 @@ export const debug = (...args) => {
 export const log = (...args) => console.log("adv-reminder |", ...args);
 
 /**
+ * Whether a Midi-style flag is set. Only an explicit true counts: `true`, `1`, or either as a string, which is how
+ * change types other than Custom store them. Anything else, including Midi's conditional expressions that only Midi can
+ * evaluate, is not set.
+ * @param {unknown} value the flag's value on the actor
+ * @returns {boolean}
+ */
+export function isFlagSet(value) {
+  return ["true", "1"].includes(String(value).trim());
+}
+
+/**
  * Get the targeted actor, only if there is exactly one target. With several targets there is no way to know which
  * one the roll is against, so target-based reminders are skipped.
  * @returns {Actor5e|undefined} the target, if there is exactly one

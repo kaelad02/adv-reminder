@@ -1,4 +1,4 @@
-import { debug } from "./util.js";
+import { debug, isFlagSet } from "./util.js";
 
 class BaseFail {
   constructor(actor) {
@@ -38,7 +38,7 @@ class BaseFail {
 
     const actorFlags = this._getFlags(this.actor);
     const shouldFail =
-      failKeys.reduce((accum, curr) => actorFlags[curr] || accum, false) ||
+      failKeys.some((key) => isFlagSet(actorFlags[key])) ||
       this.actor.hasConditionEffect(this.failCondition);
     if (shouldFail) {
       // the roll is cancelled either way, but never fail silently if the chat message can't be created

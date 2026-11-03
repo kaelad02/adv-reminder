@@ -1,4 +1,4 @@
-import { debug, getAdjacentDistance, getApplicableChanges } from "./util.js";
+import { debug, getAdjacentDistance, getApplicableChanges, isFlagSet } from "./util.js";
 
 /**
  * @typedef AdvantageModeData
@@ -186,9 +186,10 @@ class BaseReminder {
   _getFlags(actor) {
     const midiFlags = actor?.flags["midi-qol"] || {};
     const flat = foundry.utils.flattenObject(midiFlags);
-    // only keep flags with a true value
+    // only keep flags that are set, as true
     Object.keys(flat).forEach(key => {
-      if (flat[key] !== true) delete flat[key];
+      if (isFlagSet(flat[key])) flat[key] = true;
+      else delete flat[key];
     });
     return flat;
   }
