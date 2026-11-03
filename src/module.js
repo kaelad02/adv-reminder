@@ -72,7 +72,7 @@ function updateConditionEffects() {
   // if adjacent, grant advantage on the attack, else grant disadvantage
   ce.advReminderGrantAdjacentAttack = new Set(["prone"]);
   // the system doesn't add Frightened, probably because it requires light of sight, but I did, so add it back
-  ce.abilityCheckDisadvantage.add("frightened");
+  (ce.abilityCheckDisadvantage ??= new Set()).add("frightened");
 
   if (game.settings.get("dnd5e", "rulesVersion") === "legacy")
     ce.advReminderDisadvantageAttack.add("exhaustion-3");
@@ -168,8 +168,9 @@ Hooks.on("renderRollConfigurationDialog", async (dialog, html) => {
         debug("adding to input:", formula);
         // add the formula to the bonus input
         const dialogContent = button.closest(".window-content");
-        const input = dialogContent.querySelector('.rolls input[name="roll.0.situational"]');
-        input.value = !!input.value ? `${input.value} + ${formula}` : formula;
+        const input = dialogContent?.querySelector('.rolls input[name="roll.0.situational"]');
+        if (!input) return;
+        input.value = input.value ? `${input.value} + ${formula}` : formula;
         // rebuild dialog (i.e. show new die icons)
         dialog.rebuild();
       });

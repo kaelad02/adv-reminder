@@ -39,7 +39,7 @@ export function initSettings() {
     restricted: false
   });
   game.settings.register("adv-reminder", "buttonStyle", {
-    name: "Button Style",
+    name: "adv-reminder.ButtonStyle.SETTING.name",
     scope: "client",
     config: false,
     type: ButtonStyle,
@@ -242,6 +242,6 @@ class ButtonStyleConfig extends HandlebarsApplicationMixin(ApplicationV2) {
       options: { "adv-reminder": { messages: ["Conditional bonus [[/r +2]]"] } },
     };
     const messageConfig = { create: false };
-    CONFIG.Dice.D20Roll.build(rollConfig, dialogConfig, messageConfig);
+    await CONFIG.Dice.D20Roll.build(rollConfig, dialogConfig, messageConfig);
   }
 }
