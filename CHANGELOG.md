@@ -22,6 +22,7 @@
 - bug fix: Midi flags set with a change type other than Custom (e.g. `Override | 1`) were ignored
 - bug fix: the messages could disappear from a roll dialog rendered again while they were prepared
 - bug fix: clicking a roll in a message no longer follows its link
+- bug fix: with Midi-QOL, an attack rolled without Midi's workflow (e.g. by a macro) showed a Prone target as a source of disadvantage even when adjacent; the distance is now measured from the speaker's token, as with the core roller
 - removes the workaround for dnd5e#5455, fixed in dnd5e 6
 - tests: an end-to-end audit drives a real Foundry world with Playwright (`npm run test:e2e`, see `test/e2e/README.md`)
 - bug fix: with the "player", "green" or custom button style without a text color, the default button text was forced to near-black (unreadable on dark colors and in the dark theme); now only the colors that are set are overridden

@@ -21,7 +21,7 @@ import {
   ToolSource,
 } from "../sources.js";
 import { showSources } from "../settings.js";
-import { debug, getTarget } from "../util.js";
+import { debug, getDistanceToTargetFn, getTarget } from "../util.js";
 import CoreRollerHooks from "./core.js";
 
 /**
@@ -91,7 +91,7 @@ export default class MidiRollerHooks extends CoreRollerHooks {
 
     if (this.isFastForwarding(config, dialog)) return;
     const target = getTarget();
-    const distanceFn = this.getDistanceFn(config);
+    const distanceFn = this.getDistanceFn(config, message);
     const activity = config.subject;
 
     new AttackMessage(activity.actor, target, activity).addMessage(dialog);
@@ -212,7 +212,7 @@ export default class MidiRollerHooks extends CoreRollerHooks {
 
     if (this.isFastForwarding(config, dialog)) return;
     const target = getTarget();
-    const distanceFn = this.getDistanceFn(config);
+    const distanceFn = this.getDistanceFn(config, message);
     const activity = config.subject;
 
     // damage/healing enricher doesn't have an activity, skip
@@ -235,10 +235,14 @@ export default class MidiRollerHooks extends CoreRollerHooks {
 
   /**
    * Use the distance from Midi's Workflow. Before the attack is rolled the hit targets are still empty, so fall back on
-   * the targets. Midi returns -1 when it can't measure (e.g. no token), which must not count as adjacent.
+   * the targets. Midi returns -1 when it can't measure (e.g. no token), which must not count as adjacent. A roll made
+   * without a workflow (e.g. by a macro) is measured from the speaker's token, as with the core roller.
+   * @param {object} config the roll configuration
+   * @param {object} [message] the roll's message configuration
    * @returns {() => number}
    */
-  getDistanceFn(config) {
+  getDistanceFn(config, message) {
+    if (!config.workflow) return getDistanceToTargetFn(message?.data?.speaker);
     return () => {
       const workflow = config.workflow;
       const targets = workflow?.hitTargets?.size ? workflow.hitTargets : workflow?.targets;

@@ -126,6 +126,39 @@ describe("MidiRollerHooks distance", () => {
     expect(sources.advantages.labels).toEqual([]);
   });
 
+  test("without a Midi workflow, the distance is measured from the speaker's token", () => {
+    // a 5 ft square grid, the attacker's token next to the target's
+    const grid = {
+      isGridless: false, isHexagonal: false, size: 100, sizeX: 100, sizeY: 100, distance: 5,
+      getOffset: ({ x, y }) => ({ i: Math.floor(y / 100), j: Math.floor(x / 100) }),
+      measurePath: ([from, to]) => ({ distance: Math.round(Math.max(Math.abs(to.x - from.x), Math.abs(to.y - from.y)) / 100) * 5 }),
+    };
+    const scene = { grid };
+    const token = (x, y) => ({ parent: scene, x, y, width: 1, height: 1, elevation: 0 });
+    const attackerToken = token(0, 0);
+    scene.tokens = { get: (id) => (id === "tokenA" ? attackerToken : undefined) };
+    game.scenes = { get: (id) => (id === "sceneA" ? scene : undefined) };
+
+    CONFIG.DND5E.conditionEffects.advReminderGrantAdjacentAttack = new Set(["prone"]);
+    game.settings = { get: () => true };
+    applySettings();
+    const targets = new Set([{ actor: createProneTarget(), document: token(100, 100) }]);
+    targets.first = () => targets.values().next().value;
+    game.user.targets = targets;
+    const actor = createActorWithFlags();
+    actor.appliedEffects = [];
+    actor.statuses = new Set();
+    const config = { subject: { actor, actionType: "mwak", ability: "str" }, rolls: [{ options: {} }] };
+    const dialog = { configure: true, options: {} };
+
+    new MidiRollerHooks().preRollAttackV2(config, dialog, { data: { speaker: { scene: "sceneA", token: "tokenA" } } });
+    setTargets();
+
+    const sources = dialog.options["adv-reminder"].advSources;
+    expect(sources.advantages.labels).toEqual(["@UUID[Effect.prone]"]);
+    expect(sources.disadvantages.labels).toEqual([]);
+  });
+
   test("an unknown distance (-1) is not treated as adjacent", () => {
     globalThis.MidiQOL = { computeDistance: () => -1 };
     const sources = rollAttack({ token: {}, targets: new Set([{}]), hitTargets: new Set([{}]) });
