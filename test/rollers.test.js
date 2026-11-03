@@ -1,7 +1,7 @@
 import { beforeAll, describe, expect, jest, test } from "@jest/globals";
 import commonTestInit from "./common.js";
 
-let CoreRollerHooks, ReadySetRollHooks, AbilitySaveFail;
+let CoreRollerHooks, ReadySetRollHooks, MidiRollerHooks, AbilitySaveFail, applySettings;
 
 beforeAll(async () => {
   commonTestInit();
@@ -20,10 +20,13 @@ beforeAll(async () => {
   globalThis.dnd5e.utils = { areKeysPressed: () => false };
   globalThis.dnd5e.documents = { Trait: { keyLabel: (key) => key } };
   globalThis.CONFIG.DND5E.conditionEffects = {};
+  globalThis.canvas = {};
 
   ({ default: CoreRollerHooks } = await import("../src/rollers/core.js"));
   ({ default: ReadySetRollHooks } = await import("../src/rollers/rsr.js"));
+  ({ default: MidiRollerHooks } = await import("../src/rollers/midi.js"));
   ({ AbilitySaveFail } = await import("../src/fails.js"));
+  ({ applySettings } = await import("../src/settings.js"));
   // don't render the auto-fail chat message
   jest.spyOn(AbilitySaveFail.prototype, "toMessage").mockResolvedValue(undefined);
 });
@@ -84,5 +87,49 @@ describe("CoreRollerHooks saving throw from a chat card", () => {
     new CoreRollerHooks().preRollSavingThrowV2(config, dialog, message);
 
     expect(config.rolls[0].options.advantage).toBe(true);
+  });
+});
+
+describe("MidiRollerHooks distance", () => {
+  function createProneTarget() {
+    const effect = { active: true, link: "@UUID[Effect.prone]", statuses: ["prone"], system: { changes: [] } };
+    return {
+      ...createActorWithFlags(),
+      statuses: new Set(["prone"]),
+      appliedEffects: [effect],
+    };
+  }
+
+  function rollAttack(workflow) {
+    CONFIG.DND5E.conditionEffects.advReminderGrantAdjacentAttack = new Set(["prone"]);
+    game.settings = { get: () => true };
+    applySettings();
+    const target = createProneTarget();
+    setTargets(target);
+    const actor = createActorWithFlags();
+    actor.appliedEffects = [];
+    actor.statuses = new Set();
+    const activity = { actor, actionType: "rwak", ability: "dex" };
+    const config = { subject: activity, rolls: [{ options: {} }], workflow };
+    const dialog = { configure: true, options: {} };
+
+    new MidiRollerHooks().preRollAttackV2(config, dialog, { data: {} });
+    setTargets();
+    return dialog.options["adv-reminder"].advSources;
+  }
+
+  test("before the attack, the distance is measured to the targets, not the (still empty) hit targets", () => {
+    globalThis.MidiQOL = { computeDistance: (t1, t2) => (t1 && t2 ? 30 : -1) };
+    const sources = rollAttack({ token: {}, targets: new Set([{}]), hitTargets: new Set() });
+
+    expect(sources.disadvantages.labels).toEqual(["@UUID[Effect.prone]"]);
+    expect(sources.advantages.labels).toEqual([]);
+  });
+
+  test("an unknown distance (-1) is not treated as adjacent", () => {
+    globalThis.MidiQOL = { computeDistance: () => -1 };
+    const sources = rollAttack({ token: {}, targets: new Set([{}]), hitTargets: new Set([{}]) });
+
+    expect(sources.advantages.labels).toEqual([]);
   });
 });

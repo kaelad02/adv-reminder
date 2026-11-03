@@ -21,6 +21,7 @@
 - refactor: the sample pack builder moved to `utils/` and is no longer part of the released module
 - docs: rewrote the fast-forward section of the README for dnd5e 6
 - deprecated: the Midi `advantage.ability.check/save.*` keys (and their disadvantage counterparts) will be removed in 7.0.0, use `advantage.check/save.*` instead
+- bug fix: with Midi-QOL, distance-based sources (Prone, Paralyzed, Unconscious) treated every target as adjacent before the attack roll: the distance was measured to the still-empty hit targets and Midi's -1 for "unknown" counted as adjacent
 - bug fix: saves against a status (`flags.adv-reminder.statuses.*`) only worked for the first target of a save card, and the natural 20 source on damage could be missed: the originating message is now read from the roll's message data, as dnd5e does, instead of `event.currentTarget`. With Ready Set Roll, saves now look up the activity too
 - bug fix: `flags.midi-qol.grants.critical.range` never made a hit critical nor showed as a source, because only boolean flags were read
 - bug fix: Midi `fail` flags (e.g. `fail.all`, `fail.ability.save.con`) were ignored on concentration saves

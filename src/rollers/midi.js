@@ -91,13 +91,7 @@ export default class MidiRollerHooks extends CoreRollerHooks {
 
     if (this.isFastForwarding(config, dialog)) return;
     const target = getTarget();
-    // use distance from Midi's Workflow
-    const distanceFn = () => {
-      const workflow = config.workflow;
-      if (!workflow) return Infinity;
-      const firstTarget = workflow.hitTargets.values().next().value;
-      return MidiQOL.computeDistance(firstTarget, workflow.token);
-    }
+    const distanceFn = this.getDistanceFn(config);
     const activity = config.subject;
 
     new AttackMessage(activity.actor, target, activity).addMessage(dialog);
@@ -218,13 +212,7 @@ export default class MidiRollerHooks extends CoreRollerHooks {
 
     if (this.isFastForwarding(config, dialog)) return;
     const target = getTarget();
-    // use distance from Midi's Workflow
-    const distanceFn = () => {
-      const workflow = config.workflow;
-      if (!workflow) return Infinity;
-      const firstTarget = workflow.hitTargets.values().next().value;
-      return MidiQOL.computeDistance(firstTarget, workflow.token);
-    }
+    const distanceFn = this.getDistanceFn(config);
     const activity = config.subject;
 
     // damage/healing enricher doesn't have an activity, skip
@@ -243,6 +231,22 @@ export default class MidiRollerHooks extends CoreRollerHooks {
       };
       source.updateOptions(dialog);
     }
+  }
+
+  /**
+   * Use the distance from Midi's Workflow. Before the attack is rolled the hit targets are still empty, so fall back on
+   * the targets. Midi returns -1 when it can't measure (e.g. no token), which must not count as adjacent.
+   * @returns {() => number}
+   */
+  getDistanceFn(config) {
+    return () => {
+      const workflow = config.workflow;
+      const targets = workflow?.hitTargets?.size ? workflow.hitTargets : workflow?.targets;
+      const firstTarget = targets?.values().next().value;
+      if (!firstTarget || !workflow.token) return Infinity;
+      const distance = MidiQOL.computeDistance(firstTarget, workflow.token);
+      return distance < 0 ? Infinity : distance;
+    };
   }
 
   /**
