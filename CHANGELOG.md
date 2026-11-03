@@ -21,6 +21,7 @@
 - feature: the DAE editor and field browser list every message key (tool, concentration, initiative and the target `grants.message.*` keys were missing), generated from the message classes, and use the V14 `custom` change type
 - feature: Italian translation
 - refactor: the button style settings window uses the standard ApplicationV2 form handling
+- refactor: roll modes are combined with the system's advantage mode fields through `AdvantageModeField.combineFields` instead of a copy of it. As in the system, an override set on the field wins over one from a `flags.adv-reminder.statuses.*` key
 - refactor: removed code for dnd5e versions before 6.0 and the migration of settings from very old versions
 - refactor: the sample pack builder moved to `utils/` and is no longer part of the released module
 - docs: rewrote the fast-forward section of the README for dnd5e 6

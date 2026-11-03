@@ -227,7 +227,7 @@ export class SkillSource extends SourceMixin(SkillReminder) {
   _customUpdateOptions(accumulator) {
     super._customUpdateOptions(accumulator);
 
-    // similar to what AttributesFields#prepareArmorClass does
+    // only for the label: the system already applies it in AttributesFields.prepareArmorClass (dnd5e 6.0.6)
     // Check for stealth disadvantage from armor
     if (this.skillId === "ste") {
       const armors = this.actor.itemTypes.equipment

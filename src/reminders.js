@@ -153,11 +153,15 @@ export class AdvantageAccumulator {
   }
 
   /**
-   * Update the options with the advantage and disadvantage properties
+   * Update the options with the advantage and disadvantage properties, combining the sources found here with the
+   * system's own advantage mode fields.
    * @param {Object} options
+   * @param {object} [context]
+   * @param {Actor5e} [context.actor]       the actor rolling
+   * @param {string[]} [context.keyPaths]   the advantage mode fields that apply to the roll
    */
-  update(options) {
-    const mode = dnd5e.dataModels.fields.AdvantageModeField.resolveMode({}, {}, this.counts);
+  update(options, { actor, keyPaths = [] } = {}) {
+    const { mode } = dnd5e.dataModels.fields.AdvantageModeField.combineFields(actor ?? {}, keyPaths, this.counts);
     debug("updating options with roll mode", mode);
     options.advantage = (mode === 1);
     options.disadvantage = (mode === -1);
@@ -202,15 +206,16 @@ class BaseReminder {
     const disConditions = this.disadvantageConditions;
     debug("advConditions", advConditions, "disConditions", disConditions);
 
-    // get the underlying adv/dis counts to initialize the accumulator
-    const counts = this._rollModeCounts(this.rollModes, options);
+    // initialize the accumulator, the system's advantage mode fields are combined at the end
+    const rollModes = this.rollModes;
+    const counts = this._rollModeCounts(rollModes, options);
 
     // find matching keys, status effects, and update options
     const accumulator = new this.constructor.AccumulatorClass(counts);
     accumulator.applyFlags(this.actorFlags, advKeys, disKeys);
     accumulator.applyConditions(this.actor, advConditions, disConditions);
     this._customUpdateOptions(accumulator);
-    accumulator.update(options);
+    accumulator.update(options, { actor: this.actor, keyPaths: Object.keys(rollModes ?? {}) });
   }
 
   _rollModeCounts(rollModes, options) {
@@ -220,20 +225,9 @@ class BaseReminder {
       disadvantages: { count: 0, suppressed: false }
     };
     if (foundry.utils.isEmpty(rollModes)) {
-      // no roll modes, initialize with options instead
+      // no advantage mode fields for this roll (e.g. attacks), start from what the roll already has
       if (options.advantage) counts.advantages.count++;
       if (options.disadvantage) counts.disadvantages.count++;
-    } else {
-      // copied from AdvantageModeField#combineFields
-      for (const kp of Object.keys(rollModes)) {
-        const c = dnd5e.dataModels.fields.AdvantageModeField.getCounts(this.actor, kp);
-        const src = foundry.utils.getProperty(this.actor._source, kp) ?? 0;
-        if (c.override !== null) counts.override = c.override;
-        if (c.advantages.suppressed) counts.advantages.suppressed = true;
-        if (c.disadvantages.suppressed) counts.disadvantages.suppressed = true;
-        counts.advantages.count += c.advantages.count + Number(src === 1);
-        counts.disadvantages.count += c.disadvantages.count + Number(src === -1);
-      }
     }
     return counts;
   }

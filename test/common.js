@@ -96,12 +96,37 @@ export default function commonTestInit() {
     };
   }
 
-  dnd5e.dataModels.fields.AdvantageModeField.resolveMode = function (model, change, counts) {
-    const { override, advantages, disadvantages } = counts ?? this.getCounts(model, change);
+  dnd5e.dataModels.fields.AdvantageModeField.combineFields = function (model, keyPaths, counts={}) {
+    counts = foundry.utils.mergeObject({
+      override: null,
+      advantages: { count: 0, suppressed: false },
+      disadvantages: { count: 0, suppressed: false }
+    }, counts);
+    for ( const kp of keyPaths ) {
+      const c = this.getCounts(model, kp);
+      const src = foundry.utils.getProperty(model._source, kp) ?? 0;
+      if ( c.override !== null ) counts.override = c.override;
+      if ( c.advantages.suppressed ) counts.advantages.suppressed = true;
+      if ( c.disadvantages.suppressed ) counts.disadvantages.suppressed = true;
+      counts.advantages.count += c.advantages.count + Number(src === 1);
+      counts.disadvantages.count += c.disadvantages.count + Number(src === -1);
+    }
+    return {
+      advantage: (((counts.advantages.count > 0) && (counts.override === null)) || (counts.override === 1))
+        && !counts.advantages.suppressed,
+      disadvantage: (((counts.disadvantages.count > 0) && (counts.override === null)) || (counts.override === -1))
+        && !counts.disadvantages.suppressed,
+      mode: this.resolveMode(model, null, counts)
+    };
+  }
+
+  dnd5e.dataModels.fields.AdvantageModeField.resolveMode = function (model, keyPath, counts) {
+    keyPath = foundry.utils.getType(keyPath) === "Object" ? keyPath.key : keyPath;
+    const { override, advantages, disadvantages } = counts ?? this.getCounts(model, keyPath);
     if ( override !== null ) return override;
-    const src = foundry.utils.getProperty(model._source, change.key) ?? 0;
-    const advantageCount = advantages.suppressed ? 0 : advantages.count + Number(src === 1);
-    const disadvantageCount = disadvantages.suppressed ? 0 : disadvantages.count + Number(src === -1);
+    const src = foundry.utils.getProperty(model._source, keyPath) ?? 0;
+    const advantageCount = advantages.suppressed ? 0 : Math.max(0, advantages.count + Number(src === 1));
+    const disadvantageCount = disadvantages.suppressed ? 0 : Math.max(0, disadvantages.count + Number(src === -1));
     return Math.sign(advantageCount) - Math.sign(disadvantageCount);
   }
 
@@ -138,6 +163,15 @@ export default function commonTestInit() {
     }, object);
     // set the value using the last key part
     lastObj[lastProp] = value;
+  };
+
+  globalThis.foundry.utils.mergeObject = (original, other = {}) => {
+    for (const [k, v] of Object.entries(other)) {
+      if (foundry.utils.getType(v) === "Object" && foundry.utils.getType(original[k]) === "Object") {
+        foundry.utils.mergeObject(original[k], v);
+      } else original[k] = v;
+    }
+    return original;
   };
 
   globalThis.foundry.utils.getProperty = (object, key) => {

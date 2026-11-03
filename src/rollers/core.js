@@ -248,7 +248,7 @@ export default class CoreRollerHooks {
 
   /**
    * Determine if messages will be shown or if reminders should be processed.
-   * Copied from the system's D20Roll#applyKeybindings function.
+   * Copied from the system's D20Roll.applyKeybindings (dnd5e 6.0.6), check it again when updating the system.
    * @param {Event} event the triggering event
    * @param {boolean} configure whether or not to show the dialog
    * @returns {{messages: boolean, reminder: boolean}}
