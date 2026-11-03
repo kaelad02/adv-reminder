@@ -239,3 +239,29 @@ export class DamageMessage extends BaseMessage {
     ];
   }
 }
+
+/**
+ * Every message key the roll messages read, built from the message classes themselves so the list can't drift from them.
+ * @returns {string[]}
+ */
+export function getAllMessageKeys() {
+  const keys = new Set();
+  const add = (message) => [...message.messageKeys, ...(message.targetKeys ?? [])].forEach((key) => keys.add(key));
+
+  const abilities = Object.keys(CONFIG.DND5E.abilities);
+  const attackTypes = ["mwak", "rwak", "msak", "rsak"];
+  for (const actionType of attackTypes) {
+    for (const ability of abilities) add(new AttackMessage(null, null, { actionType, ability }));
+  }
+  for (const actionType of Object.keys(CONFIG.DND5E.itemActionTypes ?? {})) add(new DamageMessage(null, null, { actionType }));
+  for (const ability of abilities) {
+    add(new AbilityCheckMessage(null, ability));
+    add(new AbilitySaveMessage(null, ability));
+    add(new ConcentrationMessage(null, ability));
+    add(new InitiativeMessage(null, ability));
+  }
+  for (const skill of Object.keys(CONFIG.DND5E.skills)) add(new SkillMessage(null, null, skill));
+  for (const tool of Object.keys(CONFIG.DND5E.tools ?? {})) add(new ToolMessage(null, null, tool));
+  add(new DeathSaveMessage(null));
+  return [...keys];
+}

@@ -18,6 +18,7 @@
 - feature: active effect changes follow the V14 rules: changes without a key or for the token are ignored, and `ActiveEffect#shouldApplyChange` is respected
 - feature: button style colors are set on the roll dialog itself, so they also work in detached windows
 - bug fix: with the "player", "green" or custom button style without a text color, the default button text was forced to near-black (unreadable on dark colors and in the dark theme); now only the colors that are set are overridden
+- feature: the DAE editor and field browser list every message key (tool, concentration, initiative and the target `grants.message.*` keys were missing), generated from the message classes, and use the V14 `custom` change type
 - feature: Italian translation
 - refactor: the button style settings window uses the standard ApplicationV2 form handling
 - refactor: removed code for dnd5e versions before 6.0 and the migration of settings from very old versions
