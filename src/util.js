@@ -86,23 +86,42 @@ export function measureTokenDistance(a, b) {
 }
 
 function _closestSpaceDistance(a, b, grid) {
-  const aSpaces = _getTokenSpaceCenters(a, grid);
-  const bSpaces = _getTokenSpaceCenters(b, grid);
+  const withOffsets = (token) => _getTokenSpaceCenters(token, grid).map((point) => ({ point, offset: grid.getOffset(point) }));
+  const aSpaces = withOffsets(a);
+  const bSpaces = withOffsets(b);
   let min = Infinity;
   for (const from of aSpaces) {
-    for (const to of bSpaces) min = Math.min(min, grid.measurePath([from, to]).distance);
+    for (const to of bSpaces) {
+      min = Math.min(min, _spaceDistance(from, to, grid));
+      if (min === 0) return 0;
+    }
   }
   return min;
 }
 
+function _spaceDistance(from, to, grid) {
+  // a diagonal neighbor is adjacent whatever the diagonal rule (Euclidean, alternating, illegal) makes it cost. Not
+  // SquareGrid#testAdjacency, which makes diagonals non-adjacent when they are illegal
+  if (!grid.isHexagonal) {
+    const spaces = Math.max(Math.abs(from.offset.i - to.offset.i), Math.abs(from.offset.j - to.offset.j));
+    if (spaces <= 1) return spaces * grid.distance;
+  }
+  // snap to whole grid spaces, e.g. Euclidean diagonals
+  const d = grid.measurePath([from.point, to.point]).distance;
+  return Math.round(d / grid.distance) * grid.distance;
+}
+
 function _getTokenSpaceCenters({ x, y, width, height }, grid) {
-  // create the center point of each grid space the token takes up
+  // create the center point of each grid space the token takes up, spread over the token's own size so a token of a
+  // fractional size (e.g. Tiny) isn't measured from the edge of the next space
   const columns = Math.max(1, Math.round(width));
   const rows = Math.max(1, Math.round(height));
+  const spaceWidth = (width * grid.sizeX) / columns;
+  const spaceHeight = (height * grid.sizeY) / rows;
   const centers = [];
   for (let w = 0; w < columns; w++) {
     for (let h = 0; h < rows; h++) {
-      centers.push({ x: x + (w + 0.5) * grid.sizeX, y: y + (h + 0.5) * grid.sizeY });
+      centers.push({ x: x + (w + 0.5) * spaceWidth, y: y + (h + 0.5) * spaceHeight });
     }
   }
   if (!grid.isHexagonal) return centers;
@@ -126,6 +145,18 @@ function _edgeDistance(a, b, grid) {
 }
 
 /**
+ * The active effect change phases in the order they apply: the core "initial" first, then any phase a system or module
+ * registered in CONFIG.ActiveEffect.phases, then the core "final".
+ * @returns {string[]}
+ */
+function getChangePhases() {
+  // core lists the registered phases first, which isn't the order they apply in
+  const registered = Object.keys(foundry.documents.ActiveEffect.implementation.CHANGE_PHASES)
+    .filter((p) => (p !== "initial") && (p !== "final"));
+  return ["initial", ...registered, "final"];
+}
+
+/**
  * Get a sorted array of active effect changes that apply to the actor. Can optionally filter it by change key.
  * @param {Actor5e} actor the Actor
  * @param {(change: Object) => boolean} filterFn filter on the change
@@ -146,23 +177,32 @@ export function getApplicableChanges(actor, filterFn = () => true) {
   }
   if ( !candidates.length ) return [];
 
-  // only build the roll data if a change needs it
-  const rollData = actor.getRollData?.() ?? {};
-  const phases = Object.keys(foundry.documents?.ActiveEffect?.implementation?.CHANGE_PHASES ?? { initial: 0, final: 1 });
+  // only build the roll data if a change needs it, and the replacement data once per effect
+  let rollData;
+  const dataByEffect = new Map();
+  const getReplacementData = (effect) => {
+    if ( !dataByEffect.has(effect) ) {
+      rollData ??= actor.getRollData?.() ?? {};
+      dataByEffect.set(effect, effect.getReplacementData?.(rollData) ?? rollData);
+    }
+    return dataByEffect.get(effect);
+  };
+  const phases = getChangePhases();
   const changes = [];
   for ( const { effect, change } of candidates ) {
     // core asks every phase in turn, and modules (e.g. DAE) can move a change to another phase, so a change applies
     // if any phase accepts it. Pass a copy since the system marks the change as applied.
     let phase = change.phase ?? "initial";
     if ( typeof effect.shouldApplyChange === "function" ) {
-      const replacementData = effect.getReplacementData?.(rollData) ?? rollData;
+      const replacementData = getReplacementData(effect);
       phase = phases.find((p) => effect.shouldApplyChange(foundry.utils.deepClone(change), { phase: p, replacementData }));
       if ( !phase ) continue;
     }
     const c = foundry.utils.deepClone(change);
     c.effect = effect;
     c.phase = phase;
-    c.priority = c.priority ?? CONST.ACTIVE_EFFECT_CHANGE_TYPES[c.type] ?? 0;
+    // as core's ActiveEffect#prepareBaseData
+    c.priority ??= foundry.documents.ActiveEffect.implementation.CHANGE_TYPES[c.type]?.defaultPriority ?? 0;
     changes.push(c);
   }
 

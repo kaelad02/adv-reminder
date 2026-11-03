@@ -65,6 +65,13 @@ class LabelAccumulator extends LabelMixin(AdvantageAccumulator) {
   constructor(counts) {
     super();
     this.counts = counts;
+    // subtracts that came before the add they cancel, taken from the next add
+    this._pendingRemovals = { advantages: 0, disadvantages: 0 };
+  }
+
+  _addLabel(mode, label) {
+    if (this._pendingRemovals[mode] > 0) this._pendingRemovals[mode]--;
+    else this.counts[mode].labels.push(label);
   }
 
   /**
@@ -93,18 +100,21 @@ class LabelAccumulator extends LabelMixin(AdvantageAccumulator) {
 
   _applyChangeAdd(delta, change) {
     // Add a source of advantage or disadvantage.
-    if (delta === 1) this.counts.advantages.labels.push(change.effect.link);
-    else if (delta === -1) this.counts.disadvantages.labels.push(change.effect.link);
+    if (delta === 1) this._addLabel("advantages", change.effect.link);
+    else if (delta === -1) this._addLabel("disadvantages", change.effect.link);
   }
 
   _applyChangeSubtract(delta, change) {
-    // Remove a source of advantage or disadvantage.
-    const remove = (labels) => {
-      const i = labels.indexOf(change.effect.link);
-      if (i >= 0) labels.splice(i, 1);
+    // Remove a source of advantage or disadvantage: the effect's own if it added one, else the latest from another
+    // effect, else the next one added, so the labels left match the count the roll mode uses.
+    const remove = (mode) => {
+      const labels = this.counts[mode].labels;
+      if (!labels.length) return this._pendingRemovals[mode]++;
+      const i = labels.lastIndexOf(change.effect.link);
+      labels.splice(i >= 0 ? i : labels.length - 1, 1);
     };
-    if (delta === 1) remove(this.counts.advantages.labels);
-    else if (delta === -1) remove(this.counts.disadvantages.labels);
+    if (delta === 1) remove("advantages");
+    else if (delta === -1) remove("disadvantages");
   }
 
   _applyChangeOverride(delta, change) {
@@ -193,15 +203,15 @@ const SourceMixin = (superclass) =>
     }
 
     _customUpdateOptions(accumulator) {
-      super._customUpdateOptions(accumulator);
-
-      // apply roll modes if they exist
+      // apply roll modes if they exist, before the reminder's own so its override wins, as it does for the roll
       const rollModes = this.rollModes;
       debug("rollModes", rollModes);
       if (!foundry.utils.isEmpty(rollModes)) {
         accumulator.applyRollModes(this.actor, rollModes);
         accumulator.applyRollModeEffects(this.actor, Object.keys(rollModes));
       }
+
+      super._customUpdateOptions(accumulator);
     }
   };
 

@@ -717,6 +717,23 @@ describe("AbilitySaveReminder using roll mode", () => {
     expect(options.disadvantage).toBe(false);
   });
 
+  test("saving throw with a status override wins over the system field's override", () => {
+    const actor = createActorWithRollModes({ key: "flags.adv-reminder.statuses.poisoned.save.roll.mode", type: "override", value: 1 });
+    foundry.utils.setProperty(actor, "system.abilities.con.save.roll.modeCounts", {
+      override: 0,
+      advantages: { count: 0, suppressed: false },
+      disadvantages: { count: 0, suppressed: false }
+    });
+    const activity = createActivity("poisoned");
+    const options = {};
+
+    const reminder = new AbilitySaveReminder(actor, "con", activity);
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBe(true);
+    expect(options.disadvantage).toBe(false);
+  });
+
   test("saving throw with status advantage added then subtracted should be normal", () => {
     const actor = createActorWithRollModes(
       { key: "flags.adv-reminder.statuses.poisoned.save.roll.mode", type: "add", value: 1 },

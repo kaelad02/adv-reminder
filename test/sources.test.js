@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from "@jest/globals";
-import { CriticalSource } from "../src/sources";
+import { AbilitySaveSource, CriticalSource } from "../src/sources";
 import commonTestInit from "./common.js";
 
 beforeAll(() => {
@@ -62,5 +62,33 @@ describe("CriticalSource natural 20", () => {
     new CriticalSource(actor, null, { actionType: "mwak" }, () => 5, "attack1").updateOptions(dialog);
 
     expect(dialog.options["adv-reminder"].critSources.critical.labels).toEqual(["adv-reminder.Source.Critical.nat20"]);
+  });
+});
+
+describe("AbilitySaveSource subtract", () => {
+  test("subtracting from another effect removes the advantage source", () => {
+    const key = "flags.adv-reminder.statuses.poisoned.save.roll.mode";
+    const actor = createActorWithEffects(
+      createEffect("@UUID[Effect.A]", { key, type: "add", value: 1 }),
+      createEffect("@UUID[Effect.B]", { key, type: "subtract", value: 1 }),
+    );
+    const dialog = {};
+
+    new AbilitySaveSource(actor, "con", { effects: [{ effect: { statuses: ["poisoned"] } }] }).updateOptions(dialog);
+
+    expect(dialog.options["adv-reminder"].advSources.advantages.labels).toEqual([]);
+  });
+
+  test("subtracting before the add it cancels removes the advantage source", () => {
+    const key = "flags.adv-reminder.statuses.poisoned.save.roll.mode";
+    const actor = createActorWithEffects(
+      createEffect("@UUID[Effect.B]", { key, type: "subtract", value: 1 }),
+      createEffect("@UUID[Effect.A]", { key, type: "add", value: 1 }),
+    );
+    const dialog = {};
+
+    new AbilitySaveSource(actor, "con", { effects: [{ effect: { statuses: ["poisoned"] } }] }).updateOptions(dialog);
+
+    expect(dialog.options["adv-reminder"].advSources.advantages.labels).toEqual([]);
   });
 });

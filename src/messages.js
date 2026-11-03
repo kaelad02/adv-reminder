@@ -67,22 +67,22 @@ class BaseMessage {
     // get any existing messages
     const messages = foundry.utils.getProperty(options, "options.adv-reminder.messages") ?? [];
 
+    const changesFor = (actor, keys) => getApplicableChanges(actor, (change) => keys.includes(change.key));
+
     // get messages from the actor and merge
-    const keys = this.messageKeys;
-    const actorMessages = getApplicableChanges(this.actor, (change) => keys.includes(change.key))
-      .map((change) => String(change.value));
-    messages.push(...actorMessages);
+    messages.push(...changesFor(this.actor, this.messageKeys).map((change) => String(change.value)));
 
     // get messages from the target and merge
     const targetKeys = this.targetKeys;
     if (targetKeys && this.targetActor) {
-      const targetMessages = getApplicableChanges(this.targetActor, (change) => targetKeys.includes(change.key))
-        .map((change) => String(change.value));
-      messages.push(...targetMessages);
+      messages.push(...changesFor(this.targetActor, targetKeys).map((change) => String(change.value)));
     }
 
-    // target-based reminders only work with a single target, let the user know they were skipped
-    if (targetKeys && hasMultipleTargets()) messages.push(game.i18n.localize("adv-reminder.MultipleTargets"));
+    // target-based reminders only work with a single target, let the user know if any were skipped
+    if (targetKeys && hasMultipleTargets()
+      && [...game.user.targets].some((token) => token.actor && changesFor(token.actor, targetKeys).length)) {
+      messages.push(game.i18n.localize("adv-reminder.MultipleTargets"));
+    }
 
     if (messages.length > 0) {
       debug("messages found:", messages);
@@ -253,7 +253,8 @@ export function getAllMessageKeys() {
   for (const actionType of attackTypes) {
     for (const ability of abilities) add(new AttackMessage(null, null, { actionType, ability }));
   }
-  for (const actionType of Object.keys(CONFIG.DND5E.itemActionTypes ?? {})) add(new DamageMessage(null, null, { actionType }));
+  const damageTypes = new Set([...attackTypes, ...Object.keys(CONFIG.DND5E.itemActionTypes ?? {})]);
+  for (const actionType of damageTypes) add(new DamageMessage(null, null, { actionType }));
   for (const ability of abilities) {
     add(new AbilityCheckMessage(null, ability));
     add(new AbilitySaveMessage(null, ability));

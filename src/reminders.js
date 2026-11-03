@@ -161,7 +161,9 @@ export class AdvantageAccumulator {
    * @param {string[]} [context.keyPaths]   the advantage mode fields that apply to the roll
    */
   update(options, { actor, keyPaths = [] } = {}) {
-    const { mode } = dnd5e.dataModels.fields.AdvantageModeField.combineFields(actor ?? {}, keyPaths, this.counts);
+    const combined = dnd5e.dataModels.fields.AdvantageModeField.combineFields(actor ?? {}, keyPaths, this.counts);
+    // combineFields lets the system fields' override replace this one, but an override found here applies last
+    const mode = this.counts.override ?? combined.mode;
     debug("updating options with roll mode", mode);
     options.advantage = (mode === 1);
     options.disadvantage = (mode === -1);

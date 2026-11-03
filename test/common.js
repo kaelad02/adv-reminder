@@ -152,6 +152,24 @@ export default function commonTestInit() {
   globalThis.foundry = {};
   globalThis.foundry.utils = {};
 
+  // the core phases and change types, as ActiveEffect.CHANGE_PHASES and ActiveEffect.CHANGE_TYPES compile them
+  globalThis.foundry.documents = {
+    ActiveEffect: {
+      implementation: {
+        CHANGE_PHASES: { initial: {}, final: {} },
+        CHANGE_TYPES: {
+          custom: { defaultPriority: 0 },
+          multiply: { defaultPriority: 10 },
+          add: { defaultPriority: 20 },
+          subtract: { defaultPriority: 20 },
+          downgrade: { defaultPriority: 30 },
+          upgrade: { defaultPriority: 40 },
+          override: { defaultPriority: 50 }
+        }
+      }
+    }
+  };
+
   globalThis.foundry.utils.setProperty = (object, key, value) => {
     // split the key into parts, removing the last one
     const parts = key.split(".");

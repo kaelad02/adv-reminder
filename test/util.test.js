@@ -12,6 +12,7 @@ function squareGrid() {
     sizeX: 100,
     sizeY: 100,
     distance: 5,
+    getOffset: ({ x, y }) => ({ i: Math.floor(y / 100), j: Math.floor(x / 100) }),
     measurePath: ([from, to]) => {
       const spaces = Math.max(Math.abs(to.x - from.x), Math.abs(to.y - from.y)) / 100;
       return { distance: Math.round(spaces) * 5 };
@@ -48,6 +49,42 @@ describe("measureTokenDistance", () => {
     const a = createToken(scene, { x: 0, y: 0 });
     const b = createToken(scene, { x: 100, y: 100 });
     expect(measureTokenDistance(a, b)).toBe(5);
+  });
+
+  test.each([
+    ["Euclidean", 5 * Math.SQRT2],
+    ["alternating 10/5/10", 10],
+  ])("diagonally adjacent tokens are one space apart with %s diagonals", (_, diagonal) => {
+    const grid = {
+      ...squareGrid(),
+      measurePath: ([from, to]) => ({ distance: (from.x !== to.x && from.y !== to.y) ? diagonal : 5 }),
+    };
+    const scene = { grid };
+    const a = createToken(scene, { x: 0, y: 0 });
+    const b = createToken(scene, { x: 100, y: 100 });
+    expect(measureTokenDistance(a, b)).toBe(5);
+  });
+
+  test("Euclidean distances snap to whole grid spaces", () => {
+    const grid = { ...squareGrid(), measurePath: ([from, to]) => ({ distance: Math.hypot(to.x - from.x, to.y - from.y) / 20 }) };
+    const scene = { grid };
+    const a = createToken(scene, { x: 0, y: 0 });
+    const b = createToken(scene, { x: 200, y: 200 });
+    expect(measureTokenDistance(a, b)).toBe(15);
+  });
+
+  test("tiny token measures from its own center", () => {
+    const grid = squareGrid();
+    const measured = [];
+    const measurePath = grid.measurePath;
+    grid.measurePath = (points) => {
+      measured.push(points[0]);
+      return measurePath(points);
+    };
+    const scene = { grid };
+    // a tiny token in the right half of the first space
+    measureTokenDistance(createToken(scene, { x: 50, y: 0, width: 0.5, height: 0.5 }), createToken(scene, { x: 300, y: 0 }));
+    expect(measured).toEqual([{ x: 75, y: 25 }]);
   });
 
   test("large token measures from its closest space", () => {
@@ -232,6 +269,51 @@ describe("getApplicableChanges", () => {
       { key: "explicit", type: "override", value: 1, phase: "initial", priority: 1 },
     ]));
     expect(getApplicableChanges(actor).map((c) => c.key)).toEqual(["explicit", "add", "override", "final-add"]);
+  });
+
+  test("default priority comes from the registered change types", () => {
+    const ActiveEffect = foundry.documents.ActiveEffect.implementation;
+    ActiveEffect.CHANGE_TYPES = { ...ActiveEffect.CHANGE_TYPES, daeCustom: { defaultPriority: 60 } };
+    const actor = createActor(createEffect([
+      { key: "dae", type: "daeCustom", value: 1, phase: "initial" },
+      { key: "override", type: "override", value: 1, phase: "initial" },
+      { key: "add", type: "add", value: 1, phase: "initial" },
+    ]));
+    expect(getApplicableChanges(actor).map((c) => c.key)).toEqual(["add", "override", "dae"]);
+    delete ActiveEffect.CHANGE_TYPES.daeCustom;
+  });
+
+  test("accepts a change in a registered phase, applied between initial and final", () => {
+    // core lists the registered phases before its own
+    const ActiveEffect = foundry.documents.ActiveEffect.implementation;
+    const corePhases = ActiveEffect.CHANGE_PHASES;
+    ActiveEffect.CHANGE_PHASES = { custom: {}, ...corePhases };
+    const shouldApplyChange = (change, { phase }) => phase === change.phase;
+    const actor = createActor(createEffect([
+      { key: "final", type: "add", value: 1, phase: "final" },
+      { key: "custom", type: "add", value: 1, phase: "custom" },
+      { key: "initial", type: "add", value: 1, phase: "initial" },
+    ], { shouldApplyChange }));
+    expect(getApplicableChanges(actor).map((c) => c.key)).toEqual(["initial", "custom", "final"]);
+    ActiveEffect.CHANGE_PHASES = corePhases;
+  });
+
+  test("builds the roll data once and the replacement data once per effect", () => {
+    const getReplacementData = jest.fn((data) => data);
+    const shouldApplyChange = () => true;
+    const actor = createActor(
+      createEffect([{ key: "a", type: "add", value: 1 }, { key: "b", type: "add", value: 1 }], { shouldApplyChange, getReplacementData }),
+      createEffect([{ key: "c", type: "add", value: 1 }], { shouldApplyChange, getReplacementData }),
+    );
+    getApplicableChanges(actor);
+    expect(actor.getRollData).toHaveBeenCalledTimes(1);
+    expect(getReplacementData).toHaveBeenCalledTimes(2);
+  });
+
+  test("does not build roll data when no effect asks for it", () => {
+    const actor = createActor(createEffect([{ key: "a", type: "add", value: 1 }]));
+    getApplicableChanges(actor);
+    expect(actor.getRollData).not.toHaveBeenCalled();
   });
 
   test("links each change back to its effect", () => {

@@ -764,13 +764,24 @@ describe("DamageMessage from target", () => {
 
 describe("Several targets", () => {
   test("attack with several targets adds a notice that target reminders were skipped", () => {
-    setTargets({}, {});
+    setTargets(createActorWithEffects(["flags.adv-reminder.grants.message.attack.all", "target message"]), {});
     const actor = createActorWithEffects(["flags.adv-reminder.message.attack.all", "attack message"]);
     const options = {};
 
     new AttackMessage(actor, undefined, createActivity("mwak", "str")).addMessage(options);
 
     expect(options.options["adv-reminder"].messages).toStrictEqual(["attack message", "adv-reminder.MultipleTargets"]);
+    setTargets();
+  });
+
+  test("attack with several targets without target reminders does not add the notice", () => {
+    setTargets(createActorWithEffects(["flags.adv-reminder.message.attack.all", "own message"]), createActorWithEffects());
+    const actor = createActorWithEffects(["flags.adv-reminder.message.attack.all", "attack message"]);
+    const options = {};
+
+    new AttackMessage(actor, undefined, createActivity("mwak", "str")).addMessage(options);
+
+    expect(options.options["adv-reminder"].messages).toStrictEqual(["attack message"]);
     setTargets();
   });
 
