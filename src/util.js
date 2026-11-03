@@ -105,7 +105,16 @@ function _getTokenSpaceCenters({ x, y, width, height }, grid) {
       centers.push({ x: x + (w + 0.5) * grid.sizeX, y: y + (h + 0.5) * grid.sizeY });
     }
   }
-  return centers;
+  if (!grid.isHexagonal) return centers;
+
+  // hexes don't line up with the token's rectangle: snap each point to the center of the hex it is in. Cheaper than
+  // TokenDocument#getOccupiedGridSpaceOffsets, which also tests walls and levels
+  const snapped = new Map();
+  for (const point of centers) {
+    const center = grid.getCenterPoint(grid.getOffset(point));
+    snapped.set(`${center.x},${center.y}`, center);
+  }
+  return [...snapped.values()];
 }
 
 function _edgeDistance(a, b, grid) {

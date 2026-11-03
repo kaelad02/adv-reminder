@@ -79,6 +79,28 @@ describe("measureTokenDistance", () => {
   });
 });
 
+describe("measureTokenDistance on hexagonal grids", () => {
+  test("large tokens measure between the centers of the hexes they cover", () => {
+    // a fake hex grid whose space centers are shifted, to tell them apart from the token's own rectangle
+    const grid = {
+      ...squareGrid(),
+      isHexagonal: true,
+      getOffset: ({ x, y }) => ({ i: Math.floor(y / 100), j: Math.floor(x / 100) }),
+      getCenterPoint: ({ i, j }) => ({ x: j * 100 + 30, y: i * 100 + 30 }),
+    };
+    const measured = [];
+    grid.measurePath = ([from, to]) => {
+      measured.push(from, to);
+      return { distance: 5 };
+    };
+    const scene = { grid };
+
+    measureTokenDistance(createToken(scene, { x: 0, y: 0, width: 2, height: 2 }), createToken(scene, { x: 500, y: 0 }));
+
+    expect(measured.every(({ x, y }) => x % 100 === 30 && y % 100 === 30)).toBe(true);
+  });
+});
+
 describe("getDistanceToTargetFn", () => {
   test("speaker without a scene returns Infinity instead of throwing", () => {
     game.scenes = { get: () => undefined };

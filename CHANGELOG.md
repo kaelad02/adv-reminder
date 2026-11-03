@@ -7,6 +7,7 @@
 - bug fix: Midi flags and message values that Foundry now stores JSON-parsed (e.g. `true`, `1`) no longer throw
 - bug fix: distance-based rules (Prone, Paralyzed, Unconscious, `grants.critical.range`) no longer throw in Foundry V14, which removed `canvas.grid.measureDistances`; distance is measured on the token's own scene, edge to edge on gridless scenes, and rolls without a token on the scene no longer throw
 - bug fix: "adjacent" now means within one grid space of the tokens' scene, in its units, instead of a fixed 5 ft (and not the grid of the scene being viewed), so metric scenes work
+- bug fix: on hexagonal grids, distances from tokens larger than one space were measured between points that are not hex centers (e.g. 36.3 ft); they now snap to the centers of the hexes the token covers
 - bug fix: the auto-fail chat message set its `style` in the `type` field, which only worked because dnd5e passes its own `type`; it now uses `style`, and an error is shown if the message can't be created
 - bug fix: the button style settings window didn't show the "Widen Default Button" and "Default Button Color" options
 - bug fix: messages and roll modes from active effects are found when DAE moves a change to another phase, and checking them no longer marks the effect's changes as applied
