@@ -154,12 +154,12 @@ export default class ReadySetRollHooks extends CoreRollerHooks {
     const ability = config.ability;
     const toolId = config.tool;
     const doubleProf = this.isDoubleProf(config);
-    if (this._doMessages(config)) {
+    if (this._doMessages(config, dialog)) {
       new ToolMessage(actor, ability, toolId).addMessage(dialog);
       if (showSources) new ToolSource(actor, ability, toolId, doubleProf).updateOptions(dialog);
     }
 
-    if (this._doReminder(config))
+    if (this._doReminder(config, dialog, message))
       new ToolReminder(actor, ability, toolId, doubleProf).updateOptions(config.rolls[0].options);
   }
 
