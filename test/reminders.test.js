@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, test } from "@jest/globals";
+import { afterAll, beforeAll, describe, expect, test } from "@jest/globals";
 import {
   AttackReminder,
   AbilityCheckReminder,
@@ -299,6 +299,90 @@ describe("AttackReminder both advantage and disadvantage flags", () => {
 
     expect(options.advantage).toBe(true);
     expect(options.disadvantage).toBe(false);
+  });
+});
+
+describe("AttackReminder prone target", () => {
+  beforeAll(() => {
+    CONFIG.DND5E.conditionEffects.advReminderDisadvantageAttack = new Set(["prone"]);
+    CONFIG.DND5E.conditionEffects.advReminderGrantAdjacentAttack = new Set(["prone"]);
+  });
+
+  afterAll(() => {
+    delete CONFIG.DND5E.conditionEffects.advReminderDisadvantageAttack;
+    delete CONFIG.DND5E.conditionEffects.advReminderGrantAdjacentAttack;
+  });
+
+  function createActor(...statuses) {
+    return { ...createActorWithFlags(), statuses: new Set(statuses) };
+  }
+
+  /** a distance function on a scene with 5 ft grid spaces */
+  function distanceOf(distance) {
+    const distanceFn = () => distance;
+    distanceFn.adjacentDistance = 5;
+    return distanceFn;
+  }
+
+  function rollAttack(actor, target, distance) {
+    const options = {};
+    new AttackReminder(actor, target, createActivity("mwak", "str"), distanceOf(distance)).updateOptions(options);
+    return options;
+  }
+
+  test.each([
+    ["mwak", "str"],
+    ["rwak", "dex"],
+  ])("a %s attack against an adjacent prone target should be advantage", (actionType, ability) => {
+    const options = {};
+    new AttackReminder(createActor(), createActor("prone"), createActivity(actionType, ability), distanceOf(5)).updateOptions(options);
+
+    expect(options.advantage).toBe(true);
+    expect(options.disadvantage).toBe(false);
+  });
+
+  test("an attack against a prone target in the same space should be advantage", () => {
+    const options = rollAttack(createActor(), createActor("prone"), 0);
+
+    expect(options.advantage).toBe(true);
+    expect(options.disadvantage).toBe(false);
+  });
+
+  test.each([10, 30])("an attack against a prone target %i ft away should be disadvantage", (distance) => {
+    const options = rollAttack(createActor(), createActor("prone"), distance);
+
+    expect(options.advantage).toBe(false);
+    expect(options.disadvantage).toBe(true);
+  });
+
+  test("an attack against a prone target at an unknown distance should be disadvantage", () => {
+    const options = rollAttack(createActor(), createActor("prone"), Infinity);
+
+    expect(options.advantage).toBe(false);
+    expect(options.disadvantage).toBe(true);
+  });
+
+  test("an attack against a prone target immune to prone should be normal", () => {
+    const target = createActor("prone");
+    target.system = { traits: { ci: { value: new Set(["prone"]) } } };
+    const options = rollAttack(createActor(), target, 5);
+
+    expect(options.advantage).toBe(false);
+    expect(options.disadvantage).toBe(false);
+  });
+
+  test("an attack by a prone attacker against an adjacent prone target should be normal", () => {
+    const options = rollAttack(createActor("prone"), createActor("prone"), 5);
+
+    expect(options.advantage).toBe(false);
+    expect(options.disadvantage).toBe(false);
+  });
+
+  test("an attack by a prone attacker against a distant prone target should be disadvantage", () => {
+    const options = rollAttack(createActor("prone"), createActor("prone"), 30);
+
+    expect(options.advantage).toBe(false);
+    expect(options.disadvantage).toBe(true);
   });
 });
 

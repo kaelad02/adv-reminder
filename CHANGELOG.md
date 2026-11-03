@@ -1,3 +1,7 @@
+# 6.0.1
+
+- tests: unit tests for attacks against a Prone target when the roll skips the dialog: advantage within one grid space, disadvantage beyond it or at an unknown distance, normal when the target is immune or the attacker is also Prone and adjacent
+
 # 6.0.0
 
 - breaking: makes the minimum Foundry version 14.367 and dnd5e system 6.0.0, verified with Foundry 14.369 and dnd5e 6.0.6
