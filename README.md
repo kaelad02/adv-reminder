@@ -54,10 +54,10 @@ Some of the features are controlled by settings.
 
 ## Fast-Forward Overrides
 
->[!NOTE]
-> This is for D&D 5e system version 5.0 and earlier. Version 5.1 adds the ability to add to Advantage and to override it.
+Holding one of the system's fast-forward keys skips the roll dialog, so the messages and sources are not shown. What happens to the reminders depends on how many keys are held:
 
-If the player holds down one of the Ctrl/Alt/Shift/Meta keys to fast-forward the die roll (e.g. hold Alt to roll with advantage, skipping the roll dialog) then this module WILL NOT do anything. Holding down one of those keys stops the roll dialog from popping up so it's interpreted as overriding what this module does.
+- **One key** (Shift for normal, Alt for advantage, Ctrl/Meta for disadvantage): the reminders still apply and the system combines them with the key. For example, holding Alt while this module adds disadvantage results in a normal roll.
+- **Two keys** force the result and this module does not apply any reminders: Shift+Alt forces advantage, Shift+Ctrl forces disadvantage, and Alt+Ctrl forces a normal roll.
 
 ## Module Compatibility
 
@@ -72,3 +72,9 @@ If the player holds down one of the Ctrl/Alt/Shift/Meta keys to fast-forward the
 
 - This module will apply advantage/disadvantage on checks even if RSR is configured for quick rolls. This is skipped if you hold down one of the roll modifier keys to manually apply advantage/disadvantage (similar to core behavior). 
 - Does not show messages if RSR is configured for quick rolls since there is no dialog to show them
+
+## Development
+
+- `npm test` runs the unit tests.
+- `npm run build` packs `packs/_source` into the compendium, `npm run unpack` does the reverse.
+- The "AR Message Sample Items" compendium is rebuilt with `utils/sample-pack-builder.mjs`, a development tool that is not part of the released module. See the comment at the top of that file for how to run it.

@@ -1,4 +1,6 @@
 {
+  "adv-reminder.AutoFailMessageError": "Advantage Reminder could not create the auto fail chat message, the roll was cancelled anyway. See the console for details.",
+  "adv-reminder.MultipleTargets": "Several targets selected: the target's reminders were skipped.",
   "adv-reminder.AutoFail": "Auto fail",
   "adv-reminder.Messages": "Messages",
   "adv-reminder.ButtonStyle": {

@@ -1,4 +1,6 @@
 {
+  "adv-reminder.AutoFailMessageError": "Advantage Reminder n'a pas pu créer le message d'échec automatique dans le chat, le jet a tout de même été annulé. Consultez la console pour plus de détails.",
+  "adv-reminder.MultipleTargets": "Plusieurs cibles sélectionnées : les rappels de la cible ont été ignorés.",
   "adv-reminder.AutoFail": "Échec automatique",
   "adv-reminder.ButtonStyle": {
     "SETTING": {

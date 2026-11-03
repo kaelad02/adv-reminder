@@ -1,0 +1,79 @@
+{
+  "adv-reminder.AutoFailMessageError": "Advantage Reminder non è riuscito a creare il messaggio di fallimento automatico in chat, ma il tiro è stato comunque annullato. Consulta la console per i dettagli.",
+  "adv-reminder.MultipleTargets": "Più bersagli selezionati: i promemoria del bersaglio sono stati ignorati.",
+  "adv-reminder.AutoFail": "Fallimento automatico",
+  "adv-reminder.Messages": "Messaggi",
+  "adv-reminder.ButtonStyle": {
+    "SETTING": {
+      "name": "Stile dei Pulsanti",
+      "hint": "Cambia lo stile del pulsante predefinito nelle finestre di tiro",
+      "label": "Configura Stile",
+      "test": "Mostra Tiro di Prova"
+    },
+    "FIELDS": {
+      "wide": {
+        "label": "Allarga il Pulsante Predefinito",
+        "hint": "Rende più largo il pulsante predefinito per evidenziare quale pulsante premere."
+      },
+      "color": {
+        "label": "Colore del Pulsante Predefinito",
+        "hint": "Cambia il colore del pulsante predefinito nelle finestre di tiro."
+      },
+      "custom": {
+        "label": "Colori Personalizzati",
+        "buttonColor": {
+          "label": "Colore del Pulsante",
+          "hint": "Il colore di sfondo del pulsante predefinito."
+        },
+        "textColor": {
+          "label": "Colore del Testo",
+          "hint": "Il colore del testo del pulsante predefinito. Lascia vuoto per non modificarlo."
+        }
+      }
+    },
+    "COLORS": {
+      "default": {
+        "label": "Predefinito"
+      },
+      "player": {
+        "label": "Colore del Giocatore"
+      },
+      "green": {
+        "label": "Verde"
+      },
+      "custom": {
+        "label": "Colore Personalizzato"
+      }
+    }
+  },
+  "adv-reminder.ShowSources": {
+    "Name": "Mostra le Fonti di Vantaggio/Svantaggio/Critico",
+    "Hint": "Se un Effetto Attivo determina Vantaggio, Svantaggio o Critico in un tiro, mostra il suo nome come messaggio nella finestra di tiro"
+  },
+  "adv-reminder.Source": {
+    "Advantage": {
+      "override": "Vantaggio imposto da",
+      "suppressed": "Vantaggio annullato da",
+      "prefix": "Vantaggio da",
+      "doubleProf": "Doppia Competenza"
+    },
+    "Normal": {
+      "override": "Tiro Normale imposto da"
+    },
+    "Disadvantage": {
+      "override": "Svantaggio imposto da",
+      "suppressed": "Svantaggio annullato da",
+      "prefix": "Svantaggio da"
+    },
+    "Critical": {
+      "suppressed": "Colpo Critico annullato da",
+      "prefix": "Colpo Critico da",
+      "nat20": "{value} naturale"
+    }
+  },
+  "adv-reminder.UpdateStatusEffects": {
+    "Name": "Abilita gli Effetti delle Condizioni",
+    "Hint": "Applica Vantaggio, Svantaggio o Critico in base alle condizioni del sistema (ad es. Svantaggio agli attacchi quando si è Avvelenati). Sconsigliato se usi un altro modulo che modifica o sostituisce gli effetti di stato."
+  },
+  "dae.fieldData.fieldCategories.ARMessage": "Messaggi AR"
+}

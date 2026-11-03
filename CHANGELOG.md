@@ -5,6 +5,21 @@
 - feature: support the new `subtract` change type on roll modes
 - feature: use chat message visibility modes instead of roll modes for the auto-fail message
 - bug fix: Midi flags and message values that Foundry now stores JSON-parsed (e.g. `true`, `1`) no longer throw
+- bug fix: distance-based rules (Prone, Paralyzed, Unconscious, `grants.critical.range`) no longer throw in Foundry V14, which removed `canvas.grid.measureDistances`; distance is measured on the token's own scene, edge to edge on gridless scenes, and rolls without a token on the scene no longer throw
+- bug fix: "adjacent" now means within one grid space in the scene's units instead of a fixed 5 ft, so metric scenes work
+- bug fix: the auto-fail chat message used an invalid document `type` and was never created while the roll was still cancelled; it now uses `style`, and an error is shown if the message can't be created
+- bug fix: the sample pack builder was exposed on `window` in every world because of an always-true check
+- security: messages from active effects (including a target's) are cleaned of unsafe HTML before being shown in the roll dialog
+- feature: with several targets, target-based reminders are skipped and the roll dialog says so
+- feature: active effect changes follow the V14 rules: changes without a key or for the token are ignored, and `ActiveEffect#shouldApplyChange` is respected
+- feature: button style colors are set on the roll dialog itself, so they also work in detached windows
+- feature: Italian translation
+- refactor: the button style settings window uses the standard ApplicationV2 form handling
+- refactor: removed code for dnd5e versions before 6.0 and the migration of settings from very old versions
+- refactor: the sample pack builder moved to `utils/` and is no longer part of the released module
+- docs: rewrote the fast-forward section of the README for dnd5e 6
+- deprecated: the Midi `advantage.ability.check/save.*` keys (and their disadvantage counterparts) will be removed in 7.0.0, use `advantage.check/save.*` instead
+- translations: Portuguese (Brazil) is missing the two new strings and falls back to English
 
 # 5.1.2
 

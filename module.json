@@ -33,6 +33,7 @@
   "languages": [
     { "lang": "en", "name": "English", "path": "lang/en.json" },
     { "lang": "fr", "name": "Français", "path": "lang/fr.json" },
+    { "lang": "it", "name": "Italiano", "path": "lang/it.json" },
     { "lang": "pt-BR", "name": "Portuguese (Brasil)", "path": "lang/pt-BR.json"}
   ],
   "url": "replaced by workflow",
