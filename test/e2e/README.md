@@ -27,6 +27,9 @@ Every actor, scene and chat message it creates is named with `[adv-audit]` and d
 the next run if one crashed. It views a temporary scene for the distance checks, then views the original scene again;
 it never activates a scene nor changes a setting.
 
-Run it once with only Advantage Reminder's dependencies, and once with Midi-QOL enabled: the checks adapt to the roller.
+The checks are written for the core roller. With Midi-QOL enabled the module only adds messages and sources, Midi sets
+advantage, criticals and auto-fails itself and fast-forwards saves by default, so most checks fail by design; checking
+the Midi roller needs rolls made through Midi's workflow, which this audit doesn't do yet.
+
 Re-run it after every dnd5e update; the keybindings check fails as soon as the system changes the logic the module
 copied.
