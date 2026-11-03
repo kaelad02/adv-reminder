@@ -22,9 +22,11 @@ function createActorWithEffects(...keyValuePairs) {
 function createEffect([key, value]) {
   return {
     active: true,
-    changes: [
-      { key, value, mode: 0 },
-    ]
+    system: {
+      changes: [
+        { key, value, type: "custom" },
+      ]
+    }
   };
 }
 

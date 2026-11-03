@@ -15,13 +15,13 @@ export default function commonTestInit() {
 
   /**
    * @param {string} changes.key
-   * @param {number} changes.mode
+   * @param {string} changes.type
    * @param {string} changes.value
    */
   globalThis.createActorWithRollModes = (...changes) => {
     return {
       allApplicableEffects: function* () {
-        if (changes?.length) yield { active: true, changes };
+        if (changes?.length) yield { active: true, system: { changes } };
       },
       flags: {},
       system: {},
@@ -230,13 +230,14 @@ export default function commonTestInit() {
   };
 
   globalThis.CONST = {
-    ACTIVE_EFFECT_MODES: {
-      CUSTOM: 0,
-      MULTIPLY: 1,
-      ADD: 2,
-      DOWNGRADE: 3,
-      UPGRADE: 4,
-      OVERRIDE: 5
+    ACTIVE_EFFECT_CHANGE_TYPES: {
+      custom: 0,
+      multiply: 10,
+      add: 20,
+      subtract: 20,
+      downgrade: 30,
+      upgrade: 40,
+      override: 50
     }
   };
 }

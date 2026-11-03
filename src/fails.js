@@ -46,20 +46,20 @@ class BaseFail {
     return shouldFail;
   }
 
-  async toMessage(messageData, rollMode) {
+  async toMessage(messageData, messageMode) {
     // content that immatates a die roll
     const content = await foundry.applications.handlebars.renderTemplate("modules/adv-reminder/templates/fail-dice-roll.hbs");
     // merge basic data with child's data
     const chatData = foundry.utils.mergeObject(
       {
-        user: game.user.id,
+        author: game.user.id,
         type: CONST.CHAT_MESSAGE_STYLES.OTHER,
         content,
       },
       messageData
     );
-    // apply the roll mode to adjust message visibility
-    ChatMessage.applyRollMode(chatData, rollMode ?? game.settings.get("core", "rollMode"));
+    // apply the message mode to adjust message visibility (dnd5e still names it "rollMode" in its message config)
+    ChatMessage.applyMode(chatData, messageMode ?? game.settings.get("core", "messageMode"));
 
     // create the chat message
     return ChatMessage.create(chatData);

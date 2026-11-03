@@ -6,12 +6,12 @@
         "changes": [
           {
             "key": "flags.adv-reminder.message.damage.mwak",
-            "mode": 0,
+            "type": "custom",
             "value": "[[/r @scale.rogue.sneak-attack]]{Sneak Attack} once per turn"
           },
           {
             "key": "flags.adv-reminder.message.damage.rwak",
-            "mode": 0,
+            "type": "custom",
             "value": "[[/r @scale.rogue.sneak-attack]]{Sneak Attack} once per turn"
           }
         ]
@@ -25,7 +25,7 @@
         "changes": [
           {
             "key": "flags.adv-reminder.message.ability.save.con",
-            "mode": 0,
+            "type": "custom",
             "value": "Advantage against poison"
           }
         ]
@@ -37,7 +37,7 @@
         "changes": [
           {
             "key": "flags.adv-reminder.message.ability.save.wis",
-            "mode": 0,
+            "type": "custom",
             "value": "You have advantage when saving against being charmed."
           }
         ]
@@ -51,7 +51,7 @@
         "changes": [
           {
             "key": "flags.adv-reminder.message.ability.check.all",
-            "mode": 0,
+            "type": "custom",
             "value": "[[/r 1d4]]{Guidance} on one ability check, can roll before or after"
           }
         ],

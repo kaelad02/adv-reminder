@@ -84,17 +84,20 @@ export class AdvantageAccumulator {
     // Apply the roll mode changes
     for ( let change of changes ) {
       const delta = Number(change.value);
-      switch ( change.mode ) {
-        case CONST.ACTIVE_EFFECT_MODES.ADD:
+      switch ( change.type ) {
+        case "add":
           this._applyChangeAdd(delta, change);
           break;
-        case CONST.ACTIVE_EFFECT_MODES.OVERRIDE:
+        case "subtract":
+          this._applyChangeSubtract(delta, change);
+          break;
+        case "override":
           this._applyChangeOverride(delta, change);
           break;
-        case CONST.ACTIVE_EFFECT_MODES.UPGRADE:
+        case "upgrade":
           this._applyChangeUpgrade(delta, change);
           break;
-        case CONST.ACTIVE_EFFECT_MODES.DOWNGRADE:
+        case "downgrade":
           this._applyChangeDowngrade(delta, change);
           break;
       }
@@ -105,6 +108,12 @@ export class AdvantageAccumulator {
     // Add a source of advantage or disadvantage.
     if (delta === 1) this.counts.advantages.count++;
     else if (delta === -1) this.counts.disadvantages.count++;
+  }
+
+  _applyChangeSubtract(delta, change) {
+    // Remove a source of advantage or disadvantage.
+    if (delta === 1) this.counts.advantages.count--;
+    else if (delta === -1) this.counts.disadvantages.count--;
   }
 
   _applyChangeOverride(delta, change) {

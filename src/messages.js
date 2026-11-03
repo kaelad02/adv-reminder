@@ -25,14 +25,14 @@ class BaseMessage {
     // get messages from the actor and merge
     const keys = this.messageKeys;
     const actorMessages = getApplicableChanges(this.actor, (change) => keys.includes(change.key))
-      .map((change) => change.value);
+      .map((change) => String(change.value));
     messages.push(...actorMessages);
 
     // get messages from the target and merge
     const targetKeys = this.targetKeys;
     if (targetKeys && this.targetActor) {
       const targetMessages = getApplicableChanges(this.targetActor, (change) => targetKeys.includes(change.key))
-        .map((change) => change.value);
+        .map((change) => String(change.value));
       messages.push(...targetMessages);
     }
 

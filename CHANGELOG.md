@@ -1,3 +1,11 @@
+# 6.0.0
+
+- breaking: makes the minimum Foundry version 14.367 and dnd5e system 6.0.0, verified with Foundry 14.369 and dnd5e 6.0.6
+- feature: read Active Effect changes from `effect.system.changes` and use string change types (Active Effects V2)
+- feature: support the new `subtract` change type on roll modes
+- feature: use chat message visibility modes instead of roll modes for the auto-fail message
+- bug fix: Midi flags and message values that Foundry now stores JSON-parsed (e.g. `true`, `1`) no longer throw
+
 # 5.1.2
 
 - feature: address one more v13 deprecation

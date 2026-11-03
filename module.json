@@ -5,16 +5,16 @@
   "authors": [{ "name": "kaelad", "discord": "kaelad#1693" }],
   "version": "0.1",
   "compatibility": {
-    "minimum": "13.341",
-    "verified": "13"
+    "minimum": "14.367",
+    "verified": "14.369"
   },
   "relationships": {
     "systems": [
       {
         "id": "dnd5e",
         "compatibility": {
-          "minimum": "5.1.0",
-          "verified": "5.2.5"
+          "minimum": "6.0.0",
+          "verified": "6.0.6"
         }
       }
     ]

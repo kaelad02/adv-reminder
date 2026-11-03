@@ -241,7 +241,7 @@ export default class MidiRollerHooks extends CoreRollerHooks {
         const criticalHit = config.workflow?.attackRoll?.isCritical;
         if (criticalHit) {
           const value = config.workflow.attackRoll.d20.total;
-          counts.critical.labels.push(game.i18n.format("adv-reminder.Source.Critical.nat20", { value }));
+          counts.critical.labels.push(game.i18n.localize("adv-reminder.Source.Critical.nat20", { value }));
         }
       };
       source.updateOptions(dialog);

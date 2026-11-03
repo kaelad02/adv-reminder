@@ -82,16 +82,18 @@ export function getApplicableChanges(actor, filterFn = () => true) {
   const changes = [];
   for ( const effect of actor.allApplicableEffects() ) {
     if ( !effect.active ) continue;
-    changes.push(...effect.changes
+    changes.push(...(effect.system?.changes ?? [])
       .filter(filterFn)  // added filter step
       .map(change => {
         const c = foundry.utils.deepClone(change);
         c.effect = effect;
-        c.priority = c.priority ?? (c.mode * 10);
+        c.priority = c.priority ?? CONST.ACTIVE_EFFECT_CHANGE_TYPES[c.type] ?? 0;
         return c;
       }));
     // removed adding to this.statuses
   }
-  changes.sort((a, b) => a.priority - b.priority);
+  // changes in an earlier phase apply before a later phase, regardless of priority
+  const phaseOrder = (phase) => (phase === "final" ? 1 : 0);
+  changes.sort((a, b) => (phaseOrder(a.phase) - phaseOrder(b.phase)) || (a.priority - b.priority));
   return changes;
 }

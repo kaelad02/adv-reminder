@@ -75,7 +75,7 @@ class LabelAccumulator extends LabelMixin(AdvantageAccumulator) {
   applyRollModes(actor, rollModes) {
     const source = actor._source;
     const localize = (l) => {
-      const first = (typeof l === "string") ? game.i18n.localize(l) : game.i18n.format(l.stringId, l.data);
+      const first = (typeof l === "string") ? game.i18n.localize(l) : game.i18n.localize(l.stringId, l.data);
       return `${first} ${game.i18n.localize("DND5E.AdvantageMode")}`;
     };
 
@@ -95,6 +95,16 @@ class LabelAccumulator extends LabelMixin(AdvantageAccumulator) {
     // Add a source of advantage or disadvantage.
     if (delta === 1) this.counts.advantages.labels.push(change.effect.link);
     else if (delta === -1) this.counts.disadvantages.labels.push(change.effect.link);
+  }
+
+  _applyChangeSubtract(delta, change) {
+    // Remove a source of advantage or disadvantage.
+    const remove = (labels) => {
+      const i = labels.indexOf(change.effect.link);
+      if (i >= 0) labels.splice(i, 1);
+    };
+    if (delta === 1) remove(this.counts.advantages.labels);
+    else if (delta === -1) remove(this.counts.disadvantages.labels);
   }
 
   _applyChangeOverride(delta, change) {
@@ -157,7 +167,7 @@ const SourceMixin = (superclass) =>
 
       // the Midi flag has to be true and the flag on the actor must be true (i.e. not overwritten by another change to false)
       const filterFn = (change) => change.key.startsWith("flags.midi-qol.") &&
-        ["true", "1"].includes(change.value.trim()) && foundry.utils.getProperty(actor, change.key) === true;
+        ["true", "1"].includes(String(change.value).trim()) && foundry.utils.getProperty(actor, change.key) === true;
       return getApplicableChanges(actor, filterFn)
         .map((change) => {
           change.key = change.key.substring(15);
@@ -267,7 +277,7 @@ export class InitiativeSource extends SourceMixin(InitiativeReminder) {
     const flagKeys = flags.map(flag => `flags.dnd5e.${flag}`);
     this.actor.appliedEffects
       .forEach((effect) => {
-        const hasFlag = effect.changes
+        const hasFlag = effect.system.changes
           .map(change => change.key)
           .some(key => flagKeys.includes(key));
         if (hasFlag) accumulator.advantage(effect.link);
@@ -349,7 +359,7 @@ export class CriticalSource extends SourceMixin(CriticalReminder) {
       const isCritical = lastAttack?.rolls[0]?.isCritical;
       if (isCritical) {
         const value = lastAttack.rolls[0].d20.total;
-        counts.critical.labels.push(game.i18n.format("adv-reminder.Source.Critical.nat20", { value }));
+        counts.critical.labels.push(game.i18n.localize("adv-reminder.Source.Critical.nat20", { value }));
       }
     }
   }

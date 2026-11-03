@@ -682,7 +682,7 @@ describe("AbilitySaveReminder using roll mode", () => {
   });
 
   test("saving throw with activity with a different status should be normal", () => {
-    const actor = createActorWithRollModes({ key: "flags.adv-reminder.statuses.charmed.save.roll.mode", mode: 2, value: "1" });
+    const actor = createActorWithRollModes({ key: "flags.adv-reminder.statuses.charmed.save.roll.mode", type: "add", value: 1 });
     const activity = createActivity("poisoned");
     const options = {};
 
@@ -694,7 +694,7 @@ describe("AbilitySaveReminder using roll mode", () => {
   });
 
   test("saving throw with activity with same status should be advantage", () => {
-    const actor = createActorWithRollModes({ key: "flags.adv-reminder.statuses.poisoned.save.roll.mode", mode: 2, value: "1" });
+    const actor = createActorWithRollModes({ key: "flags.adv-reminder.statuses.poisoned.save.roll.mode", type: "add", value: 1 });
     const activity = createActivity("poisoned");
     const options = {};
 
@@ -706,7 +706,7 @@ describe("AbilitySaveReminder using roll mode", () => {
   });
 
   test("saving throw with activity with same rider should be advantage", () => {
-    const actor = createActorWithRollModes({ key: "flags.adv-reminder.statuses.poisoned.save.roll.mode", mode: 2, value: "1" });
+    const actor = createActorWithRollModes({ key: "flags.adv-reminder.statuses.poisoned.save.roll.mode", type: "add", value: 1 });
     const activity = createActivity(undefined, "poisoned");
     const options = {};
 
@@ -714,6 +714,21 @@ describe("AbilitySaveReminder using roll mode", () => {
     reminder.updateOptions(options);
 
     expect(options.advantage).toBe(true);
+    expect(options.disadvantage).toBe(false);
+  });
+
+  test("saving throw with status advantage added then subtracted should be normal", () => {
+    const actor = createActorWithRollModes(
+      { key: "flags.adv-reminder.statuses.poisoned.save.roll.mode", type: "add", value: 1 },
+      { key: "flags.adv-reminder.statuses.poisoned.save.roll.mode", type: "subtract", value: 1 }
+    );
+    const activity = createActivity("poisoned");
+    const options = {};
+
+    const reminder = new AbilitySaveReminder(actor, "con", activity);
+    reminder.updateOptions(options);
+
+    expect(options.advantage).toBe(false);
     expect(options.disadvantage).toBe(false);
   });
 });

@@ -37,7 +37,7 @@ export default class SamplePackBuilder {
           const original = item.effects.contents[0];
           const update = {
             _id: original.id,
-            changes: [...original.changes, ...sampleInput.data.changes],
+            "system.changes": [...original.toObject().system.changes, ...sampleInput.data.changes],
           };
           debug("update active effect", update);
           await item.updateEmbeddedDocuments("ActiveEffect", [update]);
@@ -67,26 +67,13 @@ export default class SamplePackBuilder {
   _buildActiveEffect(item, data) {
     const template = {
       disabled: false,
-      duration: {
-        startTime: 0,
-        seconds: null,
-        rounds: null,
-        turns: null,
-        startRound: 1,
-        startTurn: 0,
-        type: "none",
-        duration: null,
-        remaining: null,
-        label: "None",
-      },
-      icon: item.img,
-      isSuppressed: false,
-      label: item.name,
+      img: item.img,
+      name: item.name,
       origin: item.uuid,
-      tint: null,
       transfer: true,
+      system: { changes: data.changes },
     };
-    return foundry.utils.mergeObject(template, data);
+    return template;
   }
 
   /**
