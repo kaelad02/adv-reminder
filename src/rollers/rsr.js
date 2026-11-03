@@ -94,6 +94,10 @@ export default class ReadySetRollHooks extends CoreRollerHooks {
     if (config[CoreRollerHooks.PROCESSED_PROP]) return;
     config[CoreRollerHooks.PROCESSED_PROP] = true;
 
+    // the saving throw hook that follows is skipped, so check for auto-fail here
+    const failChecker = new AbilitySaveFail(config.subject, config.ability);
+    if (failChecker.fails(message)) return false;
+
     const actor = config.subject;
     const abilityId = config.ability;
     if (this._doMessages(config, dialog)) {

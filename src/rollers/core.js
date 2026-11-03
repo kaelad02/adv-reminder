@@ -114,6 +114,10 @@ export default class CoreRollerHooks {
     if (config[CoreRollerHooks.PROCESSED_PROP]) return;
     config[CoreRollerHooks.PROCESSED_PROP] = true;
 
+    // the saving throw hook that follows is skipped, so check for auto-fail here
+    const failChecker = new AbilitySaveFail(config.subject, config.ability);
+    if (failChecker.fails(message)) return false;
+
     const { messages, reminder } = this.applyKeybindings(config, dialog);
 
     const actor = config.subject;
