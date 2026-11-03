@@ -1,4 +1,4 @@
-import { debug } from "./util.js";
+import { debug, setDebugMode } from "./util.js";
 
 const { DataModel } = foundry.abstract;
 const { BooleanField, ColorField, SchemaField, StringField } = foundry.data.fields;
@@ -43,8 +43,7 @@ export function initSettings() {
     scope: "client",
     config: false,
     type: ButtonStyle,
-    default: {},
-    onChange: updateStyle
+    default: {}
   });
 
   game.settings.register("adv-reminder", "showSources", {
@@ -72,54 +71,26 @@ export function initSettings() {
     type: new BooleanField({ required: true, initial: false }),
     scope: "client",
     config: false,
+    onChange: setDebugMode,
   });
-
-  migrateSettings();
-}
-
-/**
- * Migrate the old settings to the new settings.
- */
-function migrateSettings() {
-  debug("migrateSettings called");
-
-  // functions to read old settings
-  const storage = game.settings.storage.get("client");
-  const get = (key) => {
-    const item = storage.getItem(`adv-reminder.${key}`);
-    return item ? new Setting({ key: `adv-reminder.${key}`, value: item }) : undefined;
-  };
-  const remove = (key) => storage.removeItem(`adv-reminder.${key}`);
-
-  const changes = {};
-
-  const defaultButtonColor = get("defaultButtonColor");
-  if (defaultButtonColor)
-    changes["color"] = defaultButtonColor.value === "none" ? "default" : defaultButtonColor.value;
-
-  const customColor = get("customColor");
-  if (customColor)
-    changes["custom.buttonColor"] = customColor.value;
-
-  if (!foundry.utils.isEmpty(changes)) {
-    const buttonStyle = game.settings.get("adv-reminder", "buttonStyle");
-    debug("migrating buttonStyle setting", buttonStyle, changes);
-    buttonStyle.updateSource(changes);
-    game.settings.set("adv-reminder", "buttonStyle", buttonStyle);
-    remove("defaultButtonColor");
-    remove("customColor");
-  }
+  setDebugMode(game.settings.get("adv-reminder", "debugMode"));
 }
 
 export function applySettings() {
-  // initialize the color variables
-  updateStyle(game.settings.get("adv-reminder", "buttonStyle"));
-
   showSources = game.settings.get("adv-reminder", "showSources");
 }
 
-function updateStyle(buttonStyle) {
-  debug("update style called", buttonStyle);
+/**
+ * Apply the button style setting to a roll dialog. The CSS variables are set on the dialog itself, not the document
+ * root, so they also apply when the dialog is in a detached window.
+ * @param {HTMLElement} element the roll dialog's element
+ */
+export function applyButtonStyle(element) {
+  const buttonStyle = game.settings.get("adv-reminder", "buttonStyle");
+  debug("apply button style", buttonStyle);
+  if (buttonStyle.wide) element.classList.add("adv-reminder-wide");
+  if (buttonStyle.color === "default") return;
+  element.classList.add("adv-reminder-color");
 
   let color, background;
   switch (buttonStyle.color) {
@@ -138,10 +109,8 @@ function updateStyle(buttonStyle) {
   }
   debug("setStyle with", color, background);
 
-  const root = document.querySelector(":root");
-  const setStyle = (property, value) => root.style.setProperty(property, value);
-  setStyle("--adv-reminder-color", color ?? "inherit");
-  setStyle("--adv-reminder-background-color", background ?? "inherit");
+  element.style.setProperty("--adv-reminder-color", color ?? "inherit");
+  element.style.setProperty("--adv-reminder-background-color", background ?? "inherit");
 }
 
 /**
@@ -151,15 +120,15 @@ function updateStyle(buttonStyle) {
 class ButtonStyleConfig extends HandlebarsApplicationMixin(ApplicationV2) {
   constructor(options={}) {
     super(options);
-    this.#setting = options.setting ?? game.settings.get("adv-reminder", "buttonStyle");
+    // work on a copy, never on the instance cached by the settings
+    this.#setting = (options.setting ?? game.settings.get("adv-reminder", "buttonStyle")).clone();
     debug("options", options);
   }
 
   static DEFAULT_OPTIONS = {
-    //tag: "form",
+    tag: "form",
     window: {
       contentClasses: ["standard-form"],
-      contentTag: "form",
       icon: "fas fa-palette",
       title: "adv-reminder.ButtonStyle.SETTING.label"
     },
@@ -231,25 +200,11 @@ class ButtonStyleConfig extends HandlebarsApplicationMixin(ApplicationV2) {
     ];
   }
 
-  /**
-   * Workaround for "tag: form" not working correctly, use a "contentTag: form" instead but register listeners here.
-   * TODO remove in v13
-   */
-  _attachFrameListeners() {
-    super._attachFrameListeners();
-
-    const form = this.element.querySelector(".window-content");
-    form.addEventListener("submit", this._onSubmitForm.bind(this, this.options.form));
-    form.addEventListener("change", this._onChangeForm.bind(this, this.options.form));
-  }
-
   _onRender(context, options) {
     super._onRender(context, options);
 
     // set initial state of custom section
-    // TODO in v13, use this.form instead
-    const form = this.element.querySelector(".window-content");
-    this._setCustomEnabled(form);
+    this._setCustomEnabled(this.form);
   }
 
   _setCustomEnabled(form) {
@@ -269,7 +224,7 @@ class ButtonStyleConfig extends HandlebarsApplicationMixin(ApplicationV2) {
     this._setCustomEnabled(form);
     // save setting changes
     this.setting.updateSource(formData.object);
-    game.settings.set("adv-reminder", "buttonStyle", this.setting);
+    await game.settings.set("adv-reminder", "buttonStyle", this.setting.toObject());
   }
 
   static async #test(event, target) {
