@@ -1,3 +1,7 @@
+# 6.0.2
+
+- build: the release workflow can attach `module.json` and `module.zip` to the release (it lacked write permission and failed with a 403)
+
 # 6.0.1
 
 - tests: unit tests for attacks against a Prone target when the roll skips the dialog: advantage within one grid space, disadvantage beyond it or at an unknown distance, normal when the target is immune or the attacker is also Prone and adjacent
