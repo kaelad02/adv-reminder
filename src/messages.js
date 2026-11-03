@@ -1,4 +1,14 @@
-import { debug, getApplicableChanges } from "./util.js";
+import { debug, getApplicableChanges, hasMultipleTargets } from "./util.js";
+
+/**
+ * Messages come from active effects that any owner can edit, including a target's, and are rendered as HTML in the
+ * roll dialog. Strip anything unsafe before they are enriched.
+ * @param {unknown[]} messages
+ * @returns {string[]}
+ */
+export function sanitizeMessages(messages) {
+  return messages.map((message) => foundry.utils.cleanHTML(String(message)));
+}
 
 class BaseMessage {
   constructor(actor, targetActor) {
@@ -35,6 +45,9 @@ class BaseMessage {
         .map((change) => String(change.value));
       messages.push(...targetMessages);
     }
+
+    // target-based reminders only work with a single target, let the user know they were skipped
+    if (targetKeys && hasMultipleTargets()) messages.push(game.i18n.localize("adv-reminder.MultipleTargets"));
 
     if (messages.length > 0) {
       debug("messages found:", messages);

@@ -349,9 +349,6 @@ export class CriticalSource extends SourceMixin(CriticalReminder) {
   }
 
   _applyNat20(counts) {
-    // only do this check on 4.3
-    if (!foundry.utils.isNewerVersion(game.system.version, "4.2.99")) return;
-
     // check if the preceding attack roll was a critical hit
     const messageId = this.event?.currentTarget?.dataset?.messageId;
     if (messageId) {

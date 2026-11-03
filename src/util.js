@@ -1,73 +1,102 @@
+let debugMode = false;
+
+/**
+ * Cache the debugMode setting so `debug` doesn't read the setting on every call.
+ * @param {boolean} value
+ */
+export function setDebugMode(value) {
+  debugMode = !!value;
+}
+
 export function debugEnabled() {
-  return game.settings.get("adv-reminder", "debugMode");
+  return debugMode;
 }
 
 export const debug = (...args) => {
-  try {
-    if (debugEnabled()) log(...args);
-  } catch (e) {}
+  if (debugMode) log(...args);
 };
 
 export const log = (...args) => console.log("adv-reminder |", ...args);
 
 /**
- * Check if a module is active and at least a minimum version.
- * @param {string} name the module name
- * @param {string} version the minimum version
- * @returns true if the module is active and at least the minimum version, false otherwise
+ * Get the targeted actor, only if there is exactly one target. With several targets there is no way to know which
+ * one the roll is against, so target-based reminders are skipped.
+ * @returns {Actor5e|undefined} the target, if there is exactly one
  */
-export function isMinVersion(name, version) {
-  const module = game.modules.get(name);
-  return module?.active && foundry.utils.isNewerVersion(module.version, version);
+export function getTarget() {
+  const targets = game.user.targets;
+  return targets.size === 1 ? targets.first()?.actor : undefined;
 }
 
 /**
- * Get the first targeted actor, if there are any targets at all.
- * @returns {Actor5e} the first target, if there are any
+ * @returns {boolean} true if the user is targeting more than one token
  */
-export function getTarget() {
-  return [...game.user.targets][0]?.actor;
+export function hasMultipleTargets() {
+  return game.user.targets.size > 1;
+}
+
+/**
+ * The distance, in the scene's units, at which a target counts as adjacent: one grid space.
+ * @returns {number}
+ */
+export function getAdjacentDistance() {
+  return canvas?.scene?.grid?.distance ?? 5;
 }
 
 export function getDistanceToTargetFn(speaker) {
   return () => {
-    const controlledTokenDoc = game.scenes.get(speaker.scene).tokens.get(speaker.token);
-    const targetTokenDoc = game.user.targets.first()?.document;
-    if (!controlledTokenDoc || !targetTokenDoc) return Infinity;
-
-    // make rays from each controlled grid space to targeted grid space
-    const controlledSpaces = _getAllTokenGridSpaces(controlledTokenDoc);
-    const targetSpaces = _getAllTokenGridSpaces(targetTokenDoc);
-    const rays = controlledSpaces.flatMap((c) => targetSpaces.map((t) => ({ ray: new Ray(c, t) })));
-
-    // measure the horizontal distance: shortest distance between the two tokens' squares
-    const dist = canvas.scene.grid.distance;
-    const distances = canvas.grid
-      .measureDistances(rays, { gridSpaces: true })
-      .map((d) => Math.round(d / dist) * dist);
-    const horizDistance = Math.min(...distances);
-
-    // compute vertical distance: diff in elevation
-    const verticalDistance = Math.abs(controlledTokenDoc.elevation - targetTokenDoc.elevation);
-    return Math.max(horizDistance, verticalDistance);
+    const scene = game.scenes.get(speaker?.scene);
+    const controlledTokenDoc = scene?.tokens.get(speaker.token);
+    const targetTokenDoc = getTarget() ? game.user.targets.first().document : undefined;
+    if (!controlledTokenDoc || !targetTokenDoc || targetTokenDoc.parent !== scene) return Infinity;
+    return measureTokenDistance(controlledTokenDoc, targetTokenDoc);
   };
 }
 
-function _getAllTokenGridSpaces({ width, height, x, y }) {
-  // if the token is in a single space, just return that
-  if (width <= 1 && height <= 1) return [{ x, y }];
-  // create a position for each grid square it takes up
-  const grid = canvas.grid.size;
+/**
+ * Measure the distance between two tokens on the same scene, in the scene's units.
+ * Horizontal distance is between the closest pair of grid spaces (or edge to edge on a gridless scene),
+ * vertical distance is the difference in elevation, and the result is the larger of the two.
+ * @param {TokenDocument} a
+ * @param {TokenDocument} b
+ * @returns {number}
+ */
+export function measureTokenDistance(a, b) {
+  const grid = a.parent.grid;
+  const horizontal = grid.isGridless ? _edgeDistance(a, b, grid) : _closestSpaceDistance(a, b, grid);
+  const vertical = Math.abs((a.elevation ?? 0) - (b.elevation ?? 0));
+  return Math.max(horizontal, vertical);
+}
+
+function _closestSpaceDistance(a, b, grid) {
+  const aSpaces = _getTokenSpaceCenters(a, grid);
+  const bSpaces = _getTokenSpaceCenters(b, grid);
+  let min = Infinity;
+  for (const from of aSpaces) {
+    for (const to of bSpaces) min = Math.min(min, grid.measurePath([from, to]).distance);
+  }
+  return min;
+}
+
+function _getTokenSpaceCenters({ x, y, width, height }, grid) {
+  // create the center point of each grid space the token takes up
+  const columns = Math.max(1, Math.round(width));
+  const rows = Math.max(1, Math.round(height));
   const centers = [];
-  for (let w = 0; w < width; w++) {
-    for (let h = 0; h < height; h++) {
-      centers.push({
-        x: x + w * grid,
-        y: y + h * grid,
-      });
+  for (let w = 0; w < columns; w++) {
+    for (let h = 0; h < rows; h++) {
+      centers.push({ x: x + (w + 0.5) * grid.sizeX, y: y + (h + 0.5) * grid.sizeY });
     }
   }
   return centers;
+}
+
+function _edgeDistance(a, b, grid) {
+  // gap between the two tokens' rectangles, in pixels, converted to scene units
+  const gap = (aStart, aSize, bStart, bSize) => Math.max(0, bStart - (aStart + aSize), aStart - (bStart + bSize));
+  const dx = gap(a.x, a.width * grid.sizeX, b.x, b.width * grid.sizeX);
+  const dy = gap(a.y, a.height * grid.sizeY, b.y, b.height * grid.sizeY);
+  return (Math.hypot(dx, dy) / grid.size) * grid.distance;
 }
 
 /**
@@ -77,21 +106,34 @@ function _getAllTokenGridSpaces({ width, height, x, y }) {
  * @return {Object[]} array of changes, including a link back to the effect
  */
 export function getApplicableChanges(actor, filterFn = () => true) {
-  // copied from Actor#applyActiveEffects
+  // modeled after Actor#applyActiveEffects
 
-  const changes = [];
+  const candidates = [];
   for ( const effect of actor.allApplicableEffects() ) {
     if ( !effect.active ) continue;
-    changes.push(...(effect.system?.changes ?? [])
-      .filter(filterFn)  // added filter step
-      .map(change => {
-        const c = foundry.utils.deepClone(change);
-        c.effect = effect;
-        c.priority = c.priority ?? CONST.ACTIVE_EFFECT_CHANGE_TYPES[c.type] ?? 0;
-        return c;
-      }));
+    for ( const change of effect.system?.changes ?? [] ) {
+      // skip changes the core skips: no key, or ones that apply to the Token instead
+      if ( !change.key || change.key.startsWith("token.") ) continue;
+      if ( filterFn(change) ) candidates.push({ effect, change });  // added filter step
+    }
     // removed adding to this.statuses
   }
+  if ( !candidates.length ) return [];
+
+  // only build the roll data if a change needs it
+  const rollData = actor.getRollData?.() ?? {};
+  const changes = candidates
+    .filter(({ effect, change }) => effect.shouldApplyChange?.(change, {
+      phase: change.phase,
+      replacementData: effect.getReplacementData?.(rollData) ?? rollData
+    }) ?? true)
+    .map(({ effect, change }) => {
+      const c = foundry.utils.deepClone(change);
+      c.effect = effect;
+      c.priority = c.priority ?? CONST.ACTIVE_EFFECT_CHANGE_TYPES[c.type] ?? 0;
+      return c;
+    });
+
   // changes in an earlier phase apply before a later phase, regardless of priority
   const phaseOrder = (phase) => (phase === "final" ? 1 : 0);
   changes.sort((a, b) => (phaseOrder(a.phase) - phaseOrder(b.phase)) || (a.priority - b.priority));

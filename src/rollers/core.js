@@ -98,7 +98,7 @@ export default class CoreRollerHooks {
     const { messages, reminder } = this.applyKeybindings(config, dialog);
 
     const messageId = config.event?.currentTarget?.dataset?.messageId;
-    const activity = messageId ? game.messages.get(messageId).getAssociatedActivity() : undefined;
+    const activity = messageId ? game.messages.get(messageId)?.getAssociatedActivity() : undefined;
 
     if (messages) {
       new AbilitySaveMessage(actor, abilityId).addMessage(dialog);

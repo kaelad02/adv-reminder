@@ -29,6 +29,22 @@ export default function commonTestInit() {
     };
   };
 
+  /**
+   * Replace the user's targets with tokens for the given actors.
+   * @param {...object} actors
+   */
+  globalThis.setTargets = (...actors) => {
+    const targets = new Set(actors.map((actor) => ({ actor, document: { actor } })));
+    targets.first = () => targets.values().next().value;
+    game.user.targets = targets;
+  };
+
+  globalThis.game = {
+    i18n: { localize: (key) => key },
+    user: {},
+  };
+  setTargets();
+
   globalThis.CONFIG = {};
   globalThis.CONFIG.DND5E = {};
   globalThis.CONFIG.DND5E.conditionEffects = {};

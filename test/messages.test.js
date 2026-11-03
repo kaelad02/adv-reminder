@@ -6,6 +6,7 @@ import {
   DamageMessage,
   DeathSaveMessage,
   SkillMessage,
+  sanitizeMessages,
 } from "../src/messages";
 import commonTestInit from "./common.js";
 
@@ -757,5 +758,42 @@ describe("DamageMessage from target", () => {
     new DamageMessage(actor, target, activity).addMessage(options);
 
     expect(options.options["adv-reminder"].messages).toStrictEqual(["first", "second"]);
+  });
+});
+
+describe("Several targets", () => {
+  test("attack with several targets adds a notice that target reminders were skipped", () => {
+    setTargets({}, {});
+    const actor = createActorWithEffects(["flags.adv-reminder.message.attack.all", "attack message"]);
+    const options = {};
+
+    new AttackMessage(actor, undefined, createActivity("mwak", "str")).addMessage(options);
+
+    expect(options.options["adv-reminder"].messages).toStrictEqual(["attack message", "adv-reminder.MultipleTargets"]);
+    setTargets();
+  });
+
+  test("ability check with several targets does not add the notice", () => {
+    setTargets({}, {});
+    const actor = createActorWithEffects(["flags.adv-reminder.message.ability.check.all", "check message"]);
+    const options = {};
+
+    new AbilityCheckMessage(actor, "str").addMessage(options);
+
+    expect(options.options["adv-reminder"].messages).toStrictEqual(["check message"]);
+    setTargets();
+  });
+});
+
+describe("sanitizeMessages", () => {
+  test("every message goes through cleanHTML as a string", () => {
+    const cleanHTML = jest.fn((html) => html.replace(/ onerror="[^"]*"/, ""));
+    foundry.utils.cleanHTML = cleanHTML;
+
+    const result = sanitizeMessages(['<img src="x" onerror="alert(1)">', 5]);
+
+    expect(cleanHTML).toHaveBeenCalledWith('<img src="x" onerror="alert(1)">');
+    expect(cleanHTML).toHaveBeenCalledWith("5");
+    expect(result).toStrictEqual(['<img src="x">', "5"]);
   });
 });

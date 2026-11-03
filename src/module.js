@@ -1,9 +1,9 @@
 import CoreRollerHooks from "./rollers/core.js";
 import MidiRollerHooks from "./rollers/midi.js";
 import ReadySetRollHooks from "./rollers/rsr.js";
-import SamplePackBuilder from "./sample-pack.js";
-import { applySettings, ButtonStyle, initSettings } from "./settings.js";
-import { debug, debugEnabled, log } from "./util.js";
+import { applyButtonStyle, applySettings, ButtonStyle, initSettings } from "./settings.js";
+import { sanitizeMessages } from "./messages.js";
+import { debug, log } from "./util.js";
 import DaeIntegration from "./dae-integration.js";
 
 const TextEditor = foundry.applications.ux.TextEditor.implementation;
@@ -80,11 +80,6 @@ function updateConditionEffects() {
     ce.advReminderDisadvantageAttack.add("exhaustion-3");
 }
 
-Hooks.once("ready", () => {
-  // expose SamplePackBuilder
-  if (debugEnabled) window.samplePack = new SamplePackBuilder();
-});
-
 /**
  * Process the d20 roll sources of advantage/normal/disadvantage
  */
@@ -159,7 +154,8 @@ Hooks.on("renderRollConfigurationDialog", async (dialog, html) => {
   if (message) {
     // add messages right after configuration
     const configFieldset = html.querySelector('fieldset[data-application-part="configuration"]');
-    configFieldset.after(message);
+    if (configFieldset) configFieldset.after(message);
+    else html.querySelector(".window-content")?.prepend(message);
     // swap "inline-roll" class for "dialog-roll"
     const inlineRolls = html.querySelectorAll("a.inline-roll");
     inlineRolls.forEach(ir => {
@@ -182,10 +178,8 @@ Hooks.on("renderRollConfigurationDialog", async (dialog, html) => {
     });
   }
 
-  // add custom button styling by adding a class
-  const buttonStyle = game.settings.get("adv-reminder", "buttonStyle");
-  if (buttonStyle.wide) html.classList.add("adv-reminder-wide");
-  if (buttonStyle.color !== "default") html.classList.add("adv-reminder-color");
+  // add custom button styling
+  applyButtonStyle(html);
 
   // reset position in case the dialog is too tall and the buttons are off the screen
   dialog.setPosition();
@@ -196,7 +190,7 @@ async function prepareMessage(dialog) {
   if (!opt || opt.rendered) return;
 
   // get the messages and sources
-  const messages = opt.messages ?? [];
+  const messages = sanitizeMessages(opt.messages ?? []);
   const sources = opt.sources ?? [];
 
   if (messages.length || sources.length) {

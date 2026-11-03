@@ -34,9 +34,6 @@ const EvaluatedMixin = (superclass) => class extends superclass {
   _getFlags(actor) {
     if (!actor) return {};
 
-    // flags.midi.evaluated is not reliable in version 12.4.64 (last v12 version) so use 13.0.8 as the minimum version
-    //if (!isMinVersion("midi-qol", "13.0.7")) return super._getFlags(actor);
-
     // start with the normal flags and swap the Array for Set
     const flags = super._getFlags(actor);
     for (const key of Object.keys(flags)) {
