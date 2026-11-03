@@ -177,6 +177,25 @@ describe("getApplicableChanges", () => {
       expect.objectContaining({ phase: "initial" }));
   });
 
+  test("accepts a change that another module moved to a later phase", () => {
+    // like DAE, which applies some keys in the "final" phase whatever phase the change stores
+    const shouldApplyChange = (change, { phase }) => phase === (change.key === "moved" ? "final" : change.phase);
+    const actor = createActor(createEffect([
+      { key: "moved", type: "add", value: 1, phase: "initial" },
+      { key: "stays", type: "override", value: 1, phase: "initial" },
+    ], { shouldApplyChange }));
+    const changes = getApplicableChanges(actor);
+    expect(changes.map((c) => `${c.key}:${c.phase}`)).toEqual(["stays:initial", "moved:final"]);
+  });
+
+  test("never mutates the effect's own changes", () => {
+    const original = { key: "a", type: "add", value: 1, phase: "initial" };
+    const shouldApplyChange = (change) => { change.applied = true; return true; };
+    getApplicableChanges(createActor(createEffect([original], { shouldApplyChange })));
+    expect(original).not.toHaveProperty("applied");
+    expect(original).not.toHaveProperty("effect");
+  });
+
   test("does not build roll data when no change matches the filter", () => {
     const actor = createActor(createEffect([{ key: "a", type: "add", value: 1 }]));
     expect(getApplicableChanges(actor, () => false)).toEqual([]);

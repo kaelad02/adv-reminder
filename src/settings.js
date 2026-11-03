@@ -181,13 +181,9 @@ class ButtonStyleConfig extends HandlebarsApplicationMixin(ApplicationV2) {
 
     return [
       // Widen
-      {
-        outer: { field: fields.wide, value: source.wide }
-      },
+      { field: fields.wide, value: source.wide },
       // Style
-      {
-        outer: { field: fields.color, value: source.color }
-      },
+      { field: fields.color, value: source.color },
       // Custom
       {
         fieldset: true,

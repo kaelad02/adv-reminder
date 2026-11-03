@@ -122,20 +122,29 @@ export function getApplicableChanges(actor, filterFn = () => true) {
 
   // only build the roll data if a change needs it
   const rollData = actor.getRollData?.() ?? {};
-  const changes = candidates
-    .filter(({ effect, change }) => effect.shouldApplyChange?.(change, {
-      phase: change.phase,
-      replacementData: effect.getReplacementData?.(rollData) ?? rollData
-    }) ?? true)
-    .map(({ effect, change }) => {
-      const c = foundry.utils.deepClone(change);
-      c.effect = effect;
-      c.priority = c.priority ?? CONST.ACTIVE_EFFECT_CHANGE_TYPES[c.type] ?? 0;
-      return c;
-    });
+  const phases = Object.keys(foundry.documents?.ActiveEffect?.implementation?.CHANGE_PHASES ?? { initial: 0, final: 1 });
+  const changes = [];
+  for ( const { effect, change } of candidates ) {
+    // core asks every phase in turn, and modules (e.g. DAE) can move a change to another phase, so a change applies
+    // if any phase accepts it. Pass a copy since the system marks the change as applied.
+    let phase = change.phase ?? "initial";
+    if ( typeof effect.shouldApplyChange === "function" ) {
+      const replacementData = effect.getReplacementData?.(rollData) ?? rollData;
+      phase = phases.find((p) => effect.shouldApplyChange(foundry.utils.deepClone(change), { phase: p, replacementData }));
+      if ( !phase ) continue;
+    }
+    const c = foundry.utils.deepClone(change);
+    c.effect = effect;
+    c.phase = phase;
+    c.priority = c.priority ?? CONST.ACTIVE_EFFECT_CHANGE_TYPES[c.type] ?? 0;
+    changes.push(c);
+  }
 
   // changes in an earlier phase apply before a later phase, regardless of priority
-  const phaseOrder = (phase) => (phase === "final" ? 1 : 0);
+  const phaseOrder = (phase) => {
+    const i = phases.indexOf(phase);
+    return i === -1 ? phases.length : i;
+  };
   changes.sort((a, b) => (phaseOrder(a.phase) - phaseOrder(b.phase)) || (a.priority - b.priority));
   return changes;
 }
