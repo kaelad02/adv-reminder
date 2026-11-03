@@ -148,52 +148,57 @@ Hooks.on("renderDamageRollConfigurationDialog", (dialog, html) => {
 Hooks.on("renderRollConfigurationDialog", async (dialog, html) => {
   debug("renderRollConfigurationDialog hook called");
 
-  const message = await prepareMessage(dialog);
-  if (message) {
-    // add messages right after configuration
-    const configFieldset = html.querySelector('fieldset[data-application-part="configuration"]');
-    if (configFieldset) configFieldset.after(message);
-    else html.querySelector(".window-content")?.prepend(message);
-    // swap "inline-roll" class for "dialog-roll"
-    const inlineRolls = html.querySelectorAll("a.inline-roll");
-    inlineRolls.forEach(ir => {
-      debug("found inline-roll", ir);
-      ir.classList.remove("inline-roll");
-      ir.classList.add("dialog-roll");
-      // add click listener
-      ir.addEventListener("click", (event) => {
-        // get the formula from the button
-        const button = event.currentTarget;
-        const formula = button.dataset.formula;
-        debug("adding to input:", formula);
-        // add the formula to the bonus input
-        const dialogContent = button.closest(".window-content");
-        const input = dialogContent?.querySelector('.rolls input[name="roll.0.situational"]');
-        if (!input) return;
-        input.value = input.value ? `${input.value} + ${formula}` : formula;
-        // rebuild dialog (i.e. show new die icons)
-        dialog.rebuild();
-      });
-    });
-  }
-
   // add custom button styling
   applyButtonStyle(html);
+
+  const opt = dialog.options["adv-reminder"];
+  if (!opt) return;
+
+  // render the messages once per dialog, but add them on each render that lost them: a part that is rendered again
+  // while the messages are prepared would drop them
+  opt.messagesHTML ??= renderDialogMessages(opt, dialog.rolls[0]?.data ?? {});
+  const content = await opt.messagesHTML;
+  if (!content || !dialog.rendered || html.querySelector(".adv-reminder-messages")) return;
+  debug("messages", opt.messages, "sources", opt.sources, "html", content);
+
+  const message = createMessageElement(dialog, content);
+  // add messages right after configuration
+  const configFieldset = html.querySelector('fieldset[data-application-part="configuration"]');
+  if (configFieldset) configFieldset.after(message);
+  else html.querySelector(".window-content")?.prepend(message);
 
   // reset position in case the dialog is too tall and the buttons are off the screen
   dialog.setPosition();
 });
 
-async function prepareMessage(dialog) {
-  const opt = dialog.options["adv-reminder"];
-  if (!opt || opt.rendered) return;
-
-  const html = await renderDialogMessages(opt, dialog.rolls[0]?.data ?? {});
-  if (!html) return;
-  debug("messages", opt.messages, "sources", opt.sources, "html", html);
-  opt.rendered = true;
-  // turn into HTML element
+/**
+ * Turn the messages into an element, with their inline rolls adding to the roll's situational bonus.
+ * @param {RollConfigurationDialog} dialog
+ * @param {string} content the rendered messages
+ * @returns {HTMLElement}
+ */
+function createMessageElement(dialog, content) {
   const t = document.createElement("template");
-  t.innerHTML = html;
-  return t.content.firstElementChild;
+  t.innerHTML = content;
+  const message = t.content.firstElementChild;
+
+  // swap "inline-roll" class for "dialog-roll"
+  message.querySelectorAll("a.inline-roll").forEach((ir) => {
+    debug("found inline-roll", ir);
+    ir.classList.remove("inline-roll");
+    ir.classList.add("dialog-roll");
+    ir.addEventListener("click", (event) => {
+      event.preventDefault();
+      // get the formula from the button
+      const formula = event.currentTarget.dataset.formula;
+      debug("adding to input:", formula);
+      // add the formula to the bonus input
+      const input = dialog.element.querySelector('.rolls input[name="roll.0.situational"]');
+      if (!input) return;
+      input.value = input.value ? `${input.value} + ${formula}` : formula;
+      // rebuild dialog (i.e. show new die icons)
+      dialog.rebuild();
+    });
+  });
+  return message;
 }
