@@ -1,6 +1,6 @@
 {
   "name": "adv-reminder",
-  "version": "0.4.0",
+  "version": "6.0.0",
   "author": "kaelad",
   "description": "Get advantage reminders for lots of d20 rolls",
   "private": true,
@@ -8,12 +8,14 @@
   "scripts": {
     "build": "node ./utils/packs.mjs package pack",
     "unpack": "node ./utils/packs.mjs package unpack",
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "test:e2e": "node test/e2e/audit.mjs"
   },
   "devDependencies": {
     "@foundryvtt/foundryvtt-cli": "^1.0.3",
     "fancy-log": "^2.0.0",
     "jest": "^27.4.7",
+    "playwright": "^1.64.1",
     "yargs": "^17.7.2"
   }
 }
