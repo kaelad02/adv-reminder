@@ -1,8 +1,3 @@
-:root {
-  --adv-reminder-color: #191813; /* copied from --color-text-dark-primary */
-  --adv-reminder-background-color: rgba(0, 0, 0, 0.05);
-}
-
 /* Wide setting */
 .dnd5e2.roll-configuration.adv-reminder-wide .dialog-buttons button {
   flex: 2;
@@ -10,15 +5,17 @@
 .dnd5e2.roll-configuration.adv-reminder-wide .dialog-buttons button[autofocus] {
   flex: 3;
 }
-/* Color settings */
+/* Color settings, only set on the dialog when the user picked a color */
 .dnd5e2.roll-configuration.adv-reminder-color .dialog-buttons button[autofocus] {
   background-color: var(--adv-reminder-background-color);
-  border-color: var(--adv-reminder-color);
-  color: var(--adv-reminder-color);
 }
 .dnd5e2.roll-configuration.adv-reminder-color .dialog-buttons button:hover:not(:disabled),
 .dnd5e2.roll-configuration.adv-reminder-color .dialog-buttons button:focus {
   box-shadow: 0 0 5px var(--adv-reminder-background-color);
+}
+.dnd5e2.roll-configuration.adv-reminder-text-color .dialog-buttons button[autofocus] {
+  border-color: var(--adv-reminder-color);
+  color: var(--adv-reminder-color);
 }
 /* Copy the system's .inline-roll styling for .dialog-roll */
 .dnd5e2.roll-configuration a.dialog-roll {

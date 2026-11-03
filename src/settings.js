@@ -88,14 +88,16 @@ export function applySettings() {
 export function applyButtonStyle(element) {
   const buttonStyle = game.settings.get("adv-reminder", "buttonStyle");
   debug("apply button style", buttonStyle);
+
+  // start clean, the dialog may have been rendered before with another style
+  element.classList.remove("adv-reminder-wide", "adv-reminder-color", "adv-reminder-text-color");
+  element.style.removeProperty("--adv-reminder-color");
+  element.style.removeProperty("--adv-reminder-background-color");
+
   if (buttonStyle.wide) element.classList.add("adv-reminder-wide");
-  if (buttonStyle.color === "default") return;
-  element.classList.add("adv-reminder-color");
 
   let color, background;
   switch (buttonStyle.color) {
-    case "default":
-      break;
     case "player":
       background = game.user.color;
       break;
@@ -109,8 +111,15 @@ export function applyButtonStyle(element) {
   }
   debug("setStyle with", color, background);
 
-  element.style.setProperty("--adv-reminder-color", color ?? "inherit");
-  element.style.setProperty("--adv-reminder-background-color", background ?? "inherit");
+  // only override what is set, the rest keeps the system's style
+  if (background) {
+    element.classList.add("adv-reminder-color");
+    element.style.setProperty("--adv-reminder-background-color", String(background));
+  }
+  if (color) {
+    element.classList.add("adv-reminder-text-color");
+    element.style.setProperty("--adv-reminder-color", String(color));
+  }
 }
 
 /**
