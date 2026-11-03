@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "ClaudeInChromeDomain(localhost:30000)"
+    ]
+  }
+}
