@@ -12,6 +12,8 @@
 - bug fix: messages and roll modes from active effects are found when DAE moves a change to another phase, and checking them no longer marks the effect's changes as applied
 - bug fix: the sample pack builder was exposed on `window` in every world because of an always-true check
 - security: messages from active effects (including a target's) are cleaned of unsafe HTML before being shown in the roll dialog
+- security: messages in the roll dialog no longer reveal secret blocks nor embed other documents, and effect names shown as sources are never turned into inline rolls
+- bug fix: effect names with `&` or `<` were shown escaped twice in the sources (e.g. `&amp;`)
 - feature: with several targets, target-based reminders are skipped and the roll dialog says so
 - feature: active effect changes follow the V14 rules: changes without a key or for the token are ignored, and `ActiveEffect#shouldApplyChange` is respected
 - feature: button style colors are set on the roll dialog itself, so they also work in detached windows

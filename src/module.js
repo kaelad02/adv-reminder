@@ -2,11 +2,9 @@ import CoreRollerHooks from "./rollers/core.js";
 import MidiRollerHooks from "./rollers/midi.js";
 import ReadySetRollHooks from "./rollers/rsr.js";
 import { applyButtonStyle, applySettings, ButtonStyle, initSettings } from "./settings.js";
-import { sanitizeMessages } from "./messages.js";
+import { renderDialogMessages } from "./messages.js";
 import { debug, log } from "./util.js";
 import DaeIntegration from "./dae-integration.js";
-
-const TextEditor = foundry.applications.ux.TextEditor.implementation;
 
 Hooks.once("init", () => {
   log("initializing Advantage Reminder");
@@ -189,26 +187,12 @@ async function prepareMessage(dialog) {
   const opt = dialog.options["adv-reminder"];
   if (!opt || opt.rendered) return;
 
-  // get the messages and sources
-  const messages = sanitizeMessages(opt.messages ?? []);
-  const sources = opt.sources ?? [];
-
-  if (messages.length || sources.length) {
-    // build message
-    const message = await foundry.applications.handlebars.renderTemplate("modules/adv-reminder/templates/roll-dialog-messages.hbs", { messages, sources });
-    // enrich message, specifically replacing rolls
-    const enriched = await TextEditor.enrichHTML(message, {
-      secrets: true,
-      documents: true,
-      links: false,
-      rolls: true,
-      rollData: dialog.rolls[0]?.data ?? {},
-    });
-    debug("messages", messages, "enriched", enriched);
-    opt.rendered = true;
-    // turn into HTML element
-    const t = document.createElement("template");
-    t.innerHTML = enriched;
-    return t.content.firstElementChild;
-  }
+  const html = await renderDialogMessages(opt, dialog.rolls[0]?.data ?? {});
+  if (!html) return;
+  debug("messages", opt.messages, "sources", opt.sources, "html", html);
+  opt.rendered = true;
+  // turn into HTML element
+  const t = document.createElement("template");
+  t.innerHTML = html;
+  return t.content.firstElementChild;
 }

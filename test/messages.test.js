@@ -7,6 +7,7 @@ import {
   DeathSaveMessage,
   SkillMessage,
   sanitizeMessages,
+  renderDialogMessages,
 } from "../src/messages";
 import commonTestInit from "./common.js";
 
@@ -795,5 +796,58 @@ describe("sanitizeMessages", () => {
     expect(cleanHTML).toHaveBeenCalledWith('<img src="x" onerror="alert(1)">');
     expect(cleanHTML).toHaveBeenCalledWith("5");
     expect(result).toStrictEqual(['<img src="x">', "5"]);
+  });
+});
+
+describe("renderDialogMessages", () => {
+  let enrichCalls;
+
+  beforeAll(() => {
+    enrichCalls = [];
+    foundry.utils.cleanHTML = (html) => html;
+
+    foundry.applications = {
+      handlebars: { renderTemplate: async (path, data) => JSON.stringify(data) },
+      ux: {
+        TextEditor: {
+          implementation: {
+            enrichHTML: async (content, options) => {
+              enrichCalls.push({ content, options });
+              return `enriched(${content})`;
+            },
+          },
+        },
+      },
+    };
+  });
+
+  test("nothing to show renders nothing", async () => {
+    expect(await renderDialogMessages({}, {})).toBeUndefined();
+  });
+
+  test("messages are enriched without revealing secrets or embedding documents", async () => {
+    enrichCalls.length = 0;
+    await renderDialogMessages({ messages: ["<section class=\"secret\">gm only</section> [[/r 1d4]]"] }, {});
+
+    const call = enrichCalls.find((c) => c.content.includes("gm only"));
+    expect(call.options).toMatchObject({ secrets: false, embeds: false, rolls: true });
+  });
+
+  test("source labels are never turned into rolls and are cleaned", async () => {
+    enrichCalls.length = 0;
+    const cleaned = [];
+    foundry.utils.cleanHTML = (html) => {
+      cleaned.push(html);
+      return html;
+    };
+    const sources = [{ icon: "fas fa-angle-up", prefix: "prefix", labels: "@UUID[Actor.a.ActiveEffect.b]{Sword & Board [[/r 1d100]]}" }];
+    const html = await renderDialogMessages({ sources }, {});
+
+    const call = enrichCalls.find((c) => c.content.includes("1d100"));
+    // the document link enricher sets the label as text, so it must not be escaped beforehand
+    expect(call.content).toContain("Sword & Board");
+    expect(call.options).toMatchObject({ secrets: false, embeds: false, rolls: false });
+    expect(cleaned).toContain(`enriched(${sources[0].labels})`);
+    expect(html).toContain(`enriched(${sources[0].labels})`);
   });
 });

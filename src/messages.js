@@ -10,6 +10,41 @@ export function sanitizeMessages(messages) {
   return messages.map((message) => foundry.utils.cleanHTML(String(message)));
 }
 
+/**
+ * Render the messages and sources shown in a roll dialog.
+ * Messages may come from a target's effects, so they never reveal secrets nor embed other documents. Source labels hold
+ * links to effects whose names are written by users: only resolve the links (which show the name as text), never inline
+ * rolls, and clean the result.
+ * @param {object} options
+ * @param {unknown[]} [options.messages]
+ * @param {{icon: string, prefix: string, labels: string}[]} [options.sources]
+ * @param {object} rollData data for the inline rolls in the messages
+ * @returns {Promise<string|undefined>} the HTML, or undefined if there is nothing to show
+ */
+export async function renderDialogMessages({ messages = [], sources = [] }, rollData) {
+  if (!messages.length && !sources.length) return;
+
+  const TextEditor = foundry.applications.ux.TextEditor.implementation;
+  const enrich = (content, rolls) => TextEditor.enrichHTML(content, {
+    secrets: false,
+    embeds: false,
+    links: false,
+    documents: true,
+    rolls,
+    rollData,
+  });
+
+  const enrichedMessages = await Promise.all(sanitizeMessages(messages).map((message) => enrich(message, true)));
+  const enrichedSources = await Promise.all(sources.map(async (source) => ({
+    ...source,
+    labels: foundry.utils.cleanHTML(await enrich(source.labels, false)),
+  })));
+  return foundry.applications.handlebars.renderTemplate("modules/adv-reminder/templates/roll-dialog-messages.hbs", {
+    messages: enrichedMessages,
+    sources: enrichedSources,
+  });
+}
+
 class BaseMessage {
   constructor(actor, targetActor) {
     /** @type {Actor5e} */
