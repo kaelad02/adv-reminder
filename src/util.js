@@ -48,21 +48,26 @@ export function getOriginMessageId(event, message) {
 }
 
 /**
- * The distance, in the scene's units, at which a target counts as adjacent: one grid space.
+ * The distance, in the scene's units, at which a target counts as adjacent: one grid space of the scene the distance is
+ * measured on, or of the viewed scene if unknown.
+ * @param {function} [distanceFn] a function from getDistanceToTargetFn
  * @returns {number}
  */
-export function getAdjacentDistance() {
-  return canvas?.scene?.grid?.distance ?? 5;
+export function getAdjacentDistance(distanceFn) {
+  return distanceFn?.adjacentDistance ?? canvas?.scene?.grid?.distance ?? 5;
 }
 
 export function getDistanceToTargetFn(speaker) {
-  return () => {
-    const scene = game.scenes.get(speaker?.scene);
+  const scene = game.scenes.get(speaker?.scene);
+  const distanceFn = () => {
     const controlledTokenDoc = scene?.tokens.get(speaker.token);
     const targetTokenDoc = getTarget() ? game.user.targets.first().document : undefined;
     if (!controlledTokenDoc || !targetTokenDoc || targetTokenDoc.parent !== scene) return Infinity;
     return measureTokenDistance(controlledTokenDoc, targetTokenDoc);
   };
+  // adjacency is one grid space of the scene the tokens are on
+  distanceFn.adjacentDistance = scene?.grid?.distance;
+  return distanceFn;
 }
 
 /**

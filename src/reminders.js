@@ -308,7 +308,7 @@ export class AttackReminder extends BaseReminder {
       const grantAdjacentAttack = accumulator._getConditionForEffect(this.targetActor, "advReminderGrantAdjacentAttack");
       if (grantAdjacentAttack.length) {
         const distance = this.distanceFn();
-        const accumFn = distance <= getAdjacentDistance() ? accumulator.advantage.bind(accumulator) : accumulator.disadvantage.bind(accumulator);
+        const accumFn = distance <= getAdjacentDistance(this.distanceFn) ? accumulator.advantage.bind(accumulator) : accumulator.disadvantage.bind(accumulator);
         grantAdjacentAttack.forEach(accumFn);
       }
     }
@@ -656,7 +656,7 @@ export class CriticalReminder extends BaseReminder {
       const grantAdjacentCritical = accumulator._getConditionForEffect(this.targetActor, "advReminderGrantAdjacentCritical");
       if (grantAdjacentCritical.length) {
         const distance = this.distanceFn();
-        if (distance <= getAdjacentDistance()) grantAdjacentCritical.forEach(accumulator.critical.bind(accumulator));
+        if (distance <= getAdjacentDistance(this.distanceFn)) grantAdjacentCritical.forEach(accumulator.critical.bind(accumulator));
       }
     }
     this._customUpdateOptions(accumulator);

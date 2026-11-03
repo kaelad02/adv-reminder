@@ -1,5 +1,5 @@
 import { beforeAll, beforeEach, describe, expect, jest, test } from "@jest/globals";
-import { getApplicableChanges, getDistanceToTargetFn, getTarget, measureTokenDistance } from "../src/util.js";
+import { getAdjacentDistance, getApplicableChanges, getDistanceToTargetFn, getTarget, measureTokenDistance } from "../src/util.js";
 import commonTestInit from "./common.js";
 
 /**
@@ -216,5 +216,23 @@ describe("getApplicableChanges", () => {
     const effect = createEffect([{ key: "a", type: "add", value: 1 }]);
     const [change] = getApplicableChanges(createActor(effect));
     expect(change.effect).toBe(effect);
+  });
+});
+
+describe("getAdjacentDistance", () => {
+  test("one grid space of the speaker's scene, not of the scene being viewed", () => {
+    const metricScene = { grid: { ...squareGrid(), distance: 1.5 }, tokens: { get: () => undefined } };
+    game.scenes = { get: (id) => (id === "metric" ? metricScene : undefined) };
+    globalThis.canvas = { scene: { grid: squareGrid() } };
+
+    const distanceFn = getDistanceToTargetFn({ scene: "metric", token: "tokenA" });
+
+    expect(getAdjacentDistance(distanceFn)).toBe(1.5);
+  });
+
+  test("falls back on the viewed scene without a speaker's scene", () => {
+    globalThis.canvas = { scene: { grid: { distance: 2 } } };
+
+    expect(getAdjacentDistance(() => 0)).toBe(2);
   });
 });
